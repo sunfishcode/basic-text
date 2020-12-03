@@ -54,6 +54,13 @@ use non-canonical forms specifically for their unique appearance:
     - https://lists.w3.org/Archives/Public/public-i18n-core/2009JanMar/0216.html
     - https://www.w3.org/wiki/I18N/CanonicalNormalizationIssues#Problems_with_canonical_singletons
 
+At one point, the Unicode committee even
+[considered defining "variant normal forms"] which would be identical to NFC
+and NFD except for excluding these CJK Compatibility Ideographs, however did
+not end up pursuing the idea.
+
+[considered defining "variant normal forms"]: https://www.unicode.org/review/pr-7b.html
+
 [As of Unicode 6.3], all 1002 of these codepoints have standardized variations
 which allow them to be normalized into a form which records the codepoint they
 were normalized from. We use a [modified version] of the NFC algorithm
