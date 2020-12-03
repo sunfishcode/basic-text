@@ -1,0 +1,28 @@
+[package]
+name = "plain-text-fuzz"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.3.4"
+plain-text = { path = ".." }
+unicode-normalization = "0.1.16"
+
+[[bin]]
+name = "text_reader"
+path = "fuzz_targets/text_reader.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "utf8_reader"
+path = "fuzz_targets/utf8_reader.rs"
+test = false
+doc = false
+
+# Work around https://github.com/rust-lang/cargo/issues/8338
+[workspace]

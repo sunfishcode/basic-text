@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: stable
+    - run: cargo fmt --all -- --check
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [stable, windows, macos]
+        include:
+          - build: stable
+            os: ubuntu-latest
+            rust: stable
+          - build: windows
+            os: windows-latest
+            rust: stable
+          - build: macos
+            os: macos-latest
+            rust: stable
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+    - run: cargo test --workspace
+
+  test_nightly:
+    name: Test with Rust nightly
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [ubuntu, windows]
+        include:
+          - build: ubuntu
+            os: ubuntu-latest
+            rust: nightly-2020-09-21
+          - build: windows
+            os: windows-latest
+            rust: nightly-2020-09-21
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+    - run: cargo test --all-features --workspace
