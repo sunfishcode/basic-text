@@ -120,7 +120,7 @@ impl TextReaderImpl {
                 return None;
             }
             self.queue_iter = Some(NoForbiddenCharacters::new(
-                self.queue.iter().stream_safe().nfc(),
+                self.queue.iter().stream_safe().nfc_ext(),
             ));
         }
         if let Some(c) = self.queue_iter.as_mut().unwrap().next() {

@@ -123,7 +123,7 @@ impl TextWriterImpl {
         internals
             .impl_()
             .buffer
-            .extend(s.chars().stream_safe().nfc());
+            .extend(s.chars().stream_safe().nfc_ext());
 
         // Write to the underlying stream.
         Self::write_buffer(internals)
@@ -144,7 +144,7 @@ impl TextWriterImpl {
             internals
                 .impl_()
                 .buffer
-                .extend(slice.chars().stream_safe().nfc());
+                .extend(slice.chars().stream_safe().nfc_ext());
         }
 
         // Write to the underlying stream.

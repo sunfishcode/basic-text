@@ -56,12 +56,14 @@ use non-canonical forms specifically for their unique appearance:
 
 [As of Unicode 6.3], all 1002 of these codepoints have standardized variations
 which allow them to be normalized into a form which records the codepoint they
-were normalized from. We plan to use a modified version of the NFC algorithm
+were normalized from. We use a [modified version] of the NFC algorithm
 which uses these variation sequences instead of the standard canonical
 decompositions, which will produce valid NFC output, but which preserves the
 information about which specific CJK Compatibility Ideographs were used.
 
-TODO: Implement this modified NFC algorithm!
+TODO: Update this link once this PR either lands or is resolved in some other way.
+
+[modified version]: https://github.com/unicode-rs/unicode-normalization/pull/70
 
 At this time, it appears most implementations don't currently implement these
 variation sequences, so the characters in this form still unfortunately will
