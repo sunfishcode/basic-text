@@ -92,21 +92,11 @@ and theoretically could even be used for side-channel communication.
 Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
 
-## Deprecated codepoints with singleton canonical decompositions
-
-[Plain Text] special-cases the several codepoints on output, including
-U+2000 (EN QUAD), U+2126 (OHM SIGN), U+2329 (LEFT-POINTING ANGLE BRACKET),
-and similar.
-
-These codepoints were added to Unicode for the purpose of preserving
-round-trip compatibility with other character encodings. They have
-singleton canonical decompositions, which mean in NFD and NFC they
-decompose to a single codepoint, meaning Unicode considers them to be
-equivalent.
+## Deprecated unit name codepoints with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference
-to the dedicated unit characters for OHM SIGN, KELVIN SIGN, and
-ANGSTROM SIGN.
+to the dedicated unit characters for U+2126 OHM SIGN, U+212A KELVIN SIGN,
+and U+212B ANGSTROM SIGN.
 
 [recommends]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G25.14143
 

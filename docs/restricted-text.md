@@ -23,6 +23,16 @@ excessively long sequences of non-starters.
 
 TODO: If CGJ is disallowed, can we still have a way to safely concatenate?
 
+TODO: "Moderately Restricted" [isn't stable over time](https://www.unicode.org/reports/tr39/#Migration).
+
+TODO: [Mixed-Number Detection]
+
+TODO: Unicode Security Mechanisms also specifies some [Optional Detection] rules.
+
+TODO: U+2126 (OHM SIGN) normalizes to U+03A9 (GREEK CAPITAL LETTER OMEGA);
+does "Moderately Restricted" permit this Greek letter to be mixed with
+otherwise Latin script?
+
 [NFKC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Moderately Restricted]: https://www.unicode.org/reports/tr39/#Restriction_Level_Detection
 [Stream Safe Text Format]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
@@ -30,3 +40,5 @@ TODO: If CGJ is disallowed, can we still have a way to safely concatenate?
 [Section 5.3 of the Unicode Standard]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G7730
 [Section 23.8 of the Unicode Standard]: https://www.unicode.org/versions/Unicode13.0.0/ch23.pdf#G19635
 [Plain Text]: plain-text.md
+[Mixed-Number Detection]: https://www.unicode.org/reports/tr39/#Mixed_Number_Detection
+[Optional Detection]: https://www.unicode.org/reports/tr39/#Optional_Detection

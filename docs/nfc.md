@@ -128,13 +128,22 @@ According to (English) Wikipedia, this character is [infrequently encountered].
 
 Greek Wikipedia seems to use U+0387 and U+00B7 [interchangeably].
 
+The Unicode Standard, section 7.2 Greek, paragraph Compatibility Punctuation,
+addresses the display and compatibility concerns:
+
+> ISO/IEC 8859-7 and most vendor code pages for Greek simply make use of
+semicolon and middle dot for the punctuation in question. Therefore, use of
+U+037E and U+0387 is not necessary for interoperating with legacy Greek data,
+and their use is not generally encouraged for representation of Greek
+punctuation.
+
+That leaves the question of punctuation vs. identifier unaddressed though.
 Theoretically a solution to this might be to add a new codepoint to Unicode
 and transition Greek text content to using that instead of U+0387. However,
 as far as I'm aware no one has proposed this yet.
 
-This appears to be a real problem, without any solution in progress at
-this time. Since this appears to be the only such issue, it doesn't
-by itself seem to be sufficient reason not to use normalization.
+Since this appears to be the only such issue, it doesn't by itself seem to
+be sufficient reason not to use normalization.
 
 [may not be Unicode-specific]: https://www.unicode.org/mail-arch/unicode-ml/y2004-m04/0218.html
 [infrequently encountered]: https://en.wikipedia.org/wiki/Interpunct#Greek
