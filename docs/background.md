@@ -4,10 +4,11 @@
 
 [PRECIS] is mostly focused on identifiers and has several restrictions that
 are inappropriate for streams such as disallowing whitespace, but it also
-has a Freeform Class (4.3) which is similar in spirit to, and one of the
+has a [Freeform Class (4.3)] which is similar in spirit to, and one of the
 inspirations of, the formats defined here.
 
 [PRECIS]: https://tools.ietf.org/html/rfc8264
+[Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
 
 ## Newlines
 
@@ -45,7 +46,7 @@ Why not follow the [Unicode Newline Guidelines' Recommendations]?
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/standard/reports/tr13/tr13-5.html#Recommendations
 
-## NFC
+## NFC, Normalization
 
 [Is including NFC the right thing to do?](nfc.md).
 

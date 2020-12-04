@@ -22,11 +22,11 @@ At this time, it does seem to be. The following are some notes.
 
 NFC seems to be [by far the most widely used for text interchange], and mostly
 preserves the meaning of all practical Unicode text (see the following sections
-for more discussion), so it seems the best choice for the base text format.
+for more discussion), so it seems the best choice for the [Plain Text] format.
 
 Requiring that everything be compatibility-normalized can eliminate several
 cases of visual ambiguity, and NFKC is a subset of NFC, so it seems the best
-choice for the restricted text format.
+choice for the [Restricted Text] format.
 
 [by far the most widely used for text interchange]: https://sites.google.com/site/macchiato/unicode/nfc-faq#TOC-How-much-text-is-already-NFC-
 
@@ -159,3 +159,6 @@ building the foundations of a platform for the future, while the W3C is
 concerned about helping users use the Web today, so this format is more
 inclined to accept problems if they are believed to merely be limitations
 of today's environments that can be fixed.
+
+[Restricted Text]: restricted-text.md
+[Plain Text]: plain-text.md
