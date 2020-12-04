@@ -12,7 +12,7 @@ inspirations of, the formats defined here.
 
 ## Newlines
 
-We interpret U+000A, and nothing else, to mean "newline".
+We interpret U+000A, and nothing else, to mean *newline*.
 
 Why not use the CRLF convention? It's what [IETF RFCs] use, and as of
 ASCII-1986 / ECMA-6:1985 at least, its what ASCII itself uses.
@@ -40,6 +40,14 @@ Why not follow the [Unicode Newline Guidelines' Recommendations]?
  - PS and LS aren't widely recognized or used as line separators in plain text.
  - FF is debatable; leaving it out simplifies the system by reducing the set of
    things text can do, but that could be revisited.
+
+PS and LS are valid in both [Plain Text] and [Restricted Text], so higher-level
+formats can use them, however they aren't treated as newlines as far as the
+formats defined here are concerned.
+
+One of the key observations here is that, at the layers these formats are
+meant to be used, it isn't important to distinguish between paragraphs
+and lines. That's a consideration for higher-level formats.
 
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/standard/reports/tr13/tr13-5.html#Recommendations
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
