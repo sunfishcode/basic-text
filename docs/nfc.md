@@ -54,8 +54,8 @@ slightly differently.
 Users understandably expect that the difference in appearance is significant and will
 use non-canonical forms specifically for their unique appearance:
 
-    - https://lists.w3.org/Archives/Public/public-i18n-core/2009JanMar/0216.html
-    - https://www.w3.org/wiki/I18N/CanonicalNormalizationIssues#Problems_with_canonical_singletons
+ - https://lists.w3.org/Archives/Public/public-i18n-core/2009JanMar/0216.html
+ - https://www.w3.org/wiki/I18N/CanonicalNormalizationIssues#Problems_with_canonical_singletons
 
 At one point, the Unicode committee even
 [considered defining "variant normal forms"] which would be identical to NFC
@@ -102,7 +102,7 @@ An example of this is [here](https://phabricator.wikimedia.org/T7948).
 Early versions of Unicode appear to have used a confusing appearance for the
 TONOS mark, and several fonts developed at the time did as well. See:
 
-    - https://www.opoudjis.net/unicode/unicode_gkbkgd.html
+ - https://www.opoudjis.net/unicode/unicode_gkbkgd.html
 
 Unicode was updated to use a different appearance, and newer fonts seem to
 use it, and this seems to be a satisfactory solution.
@@ -144,7 +144,7 @@ by itself seem to be sufficient reason not to use normalization.
 
 The W3C says specs should not specify normalization for storage/interchange:
 
-   - https://www.w3.org/TR/charmod-norm/#normalizationChoice
+ - https://www.w3.org/TR/charmod-norm/#normalizationChoice
 
 and suggests an approach where specs normalize only when needed, and ideally
 only internally to other algorithms that need it.
