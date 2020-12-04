@@ -75,7 +75,7 @@ It's tempting to disallow tab in a similar spirit of reducing the set of
 things that text can do, however lots of text in practice uses and even
 [depends on tab], so it's not practical to disallow.
 
-[depends on tab](https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html)
+[depends on tab]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
 
 ## Backspace, Delete, Vertical Tab
 
@@ -99,7 +99,8 @@ are inappropriate for streams such as disallowing whitespace, but it also
 has a [Freeform Class (4.3)] which is similar in spirit to, and one of the
 inspirations of, the formats defined here.
 
-PRECIS doesn't permit horizontal tab characters; we [include them].
+PRECIS doesn't permit horizontal tab characters; we include them for the
+reasons mentioned above.
 
 [PRECIS]: https://tools.ietf.org/html/rfc8264
 [Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
