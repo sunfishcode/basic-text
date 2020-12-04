@@ -10,14 +10,6 @@ following steps, in order:
  - Convert all CJK Compatibility Ideograph codepoints that have corresponding
    [Standardized Variations] into their corresponding standardized variation
    sequences.
- - Replace codepoints whose use is "strongly discouraged" and which have
-   recommended replacements or compatibility decompositions:
-    - Replace U+0149 with U+02BC U+006E
-    - Replace U+0673 with U+0627 U+065F
-    - Replace U+0F77 with U+0FB2 U+0F81
-    - Replace U+0F79 with U+0FB3 U+0F81
-    - Replace U+17A3 with U+17A2
-    - Replace U+17A4 with U+17A2 U+17B6
  - Apply the [Stream-Safe Text Process (UAX15-D4)].
  - Apply `toNFC` according to the [Normalization Process for Stabilized Strings].
 
@@ -33,6 +25,14 @@ On input, the following transformations are applied:
  - U+000C (FF) is replaced by U+0020 (space)
  - All other disallowed codepoints are replaced by U+FFFD (REPLACEMENT CHARACTER).
  - Disallowed codepoint sequences are replaced by U+FFFD (REPLACEMENT CHARACTER).
+ - Replace codepoints whose use is "strongly discouraged" and which have
+   recommended replacements or compatibility decompositions:
+    - Replace U+0149 with U+02BC U+006E.
+    - Replace U+0673 with U+0627 U+065F.
+    - Replace U+0F77 with U+0FB2 U+0F81.
+    - Replace U+0F79 with U+0FB3 U+0F81.
+    - Replace U+17A3 with U+17A2.
+    - Replace U+17A4 with U+17A2 U+17B6.
 
 On output, before conversion to NFC, the following requirements are enforced:
  - If any bytes have been written to the stream, U+000A (newline) is required
