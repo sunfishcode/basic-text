@@ -17,7 +17,7 @@ for [Moderately Restricted] text, and to exclude the following codepoints:
    [Section 5.3 of the Unicode Standard].
  - Old Hangul Jamo, as defined in [Section 2.9 of RFC 5892].
 
-Note that even though this includes U+034F (COMBINING GRAPHEME JOINER), the
+Note that even though this excludes U+034F (COMBINING GRAPHEME JOINER), the
 [Stream Safe Text Format] is still required; content must simply avoid using
 excessively long sequences of non-starters.
 
