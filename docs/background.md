@@ -92,6 +92,15 @@ and theoretically could even be used for side-channel communication.
 Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
 
+## Deprecated codepoints
+
+U+0149, U+0673, U+0F77, U+0F79, U+17A3, and U+17A4 are officially deprecated,
+"their use is strongly discouraged", and they have recommended replacements.
+
+U+2329 and U+232A have canonical equivalents with diffferent appearances
+so their use is deprecated and it's not recommended to automatically replace
+them with their canonical equivalents.
+
 ## Deprecated unit name codepoints with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference
