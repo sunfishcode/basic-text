@@ -38,8 +38,7 @@ Why not follow the [Unicode Newline Guidelines' Recommendations]?
  - We generally don't know the exact usage of any *NLF*.
  - We effectively target a virtual platform where the platform *NLF* is newline.
  - PS and LS aren't widely recognized or used as line separators in plain text.
- - FF is debatable; leaving it out simplifies the system by reducing the set of
-   things text can do, but that could be revisited.
+ - FF is debatable (see below).
 
 PS and LS are valid in both [Plain Text] and [Restricted Text], so higher-level
 formats can use them, however they aren't treated as newlines as far as the
@@ -53,6 +52,26 @@ and lines. That's a consideration for higher-level formats.
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/standard/reports/tr13/tr13-5.html#Recommendations
+
+## Form feed
+
+Leaving U+000C (Form Feed) out simplifies the system by reducing the set of
+things text can do, and I imagine it's not used widely enough to be worth
+it, however this may change with further research.
+
+U+0020 is chosen for translating U+000C so that it continues to function as
+whitespace for parsing purposes, but doesn't indicate a new line or acquire any
+new meaning.
+
+## Backspace, Delete, Vertical Tab
+
+These appear in other "plain text" concepts. Here, plain text is meant
+to mean text that doesn't include control codes for cursor positioning.
+
+## Escape
+
+Escape sequences can cause a wide variety of side effects. Plain text
+shouldn't be able to have side effects.
 
 ## NFC, Normalization
 
@@ -94,6 +113,10 @@ known, all characters are either printable or have behavior relevant to
 simple text display.
 
 [Wikipedia article on plain text]: https://en.wikipedia.org/wiki/Plain_text
+
+## Relationship to Wikipedia's "text file"
+
+TODO: https://en.wikipedia.org/wiki/Text_file
 
 ## Relationship to Unicode's "plain text"
 
