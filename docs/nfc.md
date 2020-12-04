@@ -32,6 +32,9 @@ choice for the [Restricted Text] format.
 
 ## Specific concerns
 
+The following are some notes from researching situations where NFC has been
+considered to be semantically lossy.
+
 ### CJK Compatibility Ideographs
 
 Unicode includes 1002 CJK Compatibility Ideograph codepoints which were

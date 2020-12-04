@@ -1,14 +1,8 @@
 # Background
 
-## IETF RFC 8264 "PRECIS"
+## NFC, Normalization
 
-[PRECIS] is mostly focused on identifiers and has several restrictions that
-are inappropriate for streams such as disallowing whitespace, but it also
-has a [Freeform Class (4.3)] which is similar in spirit to, and one of the
-inspirations of, the formats defined here.
-
-[PRECIS]: https://tools.ietf.org/html/rfc8264
-[Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
+[Plain Text] normalizes to NFC. See [this page](nfc.md) for details.
 
 ## Newlines
 
@@ -53,29 +47,62 @@ and lines. That's a consideration for higher-level formats.
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/standard/reports/tr13/tr13-5.html#Recommendations
 
-## Form feed
+## Form Feed
 
 Leaving U+000C (Form Feed) out simplifies the system by reducing the set of
-things text can do, and I imagine it's not used widely enough to be worth
-it, however this may change with further research.
+things text can do. It does have [some uses], however it's fairly obscure and
+in many higher-level protocols it either already doesn't work or there are
+better alternatives.
+
+And, there is some ambiguity about whether U+000C is meant to position the
+cursor at the beginning of a line in the next page or at its previous column
+in the next page, and about whether it should be counted as starting a
+"new line", and it's not obviously worth the effort to try to describe what
+this control code does.
+
+And on devices where U+000C clears the current screen, that's a significant
+side effect which could interfere with the visibility of other unrelated data.
 
 U+0020 is chosen for translating U+000C so that it continues to function as
 whitespace for parsing purposes, but doesn't indicate a new line or acquire any
 new meaning.
+
+[some uses]: https://en.wikipedia.org/wiki/Page_break#Semantic_use
+
+## Horizontal Tab
+
+It's tempting to disallow tab in a similar spirit of reducing the set of
+things that text can do, however lots of text in practice uses and even
+[depends on tab], so it's not practical to disallow.
+
+[depends on tab](https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html)
 
 ## Backspace, Delete, Vertical Tab
 
 These appear in other "plain text" concepts. Here, plain text is meant
 to mean text that doesn't include control codes for cursor positioning.
 
+## Alert
+
+Ringing the terminal bell is well outside the scope for plain text,
+and theoretically could even be used for side-channel communication.
+
 ## Escape
 
 Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
 
-## NFC, Normalization
+## Relationship to IETF RFC 8264 "PRECIS"
 
-[Is including NFC the right thing to do?](nfc.md).
+[PRECIS] is mostly focused on identifiers and has several restrictions that
+are inappropriate for streams such as disallowing whitespace, but it also
+has a [Freeform Class (4.3)] which is similar in spirit to, and one of the
+inspirations of, the formats defined here.
+
+PRECIS doesn't permit horizontal tab characters; we [include them].
+
+[PRECIS]: https://tools.ietf.org/html/rfc8264
+[Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
 
 ## Relationship to POSIX Text Files and Printable Files
 
