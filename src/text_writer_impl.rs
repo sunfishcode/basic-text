@@ -1,9 +1,10 @@
 use crate::{
-    unicode::{is_normalization_form_starter, BOM, MAX_UTF8_SIZE},
+    categorize::Categorize,
+    unicode::{is_normalization_form_starter, BOM, MAX_UTF8_SIZE, SUB},
     TextReaderWriter, TextWriter, Utf8ReaderWriter, Utf8Writer, WriteWrapper,
 };
 use io_ext::{default_flush, ReadWriteExt, Status, WriteExt};
-use std::{io, mem::replace, str};
+use std::{cell::RefCell, io, mem, mem::replace, rc::Rc, str};
 use unicode_normalization::UnicodeNormalization;
 
 pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
@@ -93,10 +94,18 @@ impl TextWriterImpl {
     }
 
     #[inline]
-    pub(crate) fn write_bom<Inner: WriteExt>(inner: &mut Inner) -> io::Result<()> {
+    pub(crate) fn with_bom_compatibility<Inner: WriteExt>(
+        internals: &mut Inner,
+    ) -> io::Result<Self> {
+        let mut impl_ = Self::new();
+
         let mut bom_bytes = [0_u8; MAX_UTF8_SIZE];
         let bom_len = BOM.encode_utf8(&mut bom_bytes).len();
-        inner.write_str(unsafe { str::from_utf8_unchecked(&bom_bytes[..bom_len]) })
+        internals.write_str(unsafe { str::from_utf8_unchecked(&bom_bytes[..bom_len]) })?;
+
+        impl_.nl = NlGuard(false);
+
+        Ok(impl_)
     }
 
     /// Flush and close the underlying stream and return the underlying
@@ -120,10 +129,19 @@ impl TextWriterImpl {
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
-        internals
-            .impl_()
-            .buffer
-            .extend(s.chars().stream_safe().nfc_ext());
+        let error = Rc::new(RefCell::new(None));
+        for c in Categorize::new(s.chars(), Rc::clone(&error))
+            .svar()
+            .stream_safe()
+            .nfc()
+        {
+            // SUB indicates an error sent through the NFC iterator chain, and
+            // the Rc<RefCell<Option<io::Error>>> holds the actual error.
+            if c == SUB {
+                return Err(mem::replace(&mut *error.borrow_mut(), None).unwrap());
+            }
+            internals.impl_().buffer.push(c);
+        }
 
         // Write to the underlying stream.
         Self::write_buffer(internals)
@@ -135,16 +153,26 @@ impl TextWriterImpl {
     ) -> io::Result<()> {
         // Translate "\n" into "\r\n".
         let mut first = true;
+        let error = Rc::new(RefCell::new(None));
         for slice in s.split('\n') {
             if first {
                 first = false;
             } else {
                 internals.impl_().buffer.push_str("\r\n");
             }
-            internals
-                .impl_()
-                .buffer
-                .extend(slice.chars().stream_safe().nfc_ext());
+
+            for c in Categorize::new(slice.chars(), Rc::clone(&error))
+                .svar()
+                .stream_safe()
+                .nfc()
+            {
+                // SUB indicates an error sent through the NFC iterator chain, and
+                // the Rc<RefCell<Option<io::Error>>> holds the actual error.
+                if c == SUB {
+                    return Err(mem::replace(&mut *error.borrow_mut(), None).unwrap());
+                }
+                internals.impl_().buffer.push(c);
+            }
         }
 
         // Write to the underlying stream.
@@ -165,19 +193,6 @@ impl TextWriterImpl {
                     ));
                 }
             }
-        }
-
-        if internals
-            .impl_()
-            .buffer
-            .chars()
-            .any(|c| (c.is_control() && c != '\n' && c != '\t') || c == BOM)
-        {
-            internals.abandon();
-            return Err(io::Error::new(
-                io::ErrorKind::Other,
-                "invalid Unicode scalar value written to text stream",
-            ));
         }
 
         let buffer = replace(&mut internals.impl_().buffer, String::new());

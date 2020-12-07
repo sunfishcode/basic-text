@@ -1,5 +1,5 @@
 [package]
-name = "plain-text-fuzz"
+name = "text-streams-fuzz"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -9,7 +9,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.3.4"
-plain-text = { path = ".." }
+text-streams = { path = ".." }
 unicode-normalization = "0.1.16"
 
 [[bin]]

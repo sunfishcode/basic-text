@@ -1,9 +1,10 @@
-//! Streams of bytes, UTF-8, and plain text.
+//! Streams of UTF-8, text, and restricted text.
 
 #![deny(missing_docs)]
 
-mod no_forbidden_characters;
+mod categorize;
 mod rc_char_queue;
+mod replace_selected;
 mod text_reader;
 mod text_reader_impl;
 mod text_reader_writer;

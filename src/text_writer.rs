@@ -29,12 +29,11 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     /// stream for compatibility with consumers that require that to determine
     /// the text encoding.
     #[inline]
-    pub fn with_bom_compatibility(inner: Inner) -> io::Result<Self> {
-        let mut utf8_writer = Utf8Writer::new(inner);
-        TextWriterImpl::write_bom(&mut utf8_writer)?;
+    pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
+        let impl_ = TextWriterImpl::with_bom_compatibility(&mut inner)?;
         Ok(Self {
-            inner: utf8_writer,
-            impl_: TextWriterImpl::new(),
+            inner: Utf8Writer::new(inner),
+            impl_,
         })
     }
 
@@ -273,7 +272,7 @@ fn test_c1() {
 
 #[test]
 fn test_nfc() {
-    test("\u{212b}\n".as_bytes(), "\u{c5}\n");
+    test_error("\u{212b}\n".as_bytes());
     test("\u{c5}\n".as_bytes(), "\u{c5}\n");
     test("\u{41}\u{30a}\n".as_bytes(), "\u{c5}\n");
 }

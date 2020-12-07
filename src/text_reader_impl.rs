@@ -1,6 +1,6 @@
 use crate::{
-    no_forbidden_characters::NoForbiddenCharacters,
     rc_char_queue::{RcCharQueue, RcCharQueueIter},
+    replace_selected::ReplaceSelected,
     unicode::{
         is_normalization_form_starter, BOM, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
@@ -12,7 +12,7 @@ use io_ext::{
     default_read_vectored, ReadExt, ReadWriteExt, Status,
 };
 use std::{io, mem, str};
-use unicode_normalization::{Recompositions, StreamSafe, UnicodeNormalization};
+use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
 
 pub(crate) trait TextReaderInternals<Inner: ReadExt>: ReadExt {
     type Utf8Inner: ReadStr;
@@ -55,7 +55,7 @@ pub(crate) struct TextReaderImpl {
     queue: RcCharQueue,
 
     /// An iterator over the chars in `self.queue`.
-    queue_iter: Option<NoForbiddenCharacters<Recompositions<StreamSafe<RcCharQueueIter>>>>,
+    queue_iter: Option<ReplaceSelected<Recompositions<StreamSafe<Replacements<RcCharQueueIter>>>>>,
 
     /// The number of '\n' and '\u34f`'s in the queue.
     queued_nfc_resets: usize,
@@ -67,6 +67,9 @@ pub(crate) struct TextReaderImpl {
     /// At the beginning of a stream or after a push, expect a
     /// normalization-form starter.
     expect_starter: bool,
+
+    /// For emitting BOM at the start of a stream.
+    at_start: bool,
 
     /// Control-code and escape-sequence state machine.
     state: State,
@@ -84,6 +87,7 @@ impl TextReaderImpl {
             queued_nfc_resets: 0,
             pending_status: Status::active(),
             expect_starter: true,
+            at_start: true,
             state: State::Ground(true),
         }
     }
@@ -119,15 +123,15 @@ impl TextReaderImpl {
             if self.queue.is_empty() {
                 return None;
             }
-            self.queue_iter = Some(NoForbiddenCharacters::new(
-                self.queue.iter().stream_safe().nfc_ext(),
+            self.queue_iter = Some(ReplaceSelected::new(
+                self.queue.iter().svar().stream_safe().nfc(),
             ));
         }
         if let Some(c) = self.queue_iter.as_mut().unwrap().next() {
-            if c == Some('\n') || c == Some(CGJ) {
+            if c == '\n' || c == CGJ {
                 self.queued_nfc_resets -= 1;
             }
-            return Some(c.unwrap_or(REPL));
+            return Some(c);
         }
         self.queue_iter = None;
         None
@@ -135,9 +139,10 @@ impl TextReaderImpl {
 
     fn process_raw_string(&mut self) {
         for c in self.raw_string.chars() {
+            let at_start = mem::replace(&mut self.at_start, false);
             loop {
                 match (self.state, c) {
-                    (State::Ground(_), BOM) => self.state = State::Ground(false),
+                    (State::Ground(_), BOM) if at_start => (),
                     (State::Ground(_), '\n') => {
                         self.queue.push('\n');
                         self.queued_nfc_resets += 1;
@@ -165,6 +170,16 @@ impl TextReaderImpl {
                         self.queue.push(CGJ);
                         self.queued_nfc_resets += 1;
                         self.expect_starter = false;
+                        self.state = State::Ground(false)
+                    }
+                    (State::Ground(_), '\u{2329}') => {
+                        self.expect_starter = false;
+                        self.queue.push(REPL);
+                        self.state = State::Ground(false)
+                    }
+                    (State::Ground(_), '\u{232a}') => {
+                        self.expect_starter = false;
+                        self.queue.push(REPL);
                         self.state = State::Ground(false)
                     }
                     (State::Ground(_), mut c) => {
@@ -197,6 +212,7 @@ impl TextReaderImpl {
                         self.state = State::Ground(false)
                     }
                     (State::Esc, _) => {
+                        self.queue.push(REPL);
                         self.state = State::Ground(false);
                         continue;
                     }
@@ -269,11 +285,11 @@ impl TextReaderImpl {
         if status != Status::active() {
             match internals.impl_().state {
                 State::Ground(_) => {}
-                State::Cr => {
+                State::Cr | State::Esc => {
                     internals.impl_().queue.push(REPL);
                     internals.impl_().state = State::Ground(false);
                 }
-                State::Esc | State::CsiStart | State::Csi | State::Osc | State::Linux => {
+                State::CsiStart | State::Csi | State::Osc | State::Linux => {
                     internals.impl_().state = State::Ground(false);
                 }
             }

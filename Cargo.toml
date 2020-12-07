@@ -1,12 +1,12 @@
 [package]
-name = "plain-text"
+name = "text-streams"
 version = "0.0.0"
-description = "Library for working with plain text streams"
+description = "Library for working with text streams"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
 keywords = ["stream"]
 categories = ["os", "text-processing"]
-repository = "https://github.com/sunfishcode/plain-text"
+repository = "https://github.com/sunfishcode/text-streams"
 edition = "2018"
 readme = "README.md"
 

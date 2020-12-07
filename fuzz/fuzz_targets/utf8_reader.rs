@@ -3,8 +3,8 @@
 #[macro_use]
 extern crate libfuzzer_sys;
 
-use plain_text::{Read, StdReader, Utf8Reader};
 use std::str;
+use text_streams::{Read, StdReader, Utf8Reader};
 
 fuzz_target!(|bytes: &[u8]| {
     // Reading from a `Utf8Reader` should produce the same output as `String::from_utf8_lossy`.

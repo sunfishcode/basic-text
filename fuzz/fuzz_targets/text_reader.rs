@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate libfuzzer_sys;
 
-use plain_text::{Read, StdReader, TextReader};
+use text_streams::{Read, StdReader, TextReader};
 
 fuzz_target!(|bytes: &[u8]| {
     let input = bytes;

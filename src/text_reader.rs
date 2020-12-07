@@ -129,10 +129,10 @@ fn test_nl() {
 
 #[test]
 fn test_bom() {
-    test("\u{feff}".as_bytes(), "\n");
+    test("\u{feff}".as_bytes(), "");
     test(
         "\u{feff}hello\u{feff}world\u{feff}".as_bytes(),
-        "helloworld\n",
+        "hello\u{2060}world\u{2060}\n",
     );
 }
 
@@ -214,7 +214,7 @@ fn test_leading_nonstarters() {
 
 #[test]
 fn test_esc() {
-    test(b"\x1b", "\n");
+    test(b"\x1b", "\u{fffd}\n");
     test(b"\x1b@", "\n");
     test(b"\x1b@hello\x1b@world\x1b@", "helloworld\n");
 }

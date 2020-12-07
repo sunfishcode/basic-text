@@ -32,13 +32,13 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
     /// stream for compatibility with consumers that require that to determine
     /// the text encoding.
     #[inline]
-    pub fn with_bom_compatibility(inner: Inner) -> io::Result<Self> {
-        let mut utf8_reader_writer = Utf8ReaderWriter::new(inner);
-        TextWriterImpl::write_bom(&mut utf8_reader_writer)?;
+    pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
+        let writer_impl = TextWriterImpl::with_bom_compatibility(&mut inner)?;
+        let utf8_reader_writer = Utf8ReaderWriter::new(inner);
         Ok(Self {
             inner: utf8_reader_writer,
             reader_impl: TextReaderImpl::new(),
-            writer_impl: TextWriterImpl::new(),
+            writer_impl,
         })
     }
 

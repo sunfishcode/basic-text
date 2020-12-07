@@ -1,19 +1,19 @@
 Short version for non-lawyers:
 
-`plain-text` is triple-licensed under Apache 2.0 with the LLVM Exception,
+`text-streams` is triple-licensed under Apache 2.0 with the LLVM Exception,
 Apache 2.0, and MIT terms.
 
 
 Longer version:
 
-Copyrights in the `plain-text` project are retained by their contributors.
-No copyright assignment is required to contribute to the `plain-text`
+Copyrights in the `text-streams` project are retained by their contributors.
+No copyright assignment is required to contribute to the `text-streams`
 project.
 
 Some files include code derived from Rust's `libstd`; see the comments in
 the code for details.
 
-Except as otherwise noted (below and/or in individual files), `plain-text`
+Except as otherwise noted (below and/or in individual files), `text-streams`
 is licensed under:
 
  - the Apache License, Version 2.0, with the LLVM Exception

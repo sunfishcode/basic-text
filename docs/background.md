@@ -2,7 +2,7 @@
 
 ## NFC, Normalization
 
-[Plain Text] normalizes to NFC. See [this page](nfc.md) for details.
+[Text] normalizes to NFC. See [this page](nfc.md) for details.
 
 ## Newlines
 
@@ -34,7 +34,7 @@ Why not follow the [Unicode Newline Guidelines' Recommendations]?
  - PS and LS aren't widely recognized or used as line separators in plain text.
  - FF is debatable (see below).
 
-PS and LS are valid in both [Plain Text] and [Restricted Text], so higher-level
+PS and LS are valid in both [Text] and [Restricted Text], so higher-level
 formats can use them, however they aren't treated as newlines as far as the
 formats defined here are concerned.
 
@@ -101,13 +101,23 @@ U+2329 and U+232A have canonical equivalents with diffferent appearances
 so their use is deprecated and it's not recommended to automatically replace
 them with their canonical equivalents.
 
-## Deprecated unit name codepoints with singleton canonical decompositions
+## Not-recomended unit name codepoints with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference
 to the dedicated unit characters for U+2126 OHM SIGN, U+212A KELVIN SIGN,
 and U+212B ANGSTROM SIGN.
 
 [recommends]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G25.14143
+
+## "Forbidden" codepoints
+
+There were a few errors in the Unicode normalization algorithm in before
+Unicode 4.1. The affected codepoints and sequences are identified as
+[Forbidden Characters]. However, they are described as being very rare in
+practice, and they're corrected since Unicode 4.1 published in 2005 (and
+earlier in some cases), they're not restricted here.
+
+[Forbidden Characters]: https://unicode.org/reports/tr15/#Forbidding_Characters
 
 ## Relationship to IETF RFC 8264 "PRECIS"
 
@@ -129,8 +139,8 @@ A [*text file* in POSIX]:
  - excludes NUL
  - lines are at most `LINE_MAX` bytes long including the newline (TODO).
 
-[Plain Text] excludes NUL (it's a C0 control), and requires content to
-consist of lines which all end in newlines.
+[Text] excludes NUL (it's a C0 control), and requires content to consist of
+lines which all end in newlines.
 
 TODO: Should we have a `LINE_MAX`-like restriction?
 
@@ -138,7 +148,7 @@ A [*printable file* in POSIX] is a text file which contains no control
 codes other than [*whitespace* in POSIX] (space, tab, newline, carriage-return (TODO),
 form-feed (TODO), and vertical-tab (TODO)) and [*backspace* in POSIX] (typically U+0008) (TODO).
 
-[Plain Text] excludes most of the same control codes. It doesn't include
+[Text] excludes most of the same control codes. It doesn't include
 carriage-return, form-feed, vertical-tab, or backspace, as line printer
 commands aren't part of plain text content.
 
@@ -147,7 +157,7 @@ commands aren't part of plain text content.
 [*lines* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 [*whitespace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_442
 [*backspace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_38
-[Plain Text]: plain-text.md
+[Text]: text.md
 [Restricted Text]: restricted-text.md
 
 ## Relationship to Wikipedia's "plain text"
@@ -176,7 +186,7 @@ side effects, it often includes redundant ways to encode the same
 logical content, it includes numerous compatibility mechanisms, and
 it contains flexibility for parties with private agreements.
 
-The [Plain Text] format here is more focused on being just a plain text
+The [Text] format here is more focused on being just a plain text
 format with just enough information to permit the text to be rendered
 legibly.
 
