@@ -9,7 +9,7 @@ use unicode_normalization::UnicodeNormalization;
 
 pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
     type Utf8Inner: io::Write + WriteExt + WriteWrapper<Inner>;
-    fn impl_(&mut self) -> &mut TextWriterImpl;
+    fn impl_(&mut self) -> &mut TextOutput;
     fn utf8_inner(&mut self) -> &mut Self::Utf8Inner;
     fn into_utf8_inner(self) -> Self::Utf8Inner;
 }
@@ -17,7 +17,7 @@ pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
 impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
     type Utf8Inner = Utf8Writer<Inner>;
 
-    fn impl_(&mut self) -> &mut TextWriterImpl {
+    fn impl_(&mut self) -> &mut TextOutput {
         &mut self.impl_
     }
 
@@ -33,8 +33,8 @@ impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
 impl<Inner: ReadWriteExt> TextWriterInternals<Inner> for TextReaderWriter<Inner> {
     type Utf8Inner = Utf8ReaderWriter<Inner>;
 
-    fn impl_(&mut self) -> &mut TextWriterImpl {
-        &mut self.writer_impl
+    fn impl_(&mut self) -> &mut TextOutput {
+        &mut self.output
     }
 
     fn utf8_inner(&mut self) -> &mut Self::Utf8Inner {
@@ -46,7 +46,7 @@ impl<Inner: ReadWriteExt> TextWriterInternals<Inner> for TextReaderWriter<Inner>
     }
 }
 
-pub(crate) struct TextWriterImpl {
+pub(crate) struct TextOutput {
     /// Temporary staging buffer.
     buffer: String,
 
@@ -61,8 +61,8 @@ pub(crate) struct TextWriterImpl {
     expect_starter: bool,
 }
 
-impl TextWriterImpl {
-    /// Construct a new instance of `TextWriterImpl`.
+impl TextOutput {
+    /// Construct a new instance of `TextOutput`.
     #[inline]
     pub(crate) fn new() -> Self {
         Self {

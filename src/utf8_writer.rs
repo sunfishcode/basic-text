@@ -1,4 +1,4 @@
-use crate::utf8_writer_impl::Utf8WriterImpl;
+use crate::utf8_output::Utf8Output;
 use io_ext::{Status, WriteExt};
 use std::{io, str};
 
@@ -25,7 +25,7 @@ pub struct Utf8Writer<Inner: WriteExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
-    pub(crate) impl_: Utf8WriterImpl,
+    pub(crate) impl_: Utf8Output,
 }
 
 impl<Inner: WriteExt> Utf8Writer<Inner> {
@@ -34,7 +34,7 @@ impl<Inner: WriteExt> Utf8Writer<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner,
-            impl_: Utf8WriterImpl::new(),
+            impl_: Utf8Output::new(),
         }
     }
 }
@@ -42,40 +42,40 @@ impl<Inner: WriteExt> Utf8Writer<Inner> {
 impl<Inner: WriteExt> WriteExt for Utf8Writer<Inner> {
     #[inline]
     fn flush_with_status(&mut self, status: Status) -> io::Result<()> {
-        Utf8WriterImpl::flush_with_status(self, status)
+        Utf8Output::flush_with_status(self, status)
     }
 
     #[inline]
     fn abandon(&mut self) {
-        Utf8WriterImpl::abandon(self)
+        Utf8Output::abandon(self)
     }
 
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
-        Utf8WriterImpl::write_str(self, s)
+        Utf8Output::write_str(self, s)
     }
 }
 
 impl<Inner: WriteExt> WriteWrapper<Inner> for Utf8Writer<Inner> {
     #[inline]
     fn close_into_inner(self) -> io::Result<Inner> {
-        Utf8WriterImpl::close_into_inner(self)
+        Utf8Output::close_into_inner(self)
     }
 
     #[inline]
     fn abandon_into_inner(self) -> Inner {
-        Utf8WriterImpl::abandon_into_inner(self)
+        Utf8Output::abandon_into_inner(self)
     }
 }
 
 impl<Inner: WriteExt> io::Write for Utf8Writer<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        Utf8WriterImpl::write(self, buf)
+        Utf8Output::write(self, buf)
     }
 
     #[inline]
     fn flush(&mut self) -> io::Result<()> {
-        Utf8WriterImpl::flush(self)
+        Utf8Output::flush(self)
     }
 }

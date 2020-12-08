@@ -6,12 +6,12 @@ use io_ext::{
 use std::{cmp::min, io, str};
 
 pub(crate) trait Utf8ReaderInternals<Inner: ReadExt>: ReadExt {
-    fn impl_(&mut self) -> &mut Utf8ReaderImpl;
+    fn impl_(&mut self) -> &mut Utf8Input;
     fn inner(&mut self) -> &mut Inner;
 }
 
 impl<Inner: ReadExt> Utf8ReaderInternals<Inner> for Utf8Reader<Inner> {
-    fn impl_(&mut self) -> &mut Utf8ReaderImpl {
+    fn impl_(&mut self) -> &mut Utf8Input {
         &mut self.impl_
     }
 
@@ -21,8 +21,8 @@ impl<Inner: ReadExt> Utf8ReaderInternals<Inner> for Utf8Reader<Inner> {
 }
 
 impl<Inner: ReadWriteExt> Utf8ReaderInternals<Inner> for Utf8ReaderWriter<Inner> {
-    fn impl_(&mut self) -> &mut Utf8ReaderImpl {
-        &mut self.reader_impl
+    fn impl_(&mut self) -> &mut Utf8Input {
+        &mut self.input
     }
 
     fn inner(&mut self) -> &mut Inner {
@@ -30,14 +30,14 @@ impl<Inner: ReadWriteExt> Utf8ReaderInternals<Inner> for Utf8ReaderWriter<Inner>
     }
 }
 
-pub(crate) struct Utf8ReaderImpl {
+pub(crate) struct Utf8Input {
     /// A queue of bytes which have not been read but which have not been
     /// translated into the output yet.
     overflow: Vec<u8>,
 }
 
-impl Utf8ReaderImpl {
-    /// Construct a new instance of `Utf8ReaderImpl`.
+impl Utf8Input {
+    /// Construct a new instance of `Utf8Input`.
     #[inline]
     pub(crate) fn new() -> Self {
         Self {

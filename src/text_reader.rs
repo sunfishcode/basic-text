@@ -1,4 +1,4 @@
-use crate::{text_reader_impl::TextReaderImpl, ReadStr, Utf8Reader};
+use crate::{text_input::TextInput, ReadStr, Utf8Reader};
 use io_ext::{ReadExt, Status};
 use std::{io, str};
 
@@ -10,7 +10,7 @@ pub struct TextReader<Inner: ReadExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Reader<Inner>,
 
-    pub(crate) impl_: TextReaderImpl,
+    pub(crate) impl_: TextInput,
 }
 
 impl<Inner: ReadExt> TextReader<Inner> {
@@ -19,7 +19,7 @@ impl<Inner: ReadExt> TextReader<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner: Utf8Reader::new(inner),
-            impl_: TextReaderImpl::new(),
+            impl_: TextInput::new(),
         }
     }
 }
@@ -27,52 +27,52 @@ impl<Inner: ReadExt> TextReader<Inner> {
 impl<Inner: ReadExt> ReadExt for TextReader<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
-        TextReaderImpl::read_with_status(self, buf)
+        TextInput::read_with_status(self, buf)
     }
 }
 
 impl<Inner: ReadExt + ReadStr> ReadStr for TextReader<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
-        TextReaderImpl::read_str(self, buf)
+        TextInput::read_str(self, buf)
     }
 
     #[inline]
     fn read_exact_str(&mut self, buf: &mut str) -> io::Result<()> {
-        TextReaderImpl::read_exact_str(self, buf)
+        TextInput::read_exact_str(self, buf)
     }
 }
 
 impl<Inner: ReadExt> io::Read for TextReader<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        TextReaderImpl::read(self, buf)
+        TextInput::read(self, buf)
     }
 
     #[inline]
     fn read_vectored(&mut self, bufs: &mut [io::IoSliceMut<'_>]) -> io::Result<usize> {
-        TextReaderImpl::read_vectored(self, bufs)
+        TextInput::read_vectored(self, bufs)
     }
 
     #[cfg(feature = "nightly")]
     #[inline]
     fn is_read_vectored(&self) -> bool {
-        TextReaderImpl::is_read_vectored(self)
+        TextInput::is_read_vectored(self)
     }
 
     #[inline]
     fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
-        TextReaderImpl::read_to_end(self, buf)
+        TextInput::read_to_end(self, buf)
     }
 
     #[inline]
     fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
-        TextReaderImpl::read_to_string(self, buf)
+        TextInput::read_to_string(self, buf)
     }
 
     #[inline]
     fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
-        TextReaderImpl::read_exact(self, buf)
+        TextInput::read_exact(self, buf)
     }
 }
 
@@ -144,8 +144,8 @@ fn test_crlf() {
 
 #[test]
 fn test_cr_plain() {
-    test(b"\r", "\u{fffd}\n");
-    test(b"\rhello\rworld\r", "\u{fffd}hello\u{fffd}world\u{fffd}\n");
+    test(b"\r", "\n");
+    test(b"\rhello\rworld\r", "\nhello\nworld\n");
 }
 
 #[test]
@@ -184,7 +184,7 @@ fn test_non_text_c0() {
 fn test_c1() {
     test(
         "\u{80}\u{81}\u{82}\u{83}\u{84}\u{85}\u{86}\u{87}".as_bytes(),
-        "\u{fffd}\u{fffd}\u{fffd}\u{fffd}\u{fffd}\u{fffd}\u{fffd}\u{fffd}\n",
+        "\u{fffd}\u{fffd}\u{fffd}\u{fffd}\u{fffd} \u{fffd}\u{fffd}\n",
     );
     test(
         "\u{88}\u{89}\u{8a}\u{8b}\u{8c}\u{8d}\u{8e}\u{8f}".as_bytes(),

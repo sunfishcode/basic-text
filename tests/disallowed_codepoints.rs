@@ -1,7 +1,8 @@
-pub const DISALLOWED_CODEPOINTS: [char; 267] = [
+pub const DISALLOWED_CODEPOINTS: [char; 266] = [
     // All C0, U+007F, and C1 control codes other than U+000A (newline),
-    // U+0009 (horizontal tab), U+000C (form feed), U+0007 (alert), and
-    // U+001b (escape).
+    // U+0009 (horizontal tab), U+000D (carriage return), U+000C (form feed),
+    // U+0007 (alert), U+001B (escape) and U+0085 (NEL). Many of these are
+    // nonetheless disallowed, but handled via different mechanisms.
     '\0',
     '\u{1}',
     '\u{2}',
@@ -12,7 +13,6 @@ pub const DISALLOWED_CODEPOINTS: [char; 267] = [
     '\u{7}',
     '\u{8}',
     '\u{b}',
-    '\r',
     '\u{e}',
     '\u{f}',
     '\u{10}',
@@ -26,6 +26,7 @@ pub const DISALLOWED_CODEPOINTS: [char; 267] = [
     '\u{18}',
     '\u{19}',
     '\u{1a}',
+    '\u{1b}',
     '\u{1c}',
     '\u{1d}',
     '\u{1e}',
@@ -36,7 +37,6 @@ pub const DISALLOWED_CODEPOINTS: [char; 267] = [
     '\u{82}',
     '\u{83}',
     '\u{84}',
-    '\u{85}',
     '\u{86}',
     '\u{87}',
     '\u{88}',

@@ -1,4 +1,4 @@
-use crate::{text_writer_impl::TextWriterImpl, Utf8Writer, WriteWrapper};
+use crate::{text_output::TextOutput, Utf8Writer, WriteWrapper};
 use io_ext::{Status, WriteExt};
 use std::{io, str};
 
@@ -12,7 +12,7 @@ pub struct TextWriter<Inner: WriteExt> {
     pub(crate) inner: Utf8Writer<Inner>,
 
     /// Temporary staging buffer.
-    pub(crate) impl_: TextWriterImpl,
+    pub(crate) impl_: TextOutput,
 }
 
 impl<Inner: WriteExt> TextWriter<Inner> {
@@ -21,7 +21,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner: Utf8Writer::new(inner),
-            impl_: TextWriterImpl::new(),
+            impl_: TextOutput::new(),
         }
     }
 
@@ -30,7 +30,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     /// the text encoding.
     #[inline]
     pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
-        let impl_ = TextWriterImpl::with_bom_compatibility(&mut inner)?;
+        let impl_ = TextOutput::with_bom_compatibility(&mut inner)?;
         Ok(Self {
             inner: Utf8Writer::new(inner),
             impl_,
@@ -51,7 +51,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
         Self {
             inner: Utf8Writer::new(inner),
-            impl_: TextWriterImpl::with_crlf_compatibility(),
+            impl_: TextOutput::with_crlf_compatibility(),
         }
     }
 
@@ -59,55 +59,55 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     /// stream object.
     #[inline]
     pub fn close_into_inner(self) -> io::Result<Inner> {
-        TextWriterImpl::close_into_inner(self)
+        TextOutput::close_into_inner(self)
     }
 
     /// Discard and close the underlying stream and return the underlying
     /// stream object.
     #[inline]
     pub fn abandon_into_inner(self) -> Inner {
-        TextWriterImpl::abandon_into_inner(self)
+        TextOutput::abandon_into_inner(self)
     }
 }
 
 impl<Inner: WriteExt> WriteExt for TextWriter<Inner> {
     #[inline]
     fn flush_with_status(&mut self, status: Status) -> io::Result<()> {
-        TextWriterImpl::flush_with_status(self, status)
+        TextOutput::flush_with_status(self, status)
     }
 
     #[inline]
     fn abandon(&mut self) {
-        TextWriterImpl::abandon(self)
+        TextOutput::abandon(self)
     }
 
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
-        TextWriterImpl::write_str(self, s)
+        TextOutput::write_str(self, s)
     }
 }
 
 impl<Inner: WriteExt> WriteWrapper<Inner> for TextWriter<Inner> {
     #[inline]
     fn close_into_inner(self) -> io::Result<Inner> {
-        TextWriterImpl::close_into_inner(self)
+        TextOutput::close_into_inner(self)
     }
 
     #[inline]
     fn abandon_into_inner(self) -> Inner {
-        TextWriterImpl::abandon_into_inner(self)
+        TextOutput::abandon_into_inner(self)
     }
 }
 
 impl<Inner: WriteExt> io::Write for TextWriter<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        TextWriterImpl::write(self, buf)
+        TextOutput::write(self, buf)
     }
 
     #[inline]
     fn flush(&mut self) -> io::Result<()> {
-        TextWriterImpl::flush(self)
+        TextOutput::flush(self)
     }
 }
 

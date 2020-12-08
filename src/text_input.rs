@@ -2,7 +2,7 @@ use crate::{
     rc_char_queue::{RcCharQueue, RcCharQueueIter},
     replace_selected::ReplaceSelected,
     unicode::{
-        is_normalization_form_starter, BOM, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE,
+        is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
     },
     ReadStr, TextReader, TextReaderWriter, Utf8Reader, Utf8ReaderWriter,
@@ -16,14 +16,14 @@ use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNor
 
 pub(crate) trait TextReaderInternals<Inner: ReadExt>: ReadExt {
     type Utf8Inner: ReadStr;
-    fn impl_(&mut self) -> &mut TextReaderImpl;
+    fn impl_(&mut self) -> &mut TextInput;
     fn inner(&mut self) -> &mut Self::Utf8Inner;
 }
 
 impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
     type Utf8Inner = Utf8Reader<Inner>;
 
-    fn impl_(&mut self) -> &mut TextReaderImpl {
+    fn impl_(&mut self) -> &mut TextInput {
         &mut self.impl_
     }
 
@@ -35,8 +35,8 @@ impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
 impl<Inner: ReadWriteExt> TextReaderInternals<Inner> for TextReaderWriter<Inner> {
     type Utf8Inner = Utf8ReaderWriter<Inner>;
 
-    fn impl_(&mut self) -> &mut TextReaderImpl {
-        &mut self.reader_impl
+    fn impl_(&mut self) -> &mut TextInput {
+        &mut self.input
     }
 
     fn inner(&mut self) -> &mut Self::Utf8Inner {
@@ -44,7 +44,7 @@ impl<Inner: ReadWriteExt> TextReaderInternals<Inner> for TextReaderWriter<Inner>
     }
 }
 
-pub(crate) struct TextReaderImpl {
+pub(crate) struct TextInput {
     /// Temporary storage for reading scalar values from the underlying stream.
     raw_string: String,
 
@@ -75,8 +75,8 @@ pub(crate) struct TextReaderImpl {
     state: State,
 }
 
-impl TextReaderImpl {
-    /// Construct a new instance of `TextReaderImpl`.
+impl TextInput {
+    /// Construct a new instance of `TextInput`.
     #[inline]
     pub fn new() -> Self {
         let queue = RcCharQueue::new();
@@ -154,7 +154,7 @@ impl TextReaderImpl {
                         self.expect_starter = false;
                         self.state = State::Ground(false)
                     }
-                    (State::Ground(_), FF) => {
+                    (State::Ground(_), FF) | (State::Ground(_), NEL) => {
                         self.queue.push(' ');
                         self.expect_starter = false;
                         self.state = State::Ground(false)
@@ -200,15 +200,17 @@ impl TextReaderImpl {
                         self.state = State::Ground(true);
                     }
                     (State::Cr, _) => {
-                        self.queue.push(REPL);
+                        self.queue.push('\n');
+                        self.queued_nfc_resets += 1;
                         self.expect_starter = false;
-                        self.state = State::Ground(false);
+                        self.state = State::Ground(true);
                         continue;
                     }
 
                     (State::Esc, '[') => self.state = State::CsiStart,
                     (State::Esc, ']') => self.state = State::Osc,
-                    (State::Esc, c) if ('@'..='~').contains(&c) => {
+                    (State::Esc, ESC) => self.state = State::Esc,
+                    (State::Esc, c) if matches!(c, '@'..='~' | CAN) => {
                         self.state = State::Ground(false)
                     }
                     (State::Esc, _) => {
@@ -218,21 +220,23 @@ impl TextReaderImpl {
                     }
 
                     (State::CsiStart, '[') => self.state = State::Linux,
-                    (State::CsiStart, c) | (State::Csi, c) if (' '..='?').contains(&c) => {
+                    (State::CsiStart, c) | (State::Csi, c) if matches!(c, ' '..='?') => {
                         self.state = State::Csi
                     }
-                    (State::CsiStart, c) | (State::Csi, c) if ('@'..='~').contains(&c) => {
+                    (State::CsiStart, c) | (State::Csi, c) if matches!(c, '@'..='~') => {
                         self.state = State::Ground(false)
                     }
+                    (State::CsiStart, CAN) | (State::Csi, CAN) => self.state = State::Ground(false),
                     (State::CsiStart, _) | (State::Csi, _) => {
                         self.state = State::Ground(false);
                         continue;
                     }
 
-                    (State::Osc, c) if !c.is_control() || c == '\n' || c == '\t' => (),
-                    (State::Osc, _) => self.state = State::Ground(false),
+                    (State::Osc, BEL) | (State::Osc, CAN) => self.state = State::Ground(false),
+                    (State::Osc, ESC) => self.state = State::Esc,
+                    (State::Osc, _) => (),
 
-                    (State::Linux, c) if ('\0'..=DEL).contains(&c) => {
+                    (State::Linux, c) if matches!(c, '\0'..=DEL) => {
                         self.state = State::Ground(false)
                     }
                     (State::Linux, _) => {
@@ -285,7 +289,12 @@ impl TextReaderImpl {
         if status != Status::active() {
             match internals.impl_().state {
                 State::Ground(_) => {}
-                State::Cr | State::Esc => {
+                State::Cr => {
+                    internals.impl_().queue.push('\n');
+                    internals.impl_().queued_nfc_resets += 1;
+                    internals.impl_().state = State::Ground(true);
+                }
+                State::Esc => {
                     internals.impl_().queue.push(REPL);
                     internals.impl_().state = State::Ground(false);
                 }

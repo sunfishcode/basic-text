@@ -19,11 +19,11 @@ On input, after conversion to NFC:
  - If the stream starts with U+FEFF (BOM), it is removed.
  - Replace:
    - U+000D (CR) U+000A (LF) with U+000A (newline)
-   - *Disallowed codepoints* with U+FFFD (REPLACEMENT CHARACTER)
-   - U+0007 (BEL) with U+FFFD (REPLACEMENT CHARACTER)
+   - U+000D (CR) not followed by U+000A with U+000A (newline)
    - U+000C (FF) with U+0020 (SP)
-   - U+001B (ESC) as part of an *escape sequence* with nothing
-   - U+001B (ESC) otherwise with U+FFFD (REPLACEMENT CHARACTER)
+   - U+0085 (NEL) with U+0020 (SP)
+   - U+001B (ESC) when part of an *escape sequence* with nothing
+   - *Disallowed codepoints* with U+FFFD (REPLACEMENT CHARACTER)
    - U+0149 with U+02BC U+006E
    - U+0673 with U+0627 U+065F
    - U+0F77 with U+0FB2 U+0F81
@@ -58,9 +58,8 @@ On output, before conversion to NFC:
    codepoint is not U+000A, fail.
 
 The *disallowed codepoints* are:
- - All C0, U+007F, and C1 control codes other than U+000A (newline),
-   U+0009 (horizontal tab), U+000C (form feed), U+001B (escape), and
-   U+0007 (alert)
+ - All C0, U+007F, and C1 control codes other than U+000A (newline)
+   and U+0009 (horizontal tab).
  - [Noncharacters]
  - [Deprecated Format Characters]
  - [Private-Use Characters]
@@ -72,10 +71,10 @@ An *escape sequence* is any of the following sequences, all of which start with
 U+001B (ESC). If multiple rules match, the longest match is chosen.
 
 ```
-U+001B U+005B [U+0020–U+003F]* [U+0040–U+007E]?
-U+001B U+005D [^U+0007,U+0018,U+001B]* [U+0007,U+0018]?
-U+001B [U+0040–U+007E]?
-U+001B U+005B U+005B [U+0000–U+007F]?
+U+001B+ U+005B [U+0020–U+003F]* [U+0040–U+007E]?
+U+001B+ U+005D [^U+0007,U+0018,U+001B]* [U+0007,U+0018]?
+U+001B+ [U+0040–U+007E]?
+U+001B+ U+005B U+005B [U+0000–U+007F]?
 ```
 
 ## TODOs

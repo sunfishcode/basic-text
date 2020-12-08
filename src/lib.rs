@@ -5,17 +5,17 @@
 mod categorize;
 mod rc_char_queue;
 mod replace_selected;
+mod text_input;
+mod text_output;
 mod text_reader;
-mod text_reader_impl;
 mod text_reader_writer;
 mod text_writer;
-mod text_writer_impl;
 mod unicode;
+mod utf8_input;
+mod utf8_output;
 mod utf8_reader;
-mod utf8_reader_impl;
 mod utf8_reader_writer;
 mod utf8_writer;
-mod utf8_writer_impl;
 
 pub use text_reader::TextReader;
 pub use text_reader_writer::TextReaderWriter;

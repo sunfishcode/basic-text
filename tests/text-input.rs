@@ -33,11 +33,16 @@ fn test_text_input_rules() {
     assert_eq!(to_text("\u{feff}hello"), "hello\n");
 
     // Replace U+000D U+000A with U+000A (newline).
-    assert_eq!(to_text("\r"), "\u{fffd}\n");
-    assert_eq!(to_text("\rhello\n"), "\u{fffd}hello\n");
     assert_eq!(to_text("\r\n"), "\n");
-    assert_eq!(to_text("\n\r"), "\n\u{fffd}\n");
+    assert_eq!(to_text("hello\r\n"), "hello\n");
     assert_eq!(to_text("hello\r\nworld"), "hello\nworld\n");
+
+    // Replace U+000D (CR) not followed by U+000A with U+000A (newline).
+    assert_eq!(to_text("\r"), "\n");
+    assert_eq!(to_text("\rhello\n"), "\nhello\n");
+    assert_eq!(to_text("\rhello\r"), "\nhello\n");
+    assert_eq!(to_text("hello\rworld"), "hello\nworld\n");
+    assert_eq!(to_text("\n\r"), "\n\n");
 
     // *Disallowed codepoints* with U+FFFD (REPLACEMENT CHARACTER)
     for c in &DISALLOWED_CODEPOINTS {
@@ -76,6 +81,12 @@ fn test_text_input_rules() {
     assert_eq!(to_text("\n\u{c}\n"), "\n \n");
     assert_eq!(to_text("hello\u{c}world"), "hello world\n");
 
+    // Replace U+0085 (NEL) with U+0020 (SP).
+    assert_eq!(to_text("\u{85}"), " \n");
+    assert_eq!(to_text("\u{85}\n"), " \n");
+    assert_eq!(to_text("\n\u{85}\n"), "\n \n");
+    assert_eq!(to_text("hello\u{85}world"), "hello world\n");
+
     // Replace U+001B (ESC) as part of an *escape sequence* with nothing.
     assert_eq!(to_text("\u{1b}["), "\n");
     assert_eq!(to_text("\u{1b}[A"), "\n");
@@ -86,13 +97,22 @@ fn test_text_input_rules() {
     assert_eq!(to_text("\u{1b}[++"), "\n");
     assert_eq!(to_text("\u{1b}[++A"), "\n");
     assert_eq!(to_text("\u{1b}[++AB"), "B\n");
+    assert_eq!(to_text("\u{1b}[\u{18}A"), "A\n");
+    assert_eq!(to_text("\u{1b}[\u{1b}AB"), "B\n");
     assert_eq!(to_text("\u{1b}]\u{7}"), "\n");
+    assert_eq!(to_text("\u{1b}]\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}]A\u{7}"), "\n");
+    assert_eq!(to_text("\u{1b}]A\u{18}"), "\n");
+    assert_eq!(to_text("\u{1b}]A\u{1b}[BC"), "C\n");
+    assert_eq!(to_text("\u{1b}]A\u{1b}]CD\u{7}E"), "E\n");
     assert_eq!(to_text("\u{1b}]A\n\tB၌\u{7}"), "\n");
+    assert_eq!(to_text("\u{1b}]A\n\tB၌\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}]\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}]A\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}]A\n\tB၌\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}A"), "\n");
+    assert_eq!(to_text("\u{1b}\u{18}"), "\n");
+    assert_eq!(to_text("\u{1b}\u{1b}A"), "\n");
     assert_eq!(to_text("\u{1b}A\n"), "\n");
     assert_eq!(to_text("\u{1b}\t"), "\u{fffd}\t\n");
     assert_eq!(to_text("\u{1b}\n"), "\u{fffd}\n");
@@ -102,6 +122,9 @@ fn test_text_input_rules() {
     assert_eq!(to_text("\u{1b}[[\u{7f}"), "\n");
     assert_eq!(to_text("\u{1b}[[\n"), "\n");
     assert_eq!(to_text("\u{1b}[[A\n"), "\n");
+    assert_eq!(to_text("\u{1b}[[\u{18}"), "\n");
+    assert_eq!(to_text("\u{1b}[[\u{7}"), "\n");
+    assert_eq!(to_text("\u{1b}[[\u{1b}A"), "A\n");
 
     // Replace U+001B (ESC) otherwise with U+FFFD (REPLACEMENT CHARACTER).
     assert_eq!(to_text("\u{1b}"), "\u{fffd}\n");

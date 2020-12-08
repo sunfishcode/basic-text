@@ -5,13 +5,13 @@ use std::{io, str};
 pub(crate) trait Utf8WriterInternals<Inner: WriteExt>:
     WriteExt + WriteWrapper<Inner>
 {
-    fn impl_(&mut self) -> &mut Utf8WriterImpl;
+    fn impl_(&mut self) -> &mut Utf8Output;
     fn inner(&mut self) -> &mut Inner;
     fn into_inner(self) -> Inner;
 }
 
 impl<Inner: WriteExt> Utf8WriterInternals<Inner> for Utf8Writer<Inner> {
-    fn impl_(&mut self) -> &mut Utf8WriterImpl {
+    fn impl_(&mut self) -> &mut Utf8Output {
         &mut self.impl_
     }
 
@@ -25,8 +25,8 @@ impl<Inner: WriteExt> Utf8WriterInternals<Inner> for Utf8Writer<Inner> {
 }
 
 impl<Inner: ReadWriteExt> Utf8WriterInternals<Inner> for Utf8ReaderWriter<Inner> {
-    fn impl_(&mut self) -> &mut Utf8WriterImpl {
-        &mut self.writer_impl
+    fn impl_(&mut self) -> &mut Utf8Output {
+        &mut self.output
     }
 
     fn inner(&mut self) -> &mut Inner {
@@ -38,10 +38,10 @@ impl<Inner: ReadWriteExt> Utf8WriterInternals<Inner> for Utf8ReaderWriter<Inner>
     }
 }
 
-pub(crate) struct Utf8WriterImpl {}
+pub(crate) struct Utf8Output {}
 
-impl Utf8WriterImpl {
-    /// Construct a new instance of `Utf8WriterImpl`.
+impl Utf8Output {
+    /// Construct a new instance of `Utf8Output`.
     #[inline]
     pub(crate) fn new() -> Self {
         Self {}

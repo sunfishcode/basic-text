@@ -1,6 +1,5 @@
 use crate::{
-    text_reader_impl::TextReaderImpl, text_writer_impl::TextWriterImpl, ReadStr, Utf8ReaderWriter,
-    WriteWrapper,
+    text_input::TextInput, text_output::TextOutput, ReadStr, Utf8ReaderWriter, WriteWrapper,
 };
 use io_ext::{
     default_read, default_read_exact, default_read_to_end, default_read_to_string,
@@ -13,8 +12,8 @@ pub struct TextReaderWriter<Inner: ReadWriteExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8ReaderWriter<Inner>,
 
-    pub(crate) reader_impl: TextReaderImpl,
-    pub(crate) writer_impl: TextWriterImpl,
+    pub(crate) input: TextInput,
+    pub(crate) output: TextOutput,
 }
 
 impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
@@ -23,8 +22,8 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner: Utf8ReaderWriter::new(inner),
-            reader_impl: TextReaderImpl::new(),
-            writer_impl: TextWriterImpl::new(),
+            input: TextInput::new(),
+            output: TextOutput::new(),
         }
     }
 
@@ -33,12 +32,12 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
     /// the text encoding.
     #[inline]
     pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
-        let writer_impl = TextWriterImpl::with_bom_compatibility(&mut inner)?;
+        let output = TextOutput::with_bom_compatibility(&mut inner)?;
         let utf8_reader_writer = Utf8ReaderWriter::new(inner);
         Ok(Self {
             inner: utf8_reader_writer,
-            reader_impl: TextReaderImpl::new(),
-            writer_impl,
+            input: TextInput::new(),
+            output,
         })
     }
 
@@ -56,8 +55,8 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
         Self {
             inner: Utf8ReaderWriter::new(inner),
-            reader_impl: TextReaderImpl::new(),
-            writer_impl: TextWriterImpl::with_crlf_compatibility(),
+            input: TextInput::new(),
+            output: TextOutput::with_crlf_compatibility(),
         }
     }
 
@@ -65,26 +64,26 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
     /// stream object.
     #[inline]
     pub fn close_into_inner(self) -> io::Result<Inner> {
-        TextWriterImpl::close_into_inner(self)
+        TextOutput::close_into_inner(self)
     }
 
     /// Discard and close the underlying stream and return the underlying
     /// stream object.
     #[inline]
     pub fn abandon_into_inner(self) -> Inner {
-        TextWriterImpl::abandon_into_inner(self)
+        TextOutput::abandon_into_inner(self)
     }
 }
 
 impl<Inner: ReadWriteExt> ReadExt for TextReaderWriter<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
-        let size_and_status = TextReaderImpl::read_with_status(self, buf)?;
+        let size_and_status = TextInput::read_with_status(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
         // ended with a newline.
         if size_and_status.0 != 0 {
-            TextWriterImpl::newline(self, buf.get(size_and_status.0 - 1).copied() == Some(b'\n'));
+            TextOutput::newline(self, buf.get(size_and_status.0 - 1).copied() == Some(b'\n'));
         }
 
         Ok(size_and_status)
@@ -94,12 +93,12 @@ impl<Inner: ReadWriteExt> ReadExt for TextReaderWriter<Inner> {
 impl<Inner: ReadWriteExt> ReadStr for TextReaderWriter<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
-        let size_and_status = TextReaderImpl::read_str(self, buf)?;
+        let size_and_status = TextInput::read_str(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
         // ended with a newline.
         if size_and_status.0 != 0 {
-            TextWriterImpl::newline(
+            TextOutput::newline(
                 self,
                 buf.as_bytes().get(size_and_status.0 - 1).copied() == Some(b'\n'),
             );
@@ -110,11 +109,11 @@ impl<Inner: ReadWriteExt> ReadStr for TextReaderWriter<Inner> {
 
     #[inline]
     fn read_exact_str(&mut self, buf: &mut str) -> io::Result<()> {
-        TextReaderImpl::read_exact_str(self, buf)?;
+        TextInput::read_exact_str(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
         // ended with a newline.
-        TextWriterImpl::newline(
+        TextOutput::newline(
             self,
             buf.as_bytes().get(buf.len() - 1).copied() == Some(b'\n'),
         );
@@ -137,7 +136,7 @@ impl<Inner: ReadWriteExt> io::Read for TextReaderWriter<Inner> {
     #[cfg(feature = "nightly")]
     #[inline]
     fn is_read_vectored(&self) -> bool {
-        TextReaderImpl::is_read_vectored(self)
+        TextInput::is_read_vectored(self)
     }
 
     #[inline]
@@ -159,17 +158,17 @@ impl<Inner: ReadWriteExt> io::Read for TextReaderWriter<Inner> {
 impl<Inner: ReadWriteExt> WriteExt for TextReaderWriter<Inner> {
     #[inline]
     fn flush_with_status(&mut self, status: Status) -> io::Result<()> {
-        TextWriterImpl::flush_with_status(self, status)
+        TextOutput::flush_with_status(self, status)
     }
 
     #[inline]
     fn abandon(&mut self) {
-        TextWriterImpl::abandon(self)
+        TextOutput::abandon(self)
     }
 
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
-        TextWriterImpl::write_str(self, s)
+        TextOutput::write_str(self, s)
     }
 }
 
@@ -178,23 +177,23 @@ impl<Inner: ReadWriteExt> ReadWriteExt for TextReaderWriter<Inner> {}
 impl<Inner: ReadWriteExt> WriteWrapper<Inner> for TextReaderWriter<Inner> {
     #[inline]
     fn close_into_inner(self) -> io::Result<Inner> {
-        TextWriterImpl::close_into_inner(self)
+        TextOutput::close_into_inner(self)
     }
 
     #[inline]
     fn abandon_into_inner(self) -> Inner {
-        TextWriterImpl::abandon_into_inner(self)
+        TextOutput::abandon_into_inner(self)
     }
 }
 
 impl<Inner: ReadWriteExt> io::Write for TextReaderWriter<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        TextWriterImpl::write(self, buf)
+        TextOutput::write(self, buf)
     }
 
     #[inline]
     fn flush(&mut self) -> io::Result<()> {
-        TextWriterImpl::flush(self)
+        TextOutput::flush(self)
     }
 }

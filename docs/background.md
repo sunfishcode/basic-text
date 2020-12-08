@@ -6,22 +6,22 @@
 
 ## Newlines
 
-We interpret U+000A, and nothing else, to mean *newline*.
+In [Text] content, U+000A, and nothing else, means *newline*.
 
 Why not use the CRLF convention? It's what [IETF RFCs] use, and as of
 ASCII-1986 / ECMA-6:1985 at least, its what ASCII itself uses.
- - POSIX is an IEEE standard, and it uses the newline convention.
- - C is an ISO standard, and it uses the newline convention in character
-   constants and string literals.
+ - It's not what IEEE POSIX uses, and it's not what ISO C and C++ use in
+   their own data.
  - The newline convention is only one byte, so it's simpler than CRLF and
    avoids corner-case concerns of what to do when standalone CR or LF are
    encountered in various situations.
- - All practical text editors and viewers today support either line-ending
+ - All practical text editors and viewers today support the U+000A newline
    convention, [even Windows Notepad].
 
-Text input implicitly translates CRLF into newline, and text output has an
-option to translate newlines into CRLF, which is intended to ease
-compatibility with CRLF environments and IETF RFCs.
+Text input implicitly translates plain CR and CRLF into newline. Text output
+has an option to translate newlines into CRLFs, which is intended to ease
+compatibility with CRLF environments and IETF RFCs. U+085 (NEL) is translated
+into U+0020 (space) for compatibility with [ECMA-262 whitespace rules].
 
 Why not use U+0085 (NEL)? In theory it has the semantics we want, however:
  - It isn't used in many places, or supported in many environments.
@@ -45,6 +45,7 @@ and lines. That's a consideration for higher-level formats.
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G10213
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
+[ECMA-262 whitespace rules]: https://www.ecma-international.org/ecma-262/10.0/#sec-white-space
 
 ## Form Feed
 

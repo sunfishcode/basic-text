@@ -1,4 +1,4 @@
-use crate::utf8_reader_impl::Utf8ReaderImpl;
+use crate::utf8_input::Utf8Input;
 use io_ext::{ReadExt, Status};
 use std::{io, str};
 
@@ -22,7 +22,7 @@ pub struct Utf8Reader<Inner: ReadExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
-    pub(crate) impl_: Utf8ReaderImpl,
+    pub(crate) impl_: Utf8Input,
 }
 
 impl<Inner: ReadExt> Utf8Reader<Inner> {
@@ -31,7 +31,7 @@ impl<Inner: ReadExt> Utf8Reader<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner,
-            impl_: Utf8ReaderImpl::new(),
+            impl_: Utf8Input::new(),
         }
     }
 }
@@ -39,52 +39,52 @@ impl<Inner: ReadExt> Utf8Reader<Inner> {
 impl<Inner: ReadExt> ReadExt for Utf8Reader<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
-        Utf8ReaderImpl::read_with_status(self, buf)
+        Utf8Input::read_with_status(self, buf)
     }
 }
 
 impl<Inner: ReadExt> ReadStr for Utf8Reader<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
-        Utf8ReaderImpl::read_str(self, buf)
+        Utf8Input::read_str(self, buf)
     }
 
     #[inline]
     fn read_exact_str(&mut self, buf: &mut str) -> io::Result<()> {
-        Utf8ReaderImpl::read_exact_str(self, buf)
+        Utf8Input::read_exact_str(self, buf)
     }
 }
 
 impl<Inner: ReadExt> io::Read for Utf8Reader<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        Utf8ReaderImpl::read(self, buf)
+        Utf8Input::read(self, buf)
     }
 
     #[inline]
     fn read_vectored(&mut self, bufs: &mut [io::IoSliceMut<'_>]) -> io::Result<usize> {
-        Utf8ReaderImpl::read_vectored(self, bufs)
+        Utf8Input::read_vectored(self, bufs)
     }
 
     #[cfg(feature = "nightly")]
     #[inline]
     fn is_read_vectored(&self, inner: &Inner) -> bool {
-        Utf8ReaderImpl::is_read_vectored(&self)
+        Utf8Input::is_read_vectored(&self)
     }
 
     #[inline]
     fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
-        Utf8ReaderImpl::read_to_end(self, buf)
+        Utf8Input::read_to_end(self, buf)
     }
 
     #[inline]
     fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
-        Utf8ReaderImpl::read_to_string(self, buf)
+        Utf8Input::read_to_string(self, buf)
     }
 
     #[inline]
     fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
-        Utf8ReaderImpl::read_exact(self, buf)
+        Utf8Input::read_exact(self, buf)
     }
 }
 

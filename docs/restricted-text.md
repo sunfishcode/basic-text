@@ -31,6 +31,8 @@ TODO: [Mixed-Number Detection]
 
 TODO: Unicode Security Mechanisms also specifies some [Optional Detection] rules.
 
+TODO: Disallow variation selectors?
+
 TODO: U+2126 (OHM SIGN) normalizes to U+03A9 (GREEK CAPITAL LETTER OMEGA);
 does "Moderately Restricted" permit this Greek letter to be mixed with
 otherwise Latin script?
