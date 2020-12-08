@@ -18,7 +18,7 @@ following steps, in order:
 On input, after conversion to NFC:
  - If the stream starts with U+FEFF (BOM), it is removed.
  - Replace:
-   - U+000D U+000A with U+000A (newline)
+   - U+000D (CR) U+000A (LF) with U+000A (newline)
    - *Disallowed codepoints* with U+FFFD (REPLACEMENT CHARACTER)
    - U+0007 (BEL) with U+FFFD (REPLACEMENT CHARACTER)
    - U+000C (FF) with U+0020 (SP)
