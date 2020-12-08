@@ -68,6 +68,12 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             c => c,
         })
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        // Propagate the inner interator's lower bound.
+        self.iter.size_hint()
+    }
 }
 
 impl<Iter: Iterator<Item = char>> Categorize<Iter> {

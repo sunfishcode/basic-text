@@ -87,4 +87,11 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
             c => Some(c),
         }
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        // Propagate the inner iterator's lower bound, but omit the upper bound
+        // size we may use wider replacements.
+        (self.inner.size_hint().0, None)
+    }
 }
