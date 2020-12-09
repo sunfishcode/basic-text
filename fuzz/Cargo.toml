@@ -10,11 +10,13 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.3.4"
 text-streams = { path = ".." }
-unicode-normalization = "0.1.16"
+unicode-normalization = { path = "../../unicode-normalization" }
+io-ext = { path = "../../io-ext" }
+io-ext-adapters = { path = "../../io-ext-adapters" }
 
 [[bin]]
-name = "text_reader"
-path = "fuzz_targets/text_reader.rs"
+name = "text"
+path = "fuzz_targets/text.rs"
 test = false
 doc = false
 

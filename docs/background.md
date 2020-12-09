@@ -10,11 +10,9 @@ In [Text] content, U+000A, and nothing else, means *newline*.
 
 Why not use the CRLF convention? It's what [IETF RFCs] use, and as of
 ASCII-1986 / ECMA-6:1985 at least, its what ASCII itself uses.
- - It's not what IEEE POSIX uses, and it's not what ISO C and C++ use in
-   their own data.
+ - U+000A is what IEEE [POSIX] and ISO C and C++ use in program data.
  - The newline convention is only one byte, so it's simpler than CRLF and
-   avoids corner-case concerns of what to do when standalone CR or LF are
-   encountered in various situations.
+   avoids corner-case concerns of what to do when CR and LF are split apart.
  - All practical text editors and viewers today support the U+000A newline
    convention, [even Windows Notepad].
 
@@ -30,18 +28,19 @@ Why not use U+0085 (NEL)? In theory it has the semantics we want, however:
 
 Why not follow the [Unicode Newline Guidelines' Recommendations]?
  - We generally don't know the exact usage of any *NLF*.
- - We effectively target a virtual platform where the platform *NLF* is newline.
- - PS and LS aren't widely recognized or used as line separators in plain text.
+ - We effectively target a virtual platform with newline as the platform *NLF*.
+ - PS and LS aren't widely recognized or used in plain text.
  - FF is debatable (see below).
 
 PS and LS are valid in both [Text] and [Restricted Text], so higher-level
 formats can use them, however they aren't treated as newlines as far as the
 formats defined here are concerned.
 
-One of the key observations here is that, at the layers these formats are
-meant to be used, it isn't important to distinguish between paragraphs
-and lines. That's a consideration for higher-level formats.
+One of the key observations here is that, at the layers these formats are meant
+to be used, it isn't important to distinguish between paragraphs and lines.
+That's a consideration for higher-level formats.
 
+[POSIX uses]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_243
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G10213
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
@@ -55,10 +54,10 @@ in many higher-level protocols it either already doesn't work or there are
 better alternatives.
 
 And, there is some ambiguity about whether U+000C is meant to position the
-cursor at the beginning of a line in the next page or at its previous column
-in the next page, and about whether it should be counted as starting a
-"new line", and it's not obviously worth the effort to try to describe what
-this control code does.
+cursor at the beginning of a line in the next page or at its previous column in
+the next page, and about whether it should be counted as starting a "new line",
+and it's not obviously worth the effort to try to describe what this control
+code does.
 
 And on devices where U+000C clears the current screen, that's a significant
 side effect which could interfere with the visibility of other unrelated data.
@@ -72,8 +71,8 @@ new meaning.
 ## Horizontal Tab
 
 It's tempting to disallow tab in a similar spirit of reducing the set of
-things that text can do, however lots of text in practice uses and even
-[depends on tab], so it's not practical to disallow.
+things that text can do, however has much more mild effects, and lots of text
+in practice uses and even [depends on tab], so we allow it.
 
 [depends on tab]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
 
@@ -92,16 +91,16 @@ and theoretically could even be used for side-channel communication.
 Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
 
-## Deprecated codepoints
+## Deprecated scalar values
 
 U+0149, U+0673, U+0F77, U+0F79, U+17A3, and U+17A4 are officially deprecated,
 "their use is strongly discouraged", and they have recommended replacements.
 
-U+2329 and U+232A have canonical equivalents with diffferent appearances
+U+2329 and U+232A have canonical equivalents with different appearances
 so their use is deprecated and it's not recommended to automatically replace
 them with their canonical equivalents.
 
-## Not-recomended unit name codepoints with singleton canonical decompositions
+## Not-recommended scalar values with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference
 to the dedicated unit characters for U+2126 OHM SIGN, U+212A KELVIN SIGN,
@@ -109,10 +108,16 @@ and U+212B ANGSTROM SIGN.
 
 [recommends]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G25.14143
 
-## "Forbidden" codepoints
+## Characters Whose Use Is Discouraged
+
+Khmer scalar values U+17B4 and U+17B5
+"should be considered errors in the encoding". Also, "the use of U+17D8
+Khmer sign beyyal is discouraged".
+
+## "Forbidden Characters"
 
 There were a few errors in the Unicode normalization algorithm in before
-Unicode 4.1. The affected codepoints and sequences are identified as
+Unicode 4.1. The affected scalar values and sequences are identified as
 [Forbidden Characters]. However, they are described as being very rare in
 practice, and they're corrected since Unicode 4.1 published in 2005 (and
 earlier in some cases), they're not restricted here.
@@ -145,8 +150,8 @@ lines which all end in newlines.
 TODO: Should we have a `LINE_MAX`-like restriction?
 
 A [*printable file* in POSIX] is a text file which contains no control
-codes other than [*whitespace* in POSIX] (space, tab, newline, carriage-return (TODO),
-form-feed (TODO), and vertical-tab (TODO)) and [*backspace* in POSIX] (typically U+0008) (TODO).
+codes other than [*whitespace* in POSIX] (space, tab, newline, carriage-return,
+form-feed, and vertical-tab) and [*backspace* in POSIX] (typically U+0008).
 
 [Text] excludes most of the same control codes. It doesn't include
 carriage-return, form-feed, vertical-tab, or backspace, as line printer
@@ -162,10 +167,10 @@ commands aren't part of plain text content.
 
 ## Relationship to Wikipedia's "plain text"
 
-The plain text format here is intended to align with the use cases
-described in the [Wikipedia article on plain text]. The character encoding is
-known, all characters are either printable or have behavior relevant to
-simple text display.
+The plain text format here is intended to align with the use cases described in
+the [Wikipedia article on plain text]. The character encoding is known, all
+characters are either printable or have behavior relevant to simple text
+display.
 
 [Wikipedia article on plain text]: https://en.wikipedia.org/wiki/Plain_text
 

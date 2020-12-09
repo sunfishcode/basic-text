@@ -15,7 +15,7 @@ At this time, it does seem to be. The following are some notes.
    specifically want to avoid such situations.
 
  - Avoiding common application bugs - Normalization eliminates some situations
-   where two strings that look the same contain different codepoints, making
+   where two strings that look the same contain different scalar values, making
    content easier to work with.
 
 ## Which normalization form?
@@ -37,22 +37,22 @@ considered to be semantically lossy.
 
 ### CJK Compatibility Ideographs
 
-Unicode includes 1002 CJK Compatibility Ideograph codepoints which were
+Unicode includes 1002 CJK Compatibility Ideograph scalar values which were
 originally intended only for use in preserving round-trip compatibility with
 other character set standards. However, many of them are associated with
 slightly different appearances, and this has led to a lot of confusion and some
 dispute.
 
-For example, the codepoint U+2F8A6 canonically decomposes to U+6148. This means
-that Unicode considers these two codepoints to be canonically equivalent, such
-that they are required have [the same visual appearance and behavior]. Some
-systems do treat them this way, however many popular systems today display them
-slightly differently.
+For example, the scalar value U+2F8A6 canonically decomposes to U+6148. This
+means that Unicode considers these two scalar values to be canonically
+equivalent, such that they are required have
+[the same visual appearance and behavior]. Some systems do treat them this way,
+however many popular systems today display them slightly differently.
 
 [the same visual appearance and behavior]: https://unicode.org/reports/tr15/#Canon_Compat_Equivalence
 
-Users understandably expect that the difference in appearance is significant and will
-use non-canonical forms specifically for their unique appearance:
+Users understandably expect that the difference in appearance is significant
+and will use non-canonical forms specifically for their unique appearance:
 
  - https://lists.w3.org/Archives/Public/public-i18n-core/2009JanMar/0216.html
  - https://www.w3.org/wiki/I18N/CanonicalNormalizationIssues#Problems_with_canonical_singletons
@@ -64,12 +64,13 @@ not end up pursuing the idea.
 
 [considered defining "variant normal forms"]: https://www.unicode.org/review/pr-7b.html
 
-[As of Unicode 6.3], all 1002 of these codepoints have standardized variations
-which allow them to be normalized into a form which records the codepoint they
-were normalized from. We use a [modified version] of the NFC algorithm
-which uses these variation sequences instead of the standard canonical
-decompositions, which will produce valid NFC output, but which preserves the
-information about which specific CJK Compatibility Ideographs were used.
+[As of Unicode 6.3], all 1002 of these scalar values have standardized
+variations which allow them to be normalized into a form which records the
+scalar value they were normalized from. We use a [modified version] of the NFC
+algorithm which uses these variation sequences instead of the standard
+canonical decompositions, which will produce valid NFC output, but which
+preserves the information about which specific CJK Compatibility Ideographs
+were used.
 
 TODO: Update this link once this PR either lands or is resolved in some other way.
 
@@ -92,8 +93,8 @@ According to Unicode, this was once a problem, but [there's a fix now].
 ### Bugs in implementations and fonts
 
 Many apparent issues with NFC turn out to be issues with specific
-implementations or specific fonts, which tend to fade away over time
-as software is updated. Such issues are not considered here.
+implementations or specific fonts, which tend to fade away over time as
+software is updated. Such issues are not considered here.
 
 An example of this is [here](https://phabricator.wikimedia.org/T7948).
 
@@ -104,8 +105,8 @@ TONOS mark, and several fonts developed at the time did as well. See:
 
  - https://www.opoudjis.net/unicode/unicode_gkbkgd.html
 
-Unicode was updated to use a different appearance, and newer fonts seem to
-use it, and this seems to be a satisfactory solution.
+Unicode was updated to use a different appearance, and newer fonts seem to use
+it, and this seems to be a satisfactory solution.
 
 ### Greek Ano Teleia (U+0387)
 
@@ -138,7 +139,7 @@ and their use is not generally encouraged for representation of Greek
 punctuation.
 
 That leaves the question of punctuation vs. identifier unaddressed though.
-Theoretically a solution to this might be to add a new codepoint to Unicode
+Theoretically a solution to this might be to add a new scalar value to Unicode
 and transition Greek text content to using that instead of U+0387. However,
 as far as I'm aware no one has proposed this yet.
 

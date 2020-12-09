@@ -7,7 +7,8 @@ use std::{cmp::min, io, str};
 
 pub(crate) trait Utf8ReaderInternals<Inner: ReadExt>: ReadExt {
     fn impl_(&mut self) -> &mut Utf8Input;
-    fn inner(&mut self) -> &mut Inner;
+    fn inner(&self) -> &Inner;
+    fn inner_mut(&mut self) -> &mut Inner;
 }
 
 impl<Inner: ReadExt> Utf8ReaderInternals<Inner> for Utf8Reader<Inner> {
@@ -15,7 +16,11 @@ impl<Inner: ReadExt> Utf8ReaderInternals<Inner> for Utf8Reader<Inner> {
         &mut self.impl_
     }
 
-    fn inner(&mut self) -> &mut Inner {
+    fn inner(&self) -> &Inner {
+        &self.inner
+    }
+
+    fn inner_mut(&mut self) -> &mut Inner {
         &mut self.inner
     }
 }
@@ -25,7 +30,11 @@ impl<Inner: ReadWriteExt> Utf8ReaderInternals<Inner> for Utf8ReaderWriter<Inner>
         &mut self.input
     }
 
-    fn inner(&mut self) -> &mut Inner {
+    fn inner(&self) -> &Inner {
+        &self.inner
+    }
+
+    fn inner_mut(&mut self) -> &mut Inner {
         &mut self.inner
     }
 }
@@ -52,11 +61,12 @@ impl Utf8Input {
         internals: &mut impl Utf8ReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<(usize, Status)> {
-        let size_and_status = unsafe { internals.read_with_status(buf.as_bytes_mut()) }?;
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        let (size, status) = internals.read_with_status(unsafe { buf.as_bytes_mut() })?;
 
-        debug_assert!(buf.is_char_boundary(size_and_status.0));
+        debug_assert!(buf.is_char_boundary(size));
 
-        Ok(size_and_status)
+        Ok((size, status))
     }
 
     /// Like `read_exact` but produces the result in a `str`.
@@ -64,7 +74,8 @@ impl Utf8Input {
         internals: &mut impl Utf8ReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<()> {
-        unsafe { internals.read_exact(buf.as_bytes_mut()) }
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        internals.read_exact(unsafe { buf.as_bytes_mut() })
     }
 
     pub(crate) fn read_with_status<Inner: ReadExt>(
@@ -92,7 +103,7 @@ impl Utf8Input {
             }
         }
 
-        let (size, status) = internals.inner().read_with_status(&mut buf[nread..])?;
+        let (size, status) = internals.inner_mut().read_with_status(&mut buf[nread..])?;
         nread += size;
 
         match str::from_utf8(&buf[..nread]) {
@@ -120,6 +131,12 @@ impl Utf8Input {
                 }
             }
         }
+    }
+
+    pub(crate) fn minimum_buffer_size<Inner: ReadExt>(
+        internals: &impl Utf8ReaderInternals<Inner>,
+    ) -> usize {
+        internals.inner().minimum_buffer_size()
     }
 
     /// If normal reading encounters invalid bytes, the data is copied into

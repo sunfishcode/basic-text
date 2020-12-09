@@ -54,6 +54,9 @@ pub(crate) const WJ: char = '\u{2060}';
 /// REPLACEMENT CHARACTER
 pub(crate) const REPL: char = '\u{fffd}';
 
+/// OBJECT REPLACEMENT CHARACTER
+pub(crate) const ORC: char = '\u{fffc}';
+
 // TODO: include ZWJ, WJ, ZWNJ, CGJ as non-starters?
 pub(crate) fn is_normalization_form_starter(c: char) -> bool {
     canonical_combining_class(c) == 0

@@ -1,6 +1,6 @@
-mod disallowed_codepoints;
+mod disallowed_scalar_values;
 
-use disallowed_codepoints::DISALLOWED_CODEPOINTS;
+use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use io_ext_adapters::StdWriter;
 use std::io;
 use text_streams::TextWriter;
@@ -32,7 +32,7 @@ fn to_text_with_crlf_compatibility(input: &str) -> io::Result<String> {
 #[test]
 fn test_text_output_nfc() {
     // TODO: Test that all the following are done:
-    // - Convert all CJK Compatibility Ideograph codepoints that have corresponding
+    // - Convert all CJK Compatibility Ideograph scalar values that have corresponding
     //   [Standardized Variations] into their corresponding standardized variation
     //   sequences.
     // - Apply the [Stream-Safe Text Process (UAX15-D4)].
@@ -77,12 +77,12 @@ fn test_crlf_compatibility() {
 
 #[test]
 fn test_text_output_rules() {
-    // Fail at *disallowed codepoints*.
-    for c in &DISALLOWED_CODEPOINTS {
+    // Fail at *disallowed scalar values*.
+    for c in &DISALLOWED_SCALAR_VALUES {
         assert_eq!(
             to_text(&format!("{}\n", c)).unwrap_err().kind(),
             io::ErrorKind::Other,
-            "disallowed codepoint {:?} was not rejected",
+            "disallowed scalar value {:?} was not rejected",
             c,
         );
     }
@@ -93,7 +93,7 @@ fn test_text_output_rules() {
         io::ErrorKind::Other
     );
 
-    // Fail at specific codepoints.
+    // Fail at specific scalar values.
     for c in &[
         '\u{7}', '\u{c}', '\u{1b}', '\u{feff}', '\u{149}', '\u{0673}', '\u{0F77}', '\u{0F79}',
         '\u{17a3}', '\u{17a4}', '\u{2329}', '\u{232a}', '\u{2126}', '\u{212a}', '\u{212b}',
@@ -101,13 +101,13 @@ fn test_text_output_rules() {
         assert_eq!(
             to_text(&format!("{}\n", c)).unwrap_err().kind(),
             io::ErrorKind::Other,
-            "specific codepoint {:?} was not rejected",
+            "specific scalar value {:?} was not rejected",
             c,
         );
     }
 
-    // At the end of the stream, if any codepoints were transmitted and the
-    // last codepoint is not U+000A, fail.
+    // At the end of the stream, if any scalar values were transmitted and the
+    // last scalar value is not U+000A, fail.
     assert_eq!(to_text("").unwrap(), "");
     assert_eq!(to_text("\n").unwrap(), "\n");
     assert_eq!(to_text("hello\n").unwrap(), "hello\n");

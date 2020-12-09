@@ -1,4 +1,4 @@
-pub const DISALLOWED_CODEPOINTS: [char; 266] = [
+pub const DISALLOWED_SCALAR_VALUES: [char; 273] = [
     // All C0, U+007F, and C1 control codes other than U+000A (newline),
     // U+0009 (horizontal tab), U+000D (carriage return), U+000C (form feed),
     // U+0007 (alert), U+001B (escape) and U+0085 (NEL). Many of these are
@@ -63,6 +63,10 @@ pub const DISALLOWED_CODEPOINTS: [char; 266] = [
     '\u{9d}',
     '\u{9e}',
     '\u{9f}',
+    // Khmer characters erroneously invented by Unicode.
+    '\u{17b4}',
+    '\u{17b5}',
+    '\u{17d8}',
     // Deprecated Format Characters
     '\u{206a}',
     '\u{206b}',
@@ -70,6 +74,12 @@ pub const DISALLOWED_CODEPOINTS: [char; 266] = [
     '\u{206d}',
     '\u{206e}',
     '\u{206f}',
+    // Interlinear Annotations
+    '\u{fff9}',
+    '\u{fffa}',
+    '\u{fffb}',
+    // Object Replacement Character
+    '\u{fffc}',
     // Tag Characters
     '\u{e0000}',
     '\u{e0001}',

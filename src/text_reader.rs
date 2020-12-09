@@ -4,8 +4,6 @@ use std::{io, str};
 
 /// A `ReadExt` implementation which translates from an input `ReadExt`
 /// producing an arbitrary byte sequence into a valid plain text stream.
-///
-/// TODO: use `from_utf8_unchecked` and `as_mut_vec` to optimize this.
 pub struct TextReader<Inner: ReadExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Reader<Inner>,
@@ -28,6 +26,11 @@ impl<Inner: ReadExt> ReadExt for TextReader<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
         TextInput::read_with_status(self, buf)
+    }
+
+    #[inline]
+    fn minimum_buffer_size(&self) -> usize {
+        TextInput::minimum_buffer_size(self)
     }
 }
 

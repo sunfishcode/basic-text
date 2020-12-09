@@ -27,7 +27,7 @@ fuzz_target!(|bytes: &[u8]| {
     let b4s = str::from_utf8(&b4).unwrap().to_string();
     match &r4 {
         Ok(()) => assert_eq!(lossy, b4s),
-        Err(_) => assert!(lossy == b4s + "\u{fffd}"),
+        Err(_) => assert_eq!(lossy, b4s + "\u{fffd}"),
     }
 
     // Reading with 8-byte buffers should produce the same results as reading with 4-byte buffers.

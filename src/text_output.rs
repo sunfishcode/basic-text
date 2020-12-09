@@ -101,6 +101,7 @@ impl TextOutput {
 
         let mut bom_bytes = [0_u8; MAX_UTF8_SIZE];
         let bom_len = BOM.encode_utf8(&mut bom_bytes).len();
+        // Safety: `bom_bytes` is valid UTF-8 because we just encoded it.
         internals.write_str(unsafe { str::from_utf8_unchecked(&bom_bytes[..bom_len]) })?;
 
         impl_.nl = NlGuard(false);
@@ -268,11 +269,13 @@ impl TextOutput {
         buf: &[u8],
     ) -> io::Result<usize> {
         match str::from_utf8(buf) {
-            Ok(s) => internals.write_str(s).map(|_| buf.len()),
+            Ok(s) => internals.write_str(s).map(|()| buf.len()),
+            // Safety: See the example code here:
+            // https://doc.rust-lang.org/stable/std/str/struct.Utf8Error.html#examples
             Err(error) if error.valid_up_to() != 0 => Self::write_str(internals, unsafe {
                 str::from_utf8_unchecked(&buf[..error.valid_up_to()])
             })
-            .map(|_| buf.len()),
+            .map(|()| error.valid_up_to()),
             Err(error) => {
                 internals.abandon();
                 Err(io::Error::new(io::ErrorKind::Other, error))

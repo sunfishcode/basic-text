@@ -1,6 +1,6 @@
-mod disallowed_codepoints;
+mod disallowed_scalar_values;
 
-use disallowed_codepoints::DISALLOWED_CODEPOINTS;
+use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use io_ext_adapters::StdReader;
 use text_streams::TextReader;
 
@@ -15,9 +15,9 @@ fn to_text(input: &str) -> String {
 #[test]
 fn test_text_input_nfc() {
     // TODO: Test that all the following are done:
-    // - Convert all CJK Compatibility Ideograph codepoints that have corresponding
-    //   [Standardized Variations] into their corresponding standardized variation
-    //   sequences.
+    // - Convert all CJK Compatibility Ideograph scalar values that have
+    //   corresponding [Standardized Variations] into their corresponding
+    //   standardized variation sequences.
     // - Apply the [Stream-Safe Text Process (UAX15-D4)].
     // - Apply `toNFC` according to the [Normalization Process for Stabilized Strings].
     //
@@ -44,12 +44,12 @@ fn test_text_input_rules() {
     assert_eq!(to_text("hello\rworld"), "hello\nworld\n");
     assert_eq!(to_text("\n\r"), "\n\n");
 
-    // *Disallowed codepoints* with U+FFFD (REPLACEMENT CHARACTER)
-    for c in &DISALLOWED_CODEPOINTS {
+    // *Disallowed scalar values* with U+FFFD (REPLACEMENT CHARACTER)
+    for c in &DISALLOWED_SCALAR_VALUES {
         assert_eq!(
             to_text(&c.to_string()),
             "\u{fffd}\n",
-            "disallowed codepoint {:?} was not replaced",
+            "disallowed scalar value {:?} was not replaced",
             c
         );
     }
@@ -137,10 +137,10 @@ fn test_text_input_rules() {
     assert_eq!(to_text("\u{673}"), "\u{627}\u{65f}\n");
 
     // Replace U+0F77 with U+0FB2 U+0F81.
-    assert_eq!(to_text("\u{f77}"), "\u{fb2}\u{f81}\n");
+    assert_eq!(to_text("\u{f77}"), "\u{fb2}\u{f71}\u{f80}\n");
 
     // Replace U+0F79 with U+0FB3 U+0F81.
-    assert_eq!(to_text("\u{f79}"), "\u{fb3}\u{f81}\n");
+    assert_eq!(to_text("\u{f79}"), "\u{fb3}\u{f71}\u{f80}\n");
 
     // Replace U+17A3 with U+17A2.
     assert_eq!(to_text("\u{17a3}"), "\u{17a2}\n");
@@ -148,8 +148,9 @@ fn test_text_input_rules() {
     // Replace U+17A4 with U+17A2 U+17B6.
     assert_eq!(to_text("\u{17a4}"), "\u{17a2}\u{17b6}\n");
 
-    // At the end of the stream, if any codepoints were transmitted and the last
-    // codepoint is not U+000A, after replacements, a U+000A is appended.
+    // At the end of the stream, if any scalar values were transmitted and the
+    // last scalar value is not U+000A, after replacements, a U+000A is
+    // appended.
     assert_eq!(to_text(""), "");
     assert_eq!(to_text("\n"), "\n");
     assert_eq!(to_text("hello"), "hello\n");

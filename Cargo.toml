@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Library for working with text streams"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
-keywords = ["stream"]
+keywords = ["stream", "text"]
 categories = ["os", "text-processing"]
 repository = "https://github.com/sunfishcode/text-streams"
 edition = "2018"
@@ -16,7 +16,7 @@ io-ext-adapters = { path = "../io-ext-adapters" }
 unicode-normalization = { path = "../unicode-normalization" }
 
 [dev-dependencies]
-anyhow = "1.0.32"
+anyhow = "1.0.35"
 
 [features]
 default = []

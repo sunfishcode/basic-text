@@ -8,13 +8,14 @@ TODO: This isn't implemented yet.
 
 Content should not be implicitly converted into this format, as that may cause
 meaning to be silently lost. Instead, errors should be reported when content
-not meeting these restrictions is encountered, on input or output. See
-[Text] for an unrestricted alternative.
+not meeting these restrictions is encountered, on input or output, in a context
+where restricted text is required. See [Text] for an unrestricted alternative.
 
 Restricted Text is required be in [NFKC], to satisfy the requirements
-for [Moderately Restricted] text, and to exclude the following codepoints:
+for [Moderately Restricted] text, and to exclude the following scalar values:
  - Annotation Characters, as defined in [Section 23.8 of the Unicode Standard],
    U+FFF9–UFFFB.
+ - Variation Selectors, U+FE00–U+FE0F and U+E0100–U+E01EF
  - Default Ignorable Code Points, as defined in
    [Section 5.3 of the Unicode Standard].
  - Old Hangul Jamo, as defined in [Section 2.9 of RFC 5892].
@@ -30,8 +31,6 @@ TODO: "Moderately Restricted" [isn't stable over time](https://www.unicode.org/r
 TODO: [Mixed-Number Detection]
 
 TODO: Unicode Security Mechanisms also specifies some [Optional Detection] rules.
-
-TODO: Disallow variation selectors?
 
 TODO: U+2126 (OHM SIGN) normalizes to U+03A9 (GREEK CAPITAL LETTER OMEGA);
 does "Moderately Restricted" permit this Greek letter to be mixed with

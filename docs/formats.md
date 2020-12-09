@@ -4,17 +4,24 @@ This repository describes and implements three formats.
 
  - [UTF-8](utf-8.md)
    - Anything which is valid UTF-8.
+   - Invalid bytes are translated to the Replacement Character (U+FFFD) on
+     input, and rejected on output.
 
  - [Text](text.md)
    - Supports the semantics of any practical Unicode text content.
-   - The phrases "text" or "plain text" are used in various ways in many
-     contexts, but here "text" refers to a specific format.
+   - This is intended to realize the intuitive phrases "text" or "plain text"
+     which are used in various ways in many contexts. It excludes control
+     characters and other content impractical for text.
+   - Invalid scalar values and sequences are translated to replacement
+     sequences on input, and rejected on output.
 
  - [Restricted Text](restricted-text.md)
    - Like Text, but with restrictions.
-   - Reduced support for historical scripts, multiple-script text,
-     formatting, and symbols in exchange for reduced visual ambiguity
-     and simplified processing.
+   - This trades away some support for historical scripts, multiple-script
+     text, formatting, and symbols in exchange for reduced visual ambiguity and
+     simplified processing.
+   - Invalid scalar values and sequences are rejected, even on input, since it
+     isn't always possible to preserve intent automatically.
    - TODO: This isn't implemented yet.
 
 The [background information] contains rationale and source information.

@@ -78,33 +78,35 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
 impl<Inner: ReadWriteExt> ReadExt for TextReaderWriter<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
-        let size_and_status = TextInput::read_with_status(self, buf)?;
+        let (size, status) = TextInput::read_with_status(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
         // ended with a newline.
-        if size_and_status.0 != 0 {
-            TextOutput::newline(self, buf.get(size_and_status.0 - 1).copied() == Some(b'\n'));
+        if size != 0 {
+            TextOutput::newline(self, buf.get(size - 1).copied() == Some(b'\n'));
         }
 
-        Ok(size_and_status)
+        Ok((size, status))
+    }
+
+    #[inline]
+    fn minimum_buffer_size(&self) -> usize {
+        TextInput::minimum_buffer_size(self)
     }
 }
 
 impl<Inner: ReadWriteExt> ReadStr for TextReaderWriter<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
-        let size_and_status = TextInput::read_str(self, buf)?;
+        let (size, status) = TextInput::read_str(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
         // ended with a newline.
-        if size_and_status.0 != 0 {
-            TextOutput::newline(
-                self,
-                buf.as_bytes().get(size_and_status.0 - 1).copied() == Some(b'\n'),
-            );
+        if size != 0 {
+            TextOutput::newline(self, buf.as_bytes().get(size - 1).copied() == Some(b'\n'));
         }
 
-        Ok(size_and_status)
+        Ok((size, status))
     }
 
     #[inline]

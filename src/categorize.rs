@@ -1,7 +1,7 @@
-//! On output, several disallowed codepoints are rejected, to catch
+//! On output, several disallowed scalar values are rejected, to catch
 //! applications attempting to use them.
 
-use crate::unicode::{BOM, SUB};
+use crate::unicode::{BOM, ORC, SUB};
 use std::{cell::RefCell, io, rc::Rc};
 
 pub(crate) struct Categorize<Iter: Iterator<Item = char>> {
@@ -37,6 +37,10 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             | c @ '\u{232a}'
             | c @ '\u{e0001}' => self.deprecated(c),
             c @ '\u{2126}' | c @ '\u{212a}' | c @ '\u{212b}' => self.obsolete_compatibility(c),
+            // Interlinear Annotations
+            '\u{fff9}'..='\u{fffb}' => self.interlinear_annotation(),
+            // Khmer characters erroneously invented by Unicode.
+            c @ '\u{17b4}' | c @ '\u{17b5}' | c @ '\u{17d8}' => self.erroneous_khmer_character(c),
             // Deprecated Format Characters
             c @ '\u{206a}'..='\u{206f}' => self.deprecated_format_character(c),
             // Tag Characters
@@ -64,6 +68,7 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             c @ '\u{e000}'..='\u{f8ff}'
             | c @ '\u{f0000}'..='\u{ffffd}'
             | c @ '\u{100000}'..='\u{10fffd}' => self.private_use_character(c),
+            ORC => self.orc(),
             BOM => self.bom(),
             c => c,
         })
@@ -104,6 +109,18 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
             io::ErrorKind::Other,
             format!(
                 "Obsolete compatibility written to text output stream: {:?}",
+                c
+            ),
+        ));
+        SUB
+    }
+
+    #[cold]
+    fn erroneous_khmer_character(&mut self, c: char) -> char {
+        *self.error.borrow_mut() = Some(io::Error::new(
+            io::ErrorKind::Other,
+            format!(
+                "Erroneous Khmer character written to text output stream: {:?}",
                 c
             ),
         ));
@@ -153,10 +170,28 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
     }
 
     #[cold]
+    fn orc(&mut self) -> char {
+        *self.error.borrow_mut() = Some(io::Error::new(
+            io::ErrorKind::Other,
+            "Object replacement character written to text output stream",
+        ));
+        SUB
+    }
+
+    #[cold]
     fn bom(&mut self) -> char {
         *self.error.borrow_mut() = Some(io::Error::new(
             io::ErrorKind::Other,
             "Byte-order mark written to text output stream",
+        ));
+        SUB
+    }
+
+    #[cold]
+    fn interlinear_annotation(&mut self) -> char {
+        *self.error.borrow_mut() = Some(io::Error::new(
+            io::ErrorKind::Other,
+            "Interlinear annotation written to text output stream",
         ));
         SUB
     }

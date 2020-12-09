@@ -1,8 +1,8 @@
-//! On input, several disallowed codepoints are replaced, so that content
+//! On input, several disallowed scalar values are replaced, so that content
 //! containing them can still be read, but applications don't have to
 //! handle them.
 
-use crate::unicode::{BOM, REPL, WJ};
+use crate::unicode::{BOM, ORC, REPL, WJ};
 
 /// An iterator over `char`s which replaces occurrences of
 /// characters that have replacement sequences.
@@ -56,6 +56,12 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
                 self.buffer = Some('\u{17b6}');
                 Some('\u{17a2}')
             }
+            // Interlinear Annotations
+            '\u{fff9}'..='\u{fffb}' |
+            // Object Replacement Character
+            ORC |
+            // Khmer characters erroneously invented by Unicode.
+            '\u{17b4}' | '\u{17b5}' | '\u{17d8}' |
             // Deprecated Format Characters
             '\u{206a}'..='\u{206f}' |
             // Tag Characters

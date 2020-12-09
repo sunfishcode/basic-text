@@ -7,13 +7,13 @@ intended. It permits homoglyphs and other visual ambiguities; see
 
 On input and output, data is implicitly converted into [NFC] by the
 following steps, in order:
- - Replace all CJK Compatibility Ideograph codepoints that have corresponding
-   [Standardized Variations] with their corresponding standardized variation
-   sequences.
+ - Replace all CJK Compatibility Ideograph scalar values that have
+   corresponding [Standardized Variations] with their corresponding
+   standardized variation sequences.
  - Replace U+2329 with U+FFFD (REPLACEMENT CHARACTER).
  - Replace U+232A with U+FFFD (REPLACEMENT CHARACTER).
  - Apply the [Stream-Safe Text Process (UAX15-D4)].
- - Apply `toNFC` according to the [Normalization Process for Stabilized Strings].
+ - Apply `toNFC` with the [Normalization Process for Stabilized Strings].
 
 On input, after conversion to NFC:
  - If the stream starts with U+FEFF (BOM), it is removed.
@@ -23,7 +23,7 @@ On input, after conversion to NFC:
    - U+000C (FF) with U+0020 (SP)
    - U+0085 (NEL) with U+0020 (SP)
    - U+001B (ESC) when part of an *escape sequence* with nothing
-   - *Disallowed codepoints* with U+FFFD (REPLACEMENT CHARACTER)
+   - *Disallowed scalar values* with U+FFFD (REPLACEMENT CHARACTER)
    - U+0149 with U+02BC U+006E
    - U+0673 with U+0627 U+065F
    - U+0F77 with U+0FB2 U+0F81
@@ -31,14 +31,14 @@ On input, after conversion to NFC:
    - U+17A3 with U+17A2
    - U+17A4 with U+17A2 U+17B6
    - U+FEFF (BOM) with U+2060 (WJ)
- - At the end of the stream, if any codepoints were transmitted and the last
-   codepoint is not U+000A, after replacements, a U+000A is appended.
+ - At the end of the stream, if any scalar values were transmitted and the last
+   scalar value is not U+000A, after replacements, a U+000A is appended.
 
 On output, before conversion to NFC:
  - As an option (BOM compatibility), off by default, prepend U+FEFF to the stream.
  - As an option (CRLF compatibility), off by default, replace "\n" with "\r\n".
  - Fail at any of the following:
-   - *Disallowed codepoints*
+   - *Disallowed scalar values*
    - U+0007 (BEL)
    - U+000C (FF)
    - U+001B (ESC)
@@ -54,12 +54,17 @@ On output, before conversion to NFC:
    - U+2329 (LEFT-POINTING ANGLE BRACKET)
    - U+232A (RIGHT-POINTING ANGLE BRACKET)
    - U+FEFF (BOM)
- - At the end of the stream, if any codepoints were transmitted and the last
-   codepoint is not U+000A, fail.
+ - At the end of the stream, if any scalar values were transmitted and the last
+   scalar value is not U+000A, fail.
 
-The *disallowed codepoints* are:
- - All C0, U+007F, and C1 control codes other than U+000A (newline)
-   and U+0009 (horizontal tab).
+## Disallowed scalar values
+
+The *disallowed scalar values* are:
+ - All C0, U+007F, and C1 control codes other than U+000A (newline) and
+   U+0009 (horizontal tab).
+ - U+17B4, U+17B5, and U+17D8
+ - U+FFFC (object replacement character)
+ - U+FFF9–U+FFFB (interlinear annotations)
  - [Noncharacters]
  - [Deprecated Format Characters]
  - [Private-Use Characters]
@@ -81,10 +86,6 @@ U+001B+ U+005B U+005B [U+0000–U+007F]?
 
 TODO: Pull in some NFKC translations? https://github.com/rust-lang/rust/issues/2253#issuecomment-29050949
 
-TODO: U+17B4 and U+17B5 "should be considered errors in the encoding"
-and "The use of U+17D8 khmer sign beyyal is discouraged" though there
-are no replacements.
-
 TODO: Streams never start or resume after a push with a normalization-form
 non-starter. `canonical_combining_class` doesn't know about the astral
 compositions like U+11099 U+110BA => U+1109A. Restrict non-starters of that
@@ -93,13 +94,7 @@ Or use unicode-segmentation to detect grapheme boundaries?
 
 TODO: NFC isn't closed under concatenation; can we restrict streams to starting with starters, or implicitly insert CGJs?
 
-TODO: Should we say anything about bidi control codepoints? https://unicode.org/reports/tr9/
-
-TODO: Should we say anything about inter-linear annotation codepoints?
-
-TODO: Should we say anything about U+FFFC (object replacement character)?
-
-TODO: Should we say anything about unrecognized and/or IVD variation selectors?
+TODO: Validate/normalize BiDi controls? https://unicode.org/reports/tr9/
 
 [NFC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Stream-Safe Text Process (UAX15-D4)]: https://unicode.org/reports/tr15/#UAX15-D4

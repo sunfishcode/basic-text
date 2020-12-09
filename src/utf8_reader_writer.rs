@@ -40,6 +40,11 @@ impl<Inner: ReadWriteExt> ReadExt for Utf8ReaderWriter<Inner> {
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
         Utf8Input::read_with_status(self, buf)
     }
+
+    #[inline]
+    fn minimum_buffer_size(&self) -> usize {
+        Utf8Input::minimum_buffer_size(self)
+    }
 }
 
 impl<Inner: ReadWriteExt> io::Read for Utf8ReaderWriter<Inner> {

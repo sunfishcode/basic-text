@@ -17,7 +17,8 @@ use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNor
 pub(crate) trait TextReaderInternals<Inner: ReadExt>: ReadExt {
     type Utf8Inner: ReadStr;
     fn impl_(&mut self) -> &mut TextInput;
-    fn inner(&mut self) -> &mut Self::Utf8Inner;
+    fn inner(&self) -> &Self::Utf8Inner;
+    fn inner_mut(&mut self) -> &mut Self::Utf8Inner;
 }
 
 impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
@@ -27,7 +28,11 @@ impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
         &mut self.impl_
     }
 
-    fn inner(&mut self) -> &mut Self::Utf8Inner {
+    fn inner(&self) -> &Self::Utf8Inner {
+        &self.inner
+    }
+
+    fn inner_mut(&mut self) -> &mut Self::Utf8Inner {
         &mut self.inner
     }
 }
@@ -39,7 +44,11 @@ impl<Inner: ReadWriteExt> TextReaderInternals<Inner> for TextReaderWriter<Inner>
         &mut self.input
     }
 
-    fn inner(&mut self) -> &mut Self::Utf8Inner {
+    fn inner(&self) -> &Self::Utf8Inner {
+        &self.inner
+    }
+
+    fn inner_mut(&mut self) -> &mut Self::Utf8Inner {
         &mut self.inner
     }
 }
@@ -55,10 +64,7 @@ pub(crate) struct TextInput {
     queue: RcCharQueue,
 
     /// An iterator over the chars in `self.queue`.
-    queue_iter: Option<ReplaceSelected<Recompositions<StreamSafe<Replacements<RcCharQueueIter>>>>>,
-
-    /// The number of '\n' and '\u34f`'s in the queue.
-    queued_nfc_resets: usize,
+    queue_iter: Option<Recompositions<StreamSafe<ReplaceSelected<Replacements<RcCharQueueIter>>>>>,
 
     /// When we can't fit all the data from an underlying read in our buffer,
     /// we buffer it up. Remember the status value so we can replay that too.
@@ -84,7 +90,6 @@ impl TextInput {
             raw_string: String::new(),
             queue,
             queue_iter: None,
-            queued_nfc_resets: 0,
             pending_status: Status::active(),
             expect_starter: true,
             at_start: true,
@@ -100,7 +105,8 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<(usize, Status)> {
-        unsafe { Self::read_with_status(internals, buf.as_bytes_mut()) }
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        Self::read_with_status(internals, unsafe { buf.as_bytes_mut() })
     }
 
     /// Like `read_exact` but produces the result in a `str`.
@@ -109,28 +115,25 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<()> {
-        unsafe { Self::read_exact(internals, buf.as_bytes_mut()) }
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        Self::read_exact(internals, unsafe { buf.as_bytes_mut() })
     }
 
     fn queue_next(&mut self, sequence_end: bool) -> Option<char> {
-        if !sequence_end
-            && self.queued_nfc_resets == 0
-            && self.queue.len() < NORMALIZATION_BUFFER_LEN
-        {
+        if !sequence_end && self.queue.len() < NORMALIZATION_BUFFER_LEN {
             return None;
         }
         if self.queue_iter.is_none() {
             if self.queue.is_empty() {
                 return None;
             }
-            self.queue_iter = Some(ReplaceSelected::new(
-                self.queue.iter().svar().stream_safe().nfc(),
-            ));
+            self.queue_iter = Some(
+                ReplaceSelected::new(self.queue.iter().svar())
+                    .stream_safe()
+                    .nfc(),
+            );
         }
         if let Some(c) = self.queue_iter.as_mut().unwrap().next() {
-            if c == '\n' || c == CGJ {
-                self.queued_nfc_resets -= 1;
-            }
             return Some(c);
         }
         self.queue_iter = None;
@@ -145,7 +148,6 @@ impl TextInput {
                     (State::Ground(_), BOM) if at_start => (),
                     (State::Ground(_), '\n') => {
                         self.queue.push('\n');
-                        self.queued_nfc_resets += 1;
                         self.expect_starter = false;
                         self.state = State::Ground(true)
                     }
@@ -161,25 +163,16 @@ impl TextInput {
                     }
                     (State::Ground(_), '\r') => self.state = State::Cr,
                     (State::Ground(_), ESC) => self.state = State::Esc,
-                    (State::Ground(_), c) if c.is_control() => {
+                    (State::Ground(_), c)
+                        if c.is_control() || matches!(c, '\u{2329}' | '\u{232a}') =>
+                    {
                         self.queue.push(REPL);
                         self.expect_starter = false;
                         self.state = State::Ground(false);
                     }
                     (State::Ground(_), CGJ) => {
                         self.queue.push(CGJ);
-                        self.queued_nfc_resets += 1;
                         self.expect_starter = false;
-                        self.state = State::Ground(false)
-                    }
-                    (State::Ground(_), '\u{2329}') => {
-                        self.expect_starter = false;
-                        self.queue.push(REPL);
-                        self.state = State::Ground(false)
-                    }
-                    (State::Ground(_), '\u{232a}') => {
-                        self.expect_starter = false;
-                        self.queue.push(REPL);
                         self.state = State::Ground(false)
                     }
                     (State::Ground(_), mut c) => {
@@ -189,19 +182,18 @@ impl TextInput {
                                 c = REPL;
                             }
                         }
+                        assert!(c != CGJ);
                         self.queue.push(c);
                         self.state = State::Ground(false)
                     }
 
                     (State::Cr, '\n') => {
                         self.queue.push('\n');
-                        self.queued_nfc_resets += 1;
                         self.expect_starter = false;
                         self.state = State::Ground(true);
                     }
                     (State::Cr, _) => {
                         self.queue.push('\n');
-                        self.queued_nfc_resets += 1;
                         self.expect_starter = false;
                         self.state = State::Ground(true);
                         continue;
@@ -215,6 +207,7 @@ impl TextInput {
                     }
                     (State::Esc, _) => {
                         self.queue.push(REPL);
+                        self.expect_starter = false;
                         self.state = State::Ground(false);
                         continue;
                     }
@@ -280,9 +273,10 @@ impl TextInput {
         let mut raw_bytes =
             mem::replace(&mut internals.impl_().raw_string, String::new()).into_bytes();
         raw_bytes.resize(4096, 0_u8);
-        let (size, status) = internals.inner().read_with_status(&mut raw_bytes)?;
+        let (size, status) = internals.inner_mut().read_with_status(&mut raw_bytes)?;
         raw_bytes.resize(size, 0);
-        internals.impl_().raw_string = String::from_utf8(raw_bytes).unwrap();
+        // Safety: This is a UTF-8 stream so we can read directly into a `String`.
+        internals.impl_().raw_string = unsafe { String::from_utf8_unchecked(raw_bytes) };
 
         internals.impl_().process_raw_string();
 
@@ -291,11 +285,12 @@ impl TextInput {
                 State::Ground(_) => {}
                 State::Cr => {
                     internals.impl_().queue.push('\n');
-                    internals.impl_().queued_nfc_resets += 1;
+                    internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(true);
                 }
                 State::Esc => {
                     internals.impl_().queue.push(REPL);
+                    internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(false);
                 }
                 State::CsiStart | State::Csi | State::Osc | State::Linux => {
@@ -305,7 +300,7 @@ impl TextInput {
 
             if status.is_end() && internals.impl_().state != State::Ground(true) {
                 internals.impl_().queue.push('\n');
-                internals.impl_().queued_nfc_resets += 1;
+                internals.impl_().expect_starter = false;
                 internals.impl_().state = State::Ground(true);
             }
         }
@@ -332,6 +327,12 @@ impl TextInput {
                 Status::active()
             },
         ))
+    }
+
+    pub(crate) fn minimum_buffer_size<Inner: ReadExt>(
+        _internals: &impl TextReaderInternals<Inner>,
+    ) -> usize {
+        NORMALIZATION_BUFFER_SIZE
     }
 
     #[inline]
