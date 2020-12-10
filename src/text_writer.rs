@@ -55,6 +55,17 @@ impl<Inner: WriteExt> TextWriter<Inner> {
         }
     }
 
+    /// Construct a new instance of `TextWriter` wrapping `inner` that
+    /// optionally permits "ANSI"-style color escape sequences of the form
+    /// `ESC [ ... m`.
+    #[inline]
+    pub fn with_ansi_color(inner: Inner, ansi_color: bool) -> Self {
+        Self {
+            inner: Utf8Writer::new(inner),
+            impl_: TextOutput::with_ansi_color(ansi_color),
+        }
+    }
+
     /// Flush and close the underlying stream and return the underlying
     /// stream object.
     #[inline]
@@ -108,17 +119,6 @@ impl<Inner: WriteExt> io::Write for TextWriter<Inner> {
     #[inline]
     fn flush(&mut self) -> io::Result<()> {
         TextOutput::flush(self)
-    }
-}
-
-struct NlGuard(bool);
-
-impl Drop for NlGuard {
-    #[inline]
-    fn drop(&mut self) {
-        if !self.0 {
-            panic!("output text stream not ended with newline");
-        }
     }
 }
 

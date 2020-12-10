@@ -45,10 +45,7 @@ fn test_text_output_nfc() {
 #[test]
 fn test_bom_compatibility() {
     // As an option (BOM compatibility), off by default, prepend U+FEFF to the stream.
-    assert_eq!(
-        to_text_with_bom_compatibility("").unwrap_err().kind(),
-        io::ErrorKind::Other
-    );
+    assert_eq!(to_text_with_bom_compatibility("").unwrap(), "\u{feff}");
     assert_eq!(to_text_with_bom_compatibility("\n").unwrap(), "\u{feff}\n");
     assert_eq!(
         to_text_with_bom_compatibility("hello\n").unwrap(),

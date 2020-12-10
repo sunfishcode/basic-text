@@ -8,7 +8,7 @@ pub struct TextReader<Inner: ReadExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Reader<Inner>,
 
-    pub(crate) impl_: TextInput,
+    pub(crate) input: TextInput,
 }
 
 impl<Inner: ReadExt> TextReader<Inner> {
@@ -17,7 +17,7 @@ impl<Inner: ReadExt> TextReader<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner: Utf8Reader::new(inner),
-            impl_: TextInput::new(),
+            input: TextInput::new(),
         }
     }
 }

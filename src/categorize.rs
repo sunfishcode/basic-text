@@ -1,7 +1,7 @@
 //! On output, several disallowed scalar values are rejected, to catch
 //! applications attempting to use them.
 
-use crate::unicode::{BOM, ORC, SUB};
+use crate::unicode::{BOM, ESC, ORC, SUB};
 use std::{cell::RefCell, io, rc::Rc};
 
 pub(crate) struct Categorize<Iter: Iterator<Item = char>> {
@@ -26,7 +26,8 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
 
     fn next(&mut self) -> Option<Self::Item> {
         Some(match self.iter.next()? {
-            c if c.is_control() && c != '\n' && c != '\t' => self.control(c),
+            // Newline and tab are allowed, and escape is handled specially.
+            c if c.is_control() && c != '\n' && c != '\t' && c != ESC => self.control(c),
             c @ '\u{149}'
             | c @ '\u{673}'
             | c @ '\u{f77}'

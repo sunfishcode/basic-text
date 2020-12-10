@@ -12,7 +12,7 @@ pub(crate) trait Utf8WriterInternals<Inner: WriteExt>:
 
 impl<Inner: WriteExt> Utf8WriterInternals<Inner> for Utf8Writer<Inner> {
     fn impl_(&mut self) -> &mut Utf8Output {
-        &mut self.impl_
+        &mut self.output
     }
 
     fn inner(&mut self) -> &mut Inner {

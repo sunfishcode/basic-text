@@ -10,8 +10,8 @@ use crate::{
     ReadStr, TextReader, TextReaderWriter, Utf8Reader, Utf8ReaderWriter,
 };
 use io_ext::{
-    default_read, default_read_exact, default_read_to_end, default_read_to_string,
-    default_read_vectored, ReadExt, ReadWriteExt, Status,
+    default_read, default_read_exact, default_read_to_end, default_read_vectored, ReadExt,
+    ReadWriteExt, Status,
 };
 use std::{io, mem, str};
 use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
@@ -27,7 +27,7 @@ impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
     type Utf8Inner = Utf8Reader<Inner>;
 
     fn impl_(&mut self) -> &mut TextInput {
-        &mut self.impl_
+        &mut self.input
     }
 
     fn inner(&self) -> &Self::Utf8Inner {

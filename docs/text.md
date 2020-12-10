@@ -41,7 +41,6 @@ On output, before conversion to NFC:
    - *Disallowed scalar values*
    - U+0007 (BEL)
    - U+000C (FF)
-   - U+001B (ESC)
    - U+0149 (LATIN SMALL LETTER N PRECEDED BY APOSTROPHE)
    - U+0673 (ARABIC LETTER ALEF WITH WAVY HAMZA BELOW)
    - U+0F77 (TIBETAN VOWEL SIGN VOCALIC RR)
@@ -54,6 +53,9 @@ On output, before conversion to NFC:
    - U+2329 (LEFT-POINTING ANGLE BRACKET)
    - U+232A (RIGHT-POINTING ANGLE BRACKET)
    - U+FEFF (BOM)
+ - As an option (ANSI-style color), off by default, allow *escape sequences*
+   that match `U+001B U+005B [U+0020–U+003F]* U+006D`. In all other cases,
+   fail at U+001B (ESC) .
  - At the end of the stream, if any scalar values were transmitted and the last
    scalar value is not U+000A, fail.
 

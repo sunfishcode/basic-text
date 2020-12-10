@@ -13,7 +13,7 @@ pub(crate) trait Utf8ReaderInternals<Inner: ReadExt>: ReadExt {
 
 impl<Inner: ReadExt> Utf8ReaderInternals<Inner> for Utf8Reader<Inner> {
     fn impl_(&mut self) -> &mut Utf8Input {
-        &mut self.impl_
+        &mut self.input
     }
 
     fn inner(&self) -> &Inner {

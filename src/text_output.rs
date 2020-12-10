@@ -2,7 +2,7 @@
 
 use crate::{
     categorize::Categorize,
-    unicode::{is_normalization_form_starter, BOM, MAX_UTF8_SIZE, SUB},
+    unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
     TextReaderWriter, TextWriter, Utf8ReaderWriter, Utf8Writer, WriteWrapper,
 };
 use io_ext::{default_flush, ReadWriteExt, Status, WriteExt};
@@ -52,15 +52,21 @@ pub(crate) struct TextOutput {
     /// Temporary staging buffer.
     buffer: String,
 
-    /// True if the last byte written was a '\n'.
-    nl: NlGuard,
-
     /// When enabled, "\n" is replaced by "\r\n".
     crlf_compatibility: bool,
 
     /// At the beginning of a stream or after a push, expect a
     /// normalization-form starter.
     expect_starter: bool,
+
+    /// Are `ESC [ ... m`-style color sequences enabled?
+    ansi_color: bool,
+
+    /// Control-code and escape-sequence state machine.
+    state: State,
+
+    /// An in-progress escape sequence.
+    escape_sequence: String,
 }
 
 impl TextOutput {
@@ -69,9 +75,11 @@ impl TextOutput {
     pub(crate) fn new() -> Self {
         Self {
             buffer: String::new(),
-            nl: NlGuard(true),
             crlf_compatibility: false,
             expect_starter: true,
+            ansi_color: false,
+            state: State::Ground(true),
+            escape_sequence: String::new(),
         }
     }
 
@@ -87,28 +95,36 @@ impl TextOutput {
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
     #[inline]
     pub(crate) fn with_crlf_compatibility() -> Self {
-        Self {
-            buffer: String::new(),
-            nl: NlGuard(true),
-            crlf_compatibility: true,
-            expect_starter: true,
-        }
+        let mut impl_ = Self::new();
+        impl_.crlf_compatibility = true;
+        impl_
     }
 
     #[inline]
     pub(crate) fn with_bom_compatibility<Inner: WriteExt>(
         internals: &mut Inner,
     ) -> io::Result<Self> {
-        let mut impl_ = Self::new();
+        let impl_ = Self::new();
 
         let mut bom_bytes = [0_u8; MAX_UTF8_SIZE];
         let bom_len = BOM.encode_utf8(&mut bom_bytes).len();
         // Safety: `bom_bytes` is valid UTF-8 because we just encoded it.
         internals.write_str(unsafe { str::from_utf8_unchecked(&bom_bytes[..bom_len]) })?;
 
-        impl_.nl = NlGuard(false);
+        // The BOM is not part of the logical content, so leave the stream in
+        // Ground(true) mode, meaning we don't require a newline if nothing
+        // else is written to the stream.
 
         Ok(impl_)
+    }
+
+    /// Construct a new instance of `TextOutput` that optionally permits
+    /// "ANSI"-style color escape sequences of the form `ESC [ ... m`.
+    #[inline]
+    pub(crate) fn with_ansi_color(ansi_color: bool) -> Self {
+        let mut impl_ = Self::new();
+        impl_.ansi_color = ansi_color;
+        impl_
     }
 
     /// Flush and close the underlying stream and return the underlying
@@ -123,8 +139,11 @@ impl TextOutput {
     /// Discard and close the underlying stream and return the underlying
     /// stream object.
     pub(crate) fn abandon_into_inner<Inner: WriteExt>(
-        internals: impl TextWriterInternals<Inner>,
+        mut internals: impl TextWriterInternals<Inner>,
     ) -> Inner {
+        // Don't enforce a trailing newline.
+        internals.impl_().state = State::Ground(true);
+
         internals.into_utf8_inner().abandon_into_inner()
     }
 
@@ -132,19 +151,7 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
-        let error = Rc::new(RefCell::new(None));
-        for c in Categorize::new(s.chars(), Rc::clone(&error))
-            .svar()
-            .stream_safe()
-            .nfc()
-        {
-            // SUB indicates an error sent through the NFC iterator chain, and
-            // the Rc<RefCell<Option<io::Error>>> holds the actual error.
-            if c == SUB {
-                return Err(mem::replace(&mut *error.borrow_mut(), None).unwrap());
-            }
-            internals.impl_().buffer.push(c);
-        }
+        Self::state_machine(internals, s)?;
 
         // Write to the underlying stream.
         Self::write_buffer(internals)
@@ -156,26 +163,16 @@ impl TextOutput {
     ) -> io::Result<()> {
         // Translate "\n" into "\r\n".
         let mut first = true;
-        let error = Rc::new(RefCell::new(None));
         for slice in s.split('\n') {
             if first {
                 first = false;
             } else {
-                internals.impl_().buffer.push_str("\r\n");
+                let impl_ = internals.impl_();
+                impl_.state = State::Ground(true);
+                impl_.buffer.push_str("\r\n");
             }
 
-            for c in Categorize::new(slice.chars(), Rc::clone(&error))
-                .svar()
-                .stream_safe()
-                .nfc()
-            {
-                // SUB indicates an error sent through the NFC iterator chain, and
-                // the Rc<RefCell<Option<io::Error>>> holds the actual error.
-                if c == SUB {
-                    return Err(mem::replace(&mut *error.borrow_mut(), None).unwrap());
-                }
-                internals.impl_().buffer.push(c);
-            }
+            Self::state_machine(internals, slice)?;
         }
 
         // Write to the underlying stream.
@@ -208,13 +205,74 @@ impl TextOutput {
         }
         internals.impl_().buffer = buffer;
 
-        if let Some(last) = internals.impl_().buffer.as_bytes().last().copied() {
-            Self::newline(internals, last == b'\n');
-        }
-
         // Reset the temporary buffer.
         internals.impl_().buffer.clear();
 
+        Ok(())
+    }
+
+    fn state_machine<Inner: WriteExt>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        s: &str,
+    ) -> io::Result<()> {
+        let error = Rc::new(RefCell::new(None));
+        let impl_ = internals.impl_();
+        for c in Categorize::new(s.chars(), Rc::clone(&error))
+            .svar()
+            .stream_safe()
+            .nfc()
+        {
+            match (&impl_.state, c) {
+                // Recognize ANSI-style color escape sequences.
+                (State::Ground(_), ESC) if impl_.ansi_color => {
+                    impl_.state = State::Esc;
+                    impl_.escape_sequence.clear();
+                }
+                (State::Esc, '[') => {
+                    impl_.state = State::Csi;
+                    impl_.escape_sequence.push('[');
+                }
+                (State::Csi, c) if matches!(c, ' '..='?') => impl_.escape_sequence.push(c),
+                (State::Csi, 'm') => {
+                    impl_.state = State::Ground(false);
+                    impl_.buffer.push(ESC);
+                    impl_.buffer.push_str(&impl_.escape_sequence);
+                    impl_.buffer.push('m');
+                }
+
+                (State::Ground(_), '\n') => {
+                    impl_.state = State::Ground(true);
+                    impl_.buffer.push(c)
+                }
+
+                (State::Ground(_), SUB) => {
+                    // SUB indicates an error sent through the NFC iterator
+                    // chain, and the Rc<RefCell<Option<io::Error>>> holds the
+                    // actual error.
+                    internals.abandon();
+                    return Err(mem::replace(&mut *error.borrow_mut(), None).unwrap());
+                }
+
+                (State::Ground(_), ESC) => {
+                    impl_.state = State::Esc;
+                }
+
+                // Common case: in ground state and reading a normal char.
+                (State::Ground(_), c) => {
+                    impl_.state = State::Ground(false);
+                    impl_.buffer.push(c)
+                }
+
+                // Escape sequence not recognized.
+                (State::Esc, c) | (State::Csi, c) => {
+                    internals.abandon();
+                    return Err(io::Error::new(
+                        io::ErrorKind::Other,
+                        format!("unrecognized escape sequence, ending in {:?}", c),
+                    ));
+                }
+            }
+        }
         Ok(())
     }
 
@@ -223,18 +281,25 @@ impl TextOutput {
         status: Status,
     ) -> io::Result<()> {
         match status {
-            Status::End => {
-                if !internals.impl_().nl.0 {
+            Status::End => match internals.impl_().state {
+                State::Ground(true) => Ok(()),
+                State::Ground(false) => {
                     internals.abandon();
-                    return Err(io::Error::new(
+                    Err(io::Error::new(
                         io::ErrorKind::Other,
                         "output text stream must end with newline",
-                    ));
+                    ))
                 }
-            }
-            Status::Open(_) => (),
+                State::Esc | State::Csi => {
+                    internals.abandon();
+                    Err(io::Error::new(
+                        io::ErrorKind::Other,
+                        "incomplete escape sequence at end of output text stream",
+                    ))
+                }
+            },
+            Status::Open(_) => Ok(()),
         }
-        Ok(())
     }
 
     pub(crate) fn flush_with_status<Inner: WriteExt>(
@@ -252,7 +317,7 @@ impl TextOutput {
         internals.utf8_inner().abandon();
 
         // Don't enforce a trailing newline.
-        internals.impl_().nl.0 = true;
+        internals.impl_().state = State::Ground(true);
     }
 
     pub(crate) fn write_str<Inner: WriteExt>(
@@ -297,16 +362,29 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
         nl: bool,
     ) {
-        internals.impl_().nl.0 = nl;
+        if nl {
+            internals.impl_().state = State::Ground(true);
+        }
     }
 }
 
-struct NlGuard(bool);
-
-impl Drop for NlGuard {
+impl Drop for TextOutput {
     fn drop(&mut self) {
-        if !self.0 {
+        if let State::Ground(true) = self.state {
+            // oll korrect
+        } else {
             panic!("output text stream not ended with newline");
         }
     }
+}
+
+enum State {
+    // Default state. Boolean is true iff we just saw a '\n'.
+    Ground(bool),
+
+    // After a '\x1b'.
+    Esc,
+
+    // Within a sequence started by "\x1b[".
+    Csi,
 }

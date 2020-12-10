@@ -25,7 +25,7 @@ pub struct Utf8Writer<Inner: WriteExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
-    pub(crate) impl_: Utf8Output,
+    pub(crate) output: Utf8Output,
 }
 
 impl<Inner: WriteExt> Utf8Writer<Inner> {
@@ -34,7 +34,7 @@ impl<Inner: WriteExt> Utf8Writer<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner,
-            impl_: Utf8Output::new(),
+            output: Utf8Output::new(),
         }
     }
 }

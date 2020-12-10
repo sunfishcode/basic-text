@@ -60,6 +60,18 @@ impl<Inner: ReadWriteExt> TextReaderWriter<Inner> {
         }
     }
 
+    /// Construct a new instance of `TextWriter` wrapping `inner` that
+    /// optionally permits "ANSI"-style color escape sequences of the form
+    /// `ESC [ ... m` on output.
+    #[inline]
+    pub fn with_ansi_color_output(inner: Inner, ansi_color: bool) -> Self {
+        Self {
+            inner: Utf8ReaderWriter::new(inner),
+            input: TextInput::new(),
+            output: TextOutput::with_ansi_color(ansi_color),
+        }
+    }
+
     /// Flush and close the underlying stream and return the underlying
     /// stream object.
     #[inline]

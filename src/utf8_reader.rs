@@ -22,7 +22,7 @@ pub struct Utf8Reader<Inner: ReadExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
-    pub(crate) impl_: Utf8Input,
+    pub(crate) input: Utf8Input,
 }
 
 impl<Inner: ReadExt> Utf8Reader<Inner> {
@@ -31,7 +31,7 @@ impl<Inner: ReadExt> Utf8Reader<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner,
-            impl_: Utf8Input::new(),
+            input: Utf8Input::new(),
         }
     }
 }
