@@ -1,3 +1,5 @@
+//! Text input for `TextReader` and the reader half of `TextReaderWriter`.
+
 use crate::{
     rc_char_queue::{RcCharQueue, RcCharQueueIter},
     replace_selected::ReplaceSelected,

@@ -1,3 +1,5 @@
+//! Text output for `TextWriter` and the writer half of `TextReaderWriter`.
+
 use crate::{
     categorize::Categorize,
     unicode::{is_normalization_form_starter, BOM, MAX_UTF8_SIZE, SUB},
