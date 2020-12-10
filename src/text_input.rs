@@ -107,7 +107,7 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<(usize, Status)> {
-        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        // Safety: This is a UTF-8 stream so we can read into a `str`.
         Self::read_with_status(internals, unsafe { buf.as_bytes_mut() })
     }
 
@@ -117,7 +117,7 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<()> {
-        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        // Safety: This is a UTF-8 stream so we can read into a `str`.
         Self::read_exact(internals, unsafe { buf.as_bytes_mut() })
     }
 
@@ -277,7 +277,7 @@ impl TextInput {
         raw_bytes.resize(4096, 0_u8);
         let (size, status) = internals.inner_mut().read_with_status(&mut raw_bytes)?;
         raw_bytes.resize(size, 0);
-        // Safety: This is a UTF-8 stream so we can read directly into a `String`.
+        // Safety: This is a UTF-8 stream so we can read into a `String`.
         internals.impl_().raw_string = unsafe { String::from_utf8_unchecked(raw_bytes) };
 
         internals.impl_().process_raw_string();
@@ -374,7 +374,8 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut String,
     ) -> io::Result<usize> {
-        default_read_to_string(internals, buf)
+        // Safety: This is a UTF-8 stream so we can read into a `String`.
+        default_read_to_end(internals, unsafe { buf.as_mut_vec() })
     }
 
     #[inline]
