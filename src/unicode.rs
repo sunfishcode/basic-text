@@ -4,7 +4,7 @@ use unicode_normalization::char::canonical_combining_class;
 /// RFC-2279 allowed longer encodings, it's obsoleted by RFC-3629 which doesn't.
 /// This limit is also documented in [the relevant section of Rust's documentation].
 ///
-/// [the relevant section of Rust's documentation]: https://doc.rust-lang.org/stable/std/primitive.char.html#method.encode_utf8
+/// [the relevant section of Rust's documentation]: https://doc.rust-lang.org/std/primitive.char.html#method.encode_utf8
 pub(crate) const MAX_UTF8_SIZE: usize = 4;
 
 /// From unicode-normalization.

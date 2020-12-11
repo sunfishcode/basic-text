@@ -1,18 +1,30 @@
-//! Text output for `TextWriter` and the writer half of `TextReaderWriter`.
+//! Text output for `TextWriter` and the writer half of `TextInteractor`.
 
 use crate::{
     categorize::Categorize,
     unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
-    TextReaderWriter, TextWriter, Utf8ReaderWriter, Utf8Writer, WriteWrapper,
+    TextInteractor, TextWriter, Utf8Interactor, Utf8Writer, WriteWrapper,
 };
-use io_ext::{default_flush, ReadWriteExt, Status, WriteExt};
-use std::{cell::RefCell, io, mem, mem::replace, rc::Rc, str};
+#[cfg(can_vector)]
+use io_ext::default_is_write_vectored;
+#[cfg(write_all_vectored)]
+use io_ext::default_write_all_vectored;
+use io_ext::{default_write_vectored, Bufferable, InteractExt, WriteExt};
+use std::{
+    cell::RefCell,
+    io::{self, Write},
+    mem,
+    mem::replace,
+    rc::Rc,
+    str,
+};
 use unicode_normalization::UnicodeNormalization;
 
 pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
     type Utf8Inner: io::Write + WriteExt + WriteWrapper<Inner>;
     fn impl_(&mut self) -> &mut TextOutput;
-    fn utf8_inner(&mut self) -> &mut Self::Utf8Inner;
+    fn utf8_inner(&self) -> &Self::Utf8Inner;
+    fn utf8_inner_mut(&mut self) -> &mut Self::Utf8Inner;
     fn into_utf8_inner(self) -> Self::Utf8Inner;
 }
 
@@ -20,10 +32,14 @@ impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
     type Utf8Inner = Utf8Writer<Inner>;
 
     fn impl_(&mut self) -> &mut TextOutput {
-        &mut self.impl_
+        &mut self.output
     }
 
-    fn utf8_inner(&mut self) -> &mut Self::Utf8Inner {
+    fn utf8_inner(&self) -> &Self::Utf8Inner {
+        &self.inner
+    }
+
+    fn utf8_inner_mut(&mut self) -> &mut Self::Utf8Inner {
         &mut self.inner
     }
 
@@ -32,14 +48,18 @@ impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
     }
 }
 
-impl<Inner: ReadWriteExt> TextWriterInternals<Inner> for TextReaderWriter<Inner> {
-    type Utf8Inner = Utf8ReaderWriter<Inner>;
+impl<Inner: InteractExt> TextWriterInternals<Inner> for TextInteractor<Inner> {
+    type Utf8Inner = Utf8Interactor<Inner>;
 
     fn impl_(&mut self) -> &mut TextOutput {
         &mut self.output
     }
 
-    fn utf8_inner(&mut self) -> &mut Self::Utf8Inner {
+    fn utf8_inner(&self) -> &Self::Utf8Inner {
+        &self.inner
+    }
+
+    fn utf8_inner_mut(&mut self) -> &mut Self::Utf8Inner {
         &mut self.inner
     }
 
@@ -95,16 +115,16 @@ impl TextOutput {
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
     #[inline]
     pub(crate) fn with_crlf_compatibility() -> Self {
-        let mut impl_ = Self::new();
-        impl_.crlf_compatibility = true;
-        impl_
+        let mut result = Self::new();
+        result.crlf_compatibility = true;
+        result
     }
 
     #[inline]
     pub(crate) fn with_bom_compatibility<Inner: WriteExt>(
         internals: &mut Inner,
     ) -> io::Result<Self> {
-        let impl_ = Self::new();
+        let result = Self::new();
 
         let mut bom_bytes = [0_u8; MAX_UTF8_SIZE];
         let bom_len = BOM.encode_utf8(&mut bom_bytes).len();
@@ -115,16 +135,17 @@ impl TextOutput {
         // Ground(true) mode, meaning we don't require a newline if nothing
         // else is written to the stream.
 
-        Ok(impl_)
+        Ok(result)
     }
 
     /// Construct a new instance of `TextOutput` that optionally permits
     /// "ANSI"-style color escape sequences of the form `ESC [ ... m`.
+    #[cfg(feature = "terminal-support")]
     #[inline]
     pub(crate) fn with_ansi_color(ansi_color: bool) -> Self {
-        let mut impl_ = Self::new();
-        impl_.ansi_color = ansi_color;
-        impl_
+        let mut result = Self::new();
+        result.ansi_color = ansi_color;
+        result
     }
 
     /// Flush and close the underlying stream and return the underlying
@@ -132,7 +153,7 @@ impl TextOutput {
     pub(crate) fn close_into_inner<Inner: WriteExt>(
         mut internals: impl TextWriterInternals<Inner>,
     ) -> io::Result<Inner> {
-        Self::check_nl(&mut internals, Status::End)?;
+        Self::check_nl(&mut internals)?;
         internals.into_utf8_inner().close_into_inner()
     }
 
@@ -196,7 +217,7 @@ impl TextOutput {
         }
 
         let buffer = replace(&mut internals.impl_().buffer, String::new());
-        match internals.utf8_inner().write_str(&buffer) {
+        match internals.utf8_inner_mut().write_str(&buffer) {
             Ok(()) => (),
             Err(e) => {
                 internals.abandon();
@@ -278,46 +299,45 @@ impl TextOutput {
 
     fn check_nl<Inner: WriteExt>(
         internals: &mut impl TextWriterInternals<Inner>,
-        status: Status,
     ) -> io::Result<()> {
-        match status {
-            Status::End => match internals.impl_().state {
-                State::Ground(true) => Ok(()),
-                State::Ground(false) => {
-                    internals.abandon();
-                    Err(io::Error::new(
-                        io::ErrorKind::Other,
-                        "output text stream must end with newline",
-                    ))
-                }
-                State::Esc | State::Csi => {
-                    internals.abandon();
-                    Err(io::Error::new(
-                        io::ErrorKind::Other,
-                        "incomplete escape sequence at end of output text stream",
-                    ))
-                }
-            },
-            Status::Open(_) => Ok(()),
+        match internals.impl_().state {
+            State::Ground(true) => Ok(()),
+            State::Ground(false) => {
+                internals.abandon();
+                Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "output text stream must end with newline",
+                ))
+            }
+            State::Esc | State::Csi => {
+                internals.abandon();
+                Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "incomplete escape sequence at end of output text stream",
+                ))
+            }
         }
     }
 
-    pub(crate) fn flush_with_status<Inner: WriteExt>(
+    pub(crate) fn end<Inner: WriteExt>(
         internals: &mut impl TextWriterInternals<Inner>,
-        status: Status,
     ) -> io::Result<()> {
-        if status != Status::active() {
-            internals.impl_().expect_starter = true;
-        }
-        Self::check_nl(internals, status)?;
-        internals.utf8_inner().flush_with_status(status)
+        internals.impl_().expect_starter = true;
+        Self::check_nl(internals)?;
+        internals.utf8_inner_mut().end()
     }
 
     pub(crate) fn abandon<Inner: WriteExt>(internals: &mut impl TextWriterInternals<Inner>) {
-        internals.utf8_inner().abandon();
+        internals.utf8_inner_mut().abandon();
 
         // Don't enforce a trailing newline.
         internals.impl_().state = State::Ground(true);
+    }
+
+    pub(crate) fn suggested_buffer_size<Inner: WriteExt>(
+        internals: &impl TextWriterInternals<Inner>,
+    ) -> usize {
+        internals.utf8_inner().suggested_buffer_size()
     }
 
     pub(crate) fn write_str<Inner: WriteExt>(
@@ -338,7 +358,7 @@ impl TextOutput {
         match str::from_utf8(buf) {
             Ok(s) => internals.write_str(s).map(|()| buf.len()),
             // Safety: See the example code here:
-            // https://doc.rust-lang.org/stable/std/str/struct.Utf8Error.html#examples
+            // https://doc.rust-lang.org/std/str/struct.Utf8Error.html#examples
             Err(error) if error.valid_up_to() != 0 => Self::write_str(internals, unsafe {
                 str::from_utf8_unchecked(&buf[..error.valid_up_to()])
             })
@@ -354,7 +374,33 @@ impl TextOutput {
     pub(crate) fn flush<Inner: WriteExt>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
-        default_flush(internals)
+        internals.impl_().expect_starter = true;
+        internals.utf8_inner_mut().flush()
+    }
+
+    #[inline]
+    pub(crate) fn write_vectored<Inner: WriteExt>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        bufs: &[io::IoSlice<'_>],
+    ) -> io::Result<usize> {
+        default_write_vectored(internals, bufs)
+    }
+
+    #[cfg(can_vector)]
+    #[inline]
+    pub(crate) fn is_write_vectored<Inner: WriteExt>(
+        internals: &impl TextWriterInternals<Inner>,
+    ) -> bool {
+        default_is_write_vectored(internals)
+    }
+
+    #[cfg(write_all_vectored)]
+    #[inline]
+    pub(crate) fn write_all_vectored<Inner: WriteExt>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        bufs: &mut [io::IoSlice<'_>],
+    ) -> io::Result<()> {
+        default_write_all_vectored(internals, bufs)
     }
 
     #[inline]

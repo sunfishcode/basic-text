@@ -1,18 +1,30 @@
 use crate::{text_output::TextOutput, Utf8Writer, WriteWrapper};
-use io_ext::{Status, WriteExt};
-use std::{io, str};
+use io_ext::{Bufferable, WriteExt};
+#[cfg(unix)]
+use std::os::unix::io::{AsRawFd, RawFd};
+#[cfg(target_os = "wasi")]
+use std::os::wasi::io::{AsRawFd, RawFd};
+use std::{
+    fmt,
+    io::{self, Write},
+    str,
+};
+#[cfg(feature = "terminal-support")]
+use terminal_support::{Terminal, TerminalColorSupport, WriteTerminal};
+#[cfg(windows)]
+use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
 /// A `WriteExt` implementation which translates to an output `WriteExt`
 /// producing a valid plain text stream from an arbitrary byte sequence.
 ///
 /// `write` is not guaranteed to perform a single operation, because short
 /// writes could produce invalid UTF-8, so `write` will retry as needed.
-pub struct TextWriter<Inner: WriteExt> {
+pub struct TextWriter<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Writer<Inner>,
 
     /// Temporary staging buffer.
-    pub(crate) impl_: TextOutput,
+    pub(crate) output: TextOutput,
 }
 
 impl<Inner: WriteExt> TextWriter<Inner> {
@@ -21,7 +33,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     pub fn new(inner: Inner) -> Self {
         Self {
             inner: Utf8Writer::new(inner),
-            impl_: TextOutput::new(),
+            output: TextOutput::new(),
         }
     }
 
@@ -30,10 +42,10 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     /// the text encoding.
     #[inline]
     pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
-        let impl_ = TextOutput::with_bom_compatibility(&mut inner)?;
+        let output = TextOutput::with_bom_compatibility(&mut inner)?;
         Ok(Self {
             inner: Utf8Writer::new(inner),
-            impl_,
+            output,
         })
     }
 
@@ -51,18 +63,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
         Self {
             inner: Utf8Writer::new(inner),
-            impl_: TextOutput::with_crlf_compatibility(),
-        }
-    }
-
-    /// Construct a new instance of `TextWriter` wrapping `inner` that
-    /// optionally permits "ANSI"-style color escape sequences of the form
-    /// `ESC [ ... m`.
-    #[inline]
-    pub fn with_ansi_color(inner: Inner, ansi_color: bool) -> Self {
-        Self {
-            inner: Utf8Writer::new(inner),
-            impl_: TextOutput::with_ansi_color(ansi_color),
+            output: TextOutput::with_crlf_compatibility(),
         }
     }
 
@@ -73,28 +74,70 @@ impl<Inner: WriteExt> TextWriter<Inner> {
         TextOutput::close_into_inner(self)
     }
 
-    /// Discard and close the underlying stream and return the underlying
-    /// stream object.
+    /// Return the underlying stream object.
     #[inline]
     pub fn abandon_into_inner(self) -> Inner {
         TextOutput::abandon_into_inner(self)
     }
 }
 
-impl<Inner: WriteExt> WriteExt for TextWriter<Inner> {
+#[cfg(feature = "terminal-support")]
+impl<Inner: WriteExt + WriteTerminal> TextWriter<Inner> {
+    /// Construct a new instance of `TextWriter` wrapping `inner` that
+    /// optionally permits "ANSI"-style color escape sequences of the form
+    /// `ESC [ ... m` on output.
     #[inline]
-    fn flush_with_status(&mut self, status: Status) -> io::Result<()> {
-        TextOutput::flush_with_status(self, status)
+    pub fn with_ansi_color_output(inner: Inner) -> Self {
+        let ansi_color = inner.color_support() != TerminalColorSupport::Monochrome;
+        Self {
+            inner: Utf8Writer::new(inner),
+            output: TextOutput::with_ansi_color(ansi_color),
+        }
+    }
+}
+
+#[cfg(feature = "terminal-support")]
+impl<Inner: WriteExt + WriteTerminal> Terminal for TextWriter<Inner> {}
+
+#[cfg(feature = "terminal-support")]
+impl<Inner: WriteExt + WriteTerminal> WriteTerminal for TextWriter<Inner> {
+    #[inline]
+    fn color_support(&self) -> TerminalColorSupport {
+        self.inner.color_support()
     }
 
+    #[inline]
+    fn color_preference(&self) -> bool {
+        self.inner.color_preference()
+    }
+
+    #[inline]
+    fn is_output_terminal(&self) -> bool {
+        self.inner.is_output_terminal()
+    }
+}
+
+impl<Inner: WriteExt> WriteExt for TextWriter<Inner> {
+    #[inline]
+    fn end(&mut self) -> io::Result<()> {
+        TextOutput::end(self)
+    }
+
+    #[inline]
+    fn write_str(&mut self, s: &str) -> io::Result<()> {
+        TextOutput::write_str(self, s)
+    }
+}
+
+impl<Inner: WriteExt> Bufferable for TextWriter<Inner> {
     #[inline]
     fn abandon(&mut self) {
         TextOutput::abandon(self)
     }
 
     #[inline]
-    fn write_str(&mut self, s: &str) -> io::Result<()> {
-        TextOutput::write_str(self, s)
+    fn suggested_buffer_size(&self) -> usize {
+        TextOutput::suggested_buffer_size(self)
     }
 }
 
@@ -110,7 +153,7 @@ impl<Inner: WriteExt> WriteWrapper<Inner> for TextWriter<Inner> {
     }
 }
 
-impl<Inner: WriteExt> io::Write for TextWriter<Inner> {
+impl<Inner: WriteExt> Write for TextWriter<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         TextOutput::write(self, buf)
@@ -120,12 +163,52 @@ impl<Inner: WriteExt> io::Write for TextWriter<Inner> {
     fn flush(&mut self) -> io::Result<()> {
         TextOutput::flush(self)
     }
+
+    #[cfg(can_vector)]
+    #[inline]
+    fn is_write_vectored(&self) -> bool {
+        TextOutput::is_write_vectored(self)
+    }
+
+    #[inline]
+    fn write_vectored(&mut self, bufs: &[io::IoSlice<'_>]) -> io::Result<usize> {
+        TextOutput::write_vectored(self, bufs)
+    }
+
+    #[cfg(write_all_vectored)]
+    #[inline]
+    fn write_all_vectored(&mut self, bufs: &mut [io::IoSlice<'_>]) -> io::Result<()> {
+        TextOutput::write_all_vectored(self, bufs)
+    }
+}
+
+#[cfg(not(windows))]
+impl<Inner: WriteExt + AsRawFd> AsRawFd for TextWriter<Inner> {
+    #[inline]
+    fn as_raw_fd(&self) -> RawFd {
+        self.inner.as_raw_fd()
+    }
+}
+
+#[cfg(windows)]
+impl<Inner: WriteExt + AsRawHandleOrSocket> AsRawHandleOrSocket for TextWriter<Inner> {
+    #[inline]
+    fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
+        self.inner.as_raw_handle_or_socket()
+    }
+}
+
+impl<Inner: fmt::Debug> fmt::Debug for TextWriter<Inner> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut b = f.debug_struct("TextWriter");
+        b.field("inner", &self.inner);
+        b.finish()
+    }
 }
 
 #[cfg(test)]
-fn translate_via_std_writer(bytes: &[u8]) -> io::Result<String> {
-    use std::io::Write;
-    let mut writer = TextWriter::new(io_ext_adapters::StdWriter::new(Vec::<u8>::new()));
+fn translate_via_ext_writer(bytes: &[u8]) -> io::Result<String> {
+    let mut writer = TextWriter::new(io_ext_adapters::ExtWriter::new(Vec::<u8>::new()));
     writer.write_all(bytes)?;
     let inner = writer.close_into_inner()?;
     Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
@@ -133,12 +216,12 @@ fn translate_via_std_writer(bytes: &[u8]) -> io::Result<String> {
 
 #[cfg(test)]
 fn test(bytes: &[u8], s: &str) {
-    assert_eq!(translate_via_std_writer(bytes).unwrap(), s);
+    assert_eq!(translate_via_ext_writer(bytes).unwrap(), s);
 }
 
 #[cfg(test)]
 fn test_error(bytes: &[u8]) {
-    assert!(translate_via_std_writer(bytes).is_err());
+    assert!(translate_via_ext_writer(bytes).is_err());
 }
 
 #[test]

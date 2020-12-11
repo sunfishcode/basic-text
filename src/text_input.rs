@@ -1,4 +1,4 @@
-//! Text input for `TextReader` and the reader half of `TextReaderWriter`.
+//! Text input for `TextReader` and the reader half of `TextInteractor`.
 
 use crate::{
     rc_char_queue::{RcCharQueue, RcCharQueueIter},
@@ -7,17 +7,19 @@ use crate::{
         is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
     },
-    ReadStr, TextReader, TextReaderWriter, Utf8Reader, Utf8ReaderWriter,
+    TextInteractor, TextReader, Utf8Interactor, Utf8Reader,
 };
+#[cfg(can_vector)]
+use io_ext::default_is_read_vectored;
 use io_ext::{
-    default_read, default_read_exact, default_read_to_end, default_read_vectored, ReadExt,
-    ReadWriteExt, Status,
+    default_read, default_read_exact, default_read_to_end, default_read_vectored, Bufferable,
+    InteractExt, ReadExt, Status,
 };
-use std::{io, mem, str};
+use std::{cmp::max, io, mem, str};
 use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
 
-pub(crate) trait TextReaderInternals<Inner: ReadExt>: ReadExt {
-    type Utf8Inner: ReadStr;
+pub(crate) trait TextReaderInternals<Inner>: ReadExt {
+    type Utf8Inner: ReadExt;
     fn impl_(&mut self) -> &mut TextInput;
     fn inner(&self) -> &Self::Utf8Inner;
     fn inner_mut(&mut self) -> &mut Self::Utf8Inner;
@@ -39,8 +41,8 @@ impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadWriteExt> TextReaderInternals<Inner> for TextReaderWriter<Inner> {
-    type Utf8Inner = Utf8ReaderWriter<Inner>;
+impl<Inner: InteractExt> TextReaderInternals<Inner> for TextInteractor<Inner> {
+    type Utf8Inner = Utf8Interactor<Inner>;
 
     fn impl_(&mut self) -> &mut TextInput {
         &mut self.input
@@ -122,7 +124,7 @@ impl TextInput {
     }
 
     fn queue_next(&mut self, sequence_end: bool) -> Option<char> {
-        if !sequence_end && self.queue.len() < NORMALIZATION_BUFFER_LEN {
+        if !sequence_end && !self.queue.has_reset() && self.queue.len() < NORMALIZATION_BUFFER_LEN {
             return None;
         }
         if self.queue_iter.is_none() {
@@ -331,10 +333,34 @@ impl TextInput {
         ))
     }
 
+    #[inline]
     pub(crate) fn minimum_buffer_size<Inner: ReadExt>(
-        _internals: &impl TextReaderInternals<Inner>,
+        internals: &impl TextReaderInternals<Inner>,
     ) -> usize {
-        NORMALIZATION_BUFFER_SIZE
+        max(
+            NORMALIZATION_BUFFER_SIZE,
+            internals.inner().minimum_buffer_size(),
+        )
+    }
+
+    #[inline]
+    pub(crate) fn abandon<Inner: ReadExt>(internals: &mut impl TextReaderInternals<Inner>) {
+        // Don't enforce a trailing newline.
+        internals.impl_().state = State::Ground(true);
+
+        assert!(internals.impl_().queue.is_empty());
+
+        internals.inner_mut().abandon()
+    }
+
+    #[inline]
+    pub(crate) fn suggested_buffer_size<Inner: ReadExt>(
+        internals: &impl TextReaderInternals<Inner>,
+    ) -> usize {
+        max(
+            Self::minimum_buffer_size(internals),
+            internals.inner().suggested_buffer_size(),
+        )
     }
 
     #[inline]
@@ -353,7 +379,7 @@ impl TextInput {
         default_read_vectored(internals, bufs)
     }
 
-    #[cfg(feature = "nightly")]
+    #[cfg(can_vector)]
     #[inline]
     pub(crate) fn is_read_vectored<Inner: ReadExt>(
         internals: &impl TextReaderInternals<Inner>,

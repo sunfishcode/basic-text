@@ -4,7 +4,7 @@
 extern crate libfuzzer_sys;
 
 use io_ext::{SliceReader, WriteExt};
-use io_ext_adapters::StdWriter;
+use io_ext_adapters::ExtWriter;
 use std::{
     io::{Read, Write},
     str,
@@ -14,7 +14,7 @@ use unicode_normalization::UnicodeNormalization;
 
 fuzz_target!(|bytes: &[u8]| {
     let mut reader = TextReader::new(SliceReader::new(bytes));
-    let mut writer = TextWriter::new(StdWriter::new(Vec::<u8>::new()));
+    let mut writer = TextWriter::new(ExtWriter::new(Vec::<u8>::new()));
 
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
@@ -46,7 +46,7 @@ fuzz_target!(|bytes: &[u8]| {
 
     // Iff a text reader normalized something, that same thing should fail
     // when written as output.
-    let mut writer = TextWriter::new(StdWriter::new(Vec::<u8>::new()));
+    let mut writer = TextWriter::new(ExtWriter::new(Vec::<u8>::new()));
     match str::from_utf8(bytes) {
         Ok(utf8) => {
             let result = writer

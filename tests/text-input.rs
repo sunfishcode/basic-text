@@ -1,12 +1,13 @@
 mod disallowed_scalar_values;
 
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
-use io_ext_adapters::StdReader;
+use io_ext_adapters::ExtReader;
+#[cfg(test)]
+use std::io::Read;
 use text_streams::TextReader;
 
 fn to_text(input: &str) -> String {
-    use std::io::Read;
-    let mut reader = TextReader::new(StdReader::generic(input.as_bytes()));
+    let mut reader = TextReader::new(ExtReader::new(input.as_bytes()));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s

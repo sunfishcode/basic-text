@@ -1,12 +1,13 @@
-use crate::{Utf8ReaderWriter, Utf8Writer, WriteWrapper};
-use io_ext::{ReadWriteExt, Status, WriteExt};
-use std::{io, str};
+use crate::{Utf8Interactor, Utf8Writer, WriteWrapper};
+use io_ext::{default_write_fmt, InteractExt, WriteExt};
+use std::{fmt::Arguments, io, str};
 
 pub(crate) trait Utf8WriterInternals<Inner: WriteExt>:
     WriteExt + WriteWrapper<Inner>
 {
     fn impl_(&mut self) -> &mut Utf8Output;
-    fn inner(&mut self) -> &mut Inner;
+    fn inner(&self) -> &Inner;
+    fn inner_mut(&mut self) -> &mut Inner;
     fn into_inner(self) -> Inner;
 }
 
@@ -15,7 +16,11 @@ impl<Inner: WriteExt> Utf8WriterInternals<Inner> for Utf8Writer<Inner> {
         &mut self.output
     }
 
-    fn inner(&mut self) -> &mut Inner {
+    fn inner(&self) -> &Inner {
+        &self.inner
+    }
+
+    fn inner_mut(&mut self) -> &mut Inner {
         &mut self.inner
     }
 
@@ -24,12 +29,16 @@ impl<Inner: WriteExt> Utf8WriterInternals<Inner> for Utf8Writer<Inner> {
     }
 }
 
-impl<Inner: ReadWriteExt> Utf8WriterInternals<Inner> for Utf8ReaderWriter<Inner> {
+impl<Inner: InteractExt> Utf8WriterInternals<Inner> for Utf8Interactor<Inner> {
     fn impl_(&mut self) -> &mut Utf8Output {
         &mut self.output
     }
 
-    fn inner(&mut self) -> &mut Inner {
+    fn inner(&self) -> &Inner {
+        &self.inner
+    }
+
+    fn inner_mut(&mut self) -> &mut Inner {
         &mut self.inner
     }
 
@@ -53,12 +62,11 @@ impl Utf8Output {
     pub(crate) fn close_into_inner<Inner: WriteExt>(
         mut internals: impl Utf8WriterInternals<Inner>,
     ) -> io::Result<Inner> {
-        internals.flush_with_status(Status::End)?;
+        internals.flush()?;
         Ok(internals.into_inner())
     }
 
-    /// Discard and close the underlying stream and return the underlying
-    /// stream object.
+    /// Return the underlying stream object.
     #[inline]
     pub(crate) fn abandon_into_inner<Inner: WriteExt>(
         internals: impl Utf8WriterInternals<Inner>,
@@ -67,16 +75,22 @@ impl Utf8Output {
     }
 
     #[inline]
-    pub(crate) fn flush_with_status<Inner: WriteExt>(
+    pub(crate) fn end<Inner: WriteExt>(
         internals: &mut impl Utf8WriterInternals<Inner>,
-        status: Status,
     ) -> io::Result<()> {
-        internals.inner().flush_with_status(status)
+        internals.inner_mut().end()
     }
 
     #[inline]
     pub(crate) fn abandon<Inner: WriteExt>(internals: &mut impl Utf8WriterInternals<Inner>) {
-        internals.inner().abandon()
+        internals.inner_mut().abandon()
+    }
+
+    #[inline]
+    pub(crate) fn suggested_buffer_size<Inner: WriteExt>(
+        internals: &impl Utf8WriterInternals<Inner>,
+    ) -> usize {
+        internals.inner().suggested_buffer_size()
     }
 
     #[inline]
@@ -84,7 +98,7 @@ impl Utf8Output {
         internals: &mut impl Utf8WriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
-        internals.inner().write_str(s)
+        internals.inner_mut().write_str(s)
     }
 
     pub(crate) fn write<Inner: WriteExt>(
@@ -94,11 +108,11 @@ impl Utf8Output {
         match str::from_utf8(buf) {
             Ok(s) => Self::write_str(internals, s).map(|_| buf.len()),
             Err(error) if error.valid_up_to() != 0 => internals
-                .inner()
+                .inner_mut()
                 .write_all(&buf[..error.valid_up_to()])
                 .map(|_| error.valid_up_to()),
             Err(error) => {
-                internals.inner().abandon();
+                internals.inner_mut().abandon();
                 Err(io::Error::new(io::ErrorKind::Other, error))
             }
         }
@@ -108,6 +122,14 @@ impl Utf8Output {
     pub(crate) fn flush<Inner: WriteExt>(
         internals: &mut impl Utf8WriterInternals<Inner>,
     ) -> io::Result<()> {
-        internals.inner().flush()
+        internals.inner_mut().flush()
+    }
+
+    #[inline]
+    pub(crate) fn write_fmt<Inner: WriteExt>(
+        internals: &mut impl Utf8WriterInternals<Inner>,
+        fmt: Arguments,
+    ) -> io::Result<()> {
+        default_write_fmt(internals, fmt)
     }
 }

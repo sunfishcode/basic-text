@@ -4,13 +4,13 @@
 extern crate libfuzzer_sys;
 
 use std::str;
-use text_streams::{Read, StdReader, Utf8Reader};
+use text_streams::{ExtReader, Read, Utf8Reader};
 
 fuzz_target!(|bytes: &[u8]| {
     // Reading from a `Utf8Reader` should produce the same output as `String::from_utf8_lossy`.
     let lossy = String::from_utf8_lossy(bytes).to_string();
     let input = bytes;
-    let mut reader = Utf8Reader::new(StdReader::new(input));
+    let mut reader = Utf8Reader::new(ExtReader::new(input));
     let mut buf = [0; 4];
     let mut b4 = Vec::new();
     let r4 = loop {
@@ -32,7 +32,7 @@ fuzz_target!(|bytes: &[u8]| {
 
     // Reading with 8-byte buffers should produce the same results as reading with 4-byte buffers.
     let input = bytes;
-    let mut reader = Utf8Reader::new(StdReader::new(input));
+    let mut reader = Utf8Reader::new(ExtReader::new(input));
     let mut buf = [0; 8];
     let mut b8 = Vec::new();
     let r8 = loop {

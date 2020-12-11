@@ -17,13 +17,10 @@ rustc_version = "0.3.0"
 io-ext = { path = "../io-ext" }
 io-ext-adapters = { path = "../io-ext-adapters" }
 unicode-normalization = { path = "../unicode-normalization" }
+terminal-support = { path = "../terminal-support", optional = true }
 
 [dev-dependencies]
 anyhow = "1.0.35"
-
-[features]
-default = []
-nightly = []
 
 [badges]
 maintenance = { status = "actively-developed" }

@@ -1,9 +1,14 @@
-use crate::{unicode::REPL, Utf8Reader, Utf8ReaderWriter};
+use crate::{unicode::REPL, Utf8Interactor, Utf8Reader};
+#[cfg(can_vector)]
+use io_ext::default_is_read_vectored;
 use io_ext::{
     default_read, default_read_exact, default_read_to_end, default_read_to_string,
-    default_read_vectored, ReadExt, ReadWriteExt, Status,
+    default_read_vectored, InteractExt, ReadExt, Status,
 };
-use std::{cmp::min, io, str};
+use std::{
+    cmp::{max, min},
+    io, str,
+};
 
 pub(crate) trait Utf8ReaderInternals<Inner: ReadExt>: ReadExt {
     fn impl_(&mut self) -> &mut Utf8Input;
@@ -25,7 +30,7 @@ impl<Inner: ReadExt> Utf8ReaderInternals<Inner> for Utf8Reader<Inner> {
     }
 }
 
-impl<Inner: ReadWriteExt> Utf8ReaderInternals<Inner> for Utf8ReaderWriter<Inner> {
+impl<Inner: InteractExt> Utf8ReaderInternals<Inner> for Utf8Interactor<Inner> {
     fn impl_(&mut self) -> &mut Utf8Input {
         &mut self.input
     }
@@ -133,10 +138,11 @@ impl Utf8Input {
         }
     }
 
+    #[inline]
     pub(crate) fn minimum_buffer_size<Inner: ReadExt>(
         internals: &impl Utf8ReaderInternals<Inner>,
     ) -> usize {
-        internals.inner().minimum_buffer_size()
+        max(4, internals.inner().minimum_buffer_size())
     }
 
     /// If normal reading encounters invalid bytes, the data is copied into
@@ -206,6 +212,22 @@ impl Utf8Input {
     }
 
     #[inline]
+    pub(crate) fn abandon<Inner: ReadExt>(internals: &mut impl Utf8ReaderInternals<Inner>) {
+        internals.impl_().overflow.clear();
+        internals.inner_mut().abandon()
+    }
+
+    #[inline]
+    pub(crate) fn suggested_buffer_size<Inner: ReadExt>(
+        internals: &impl Utf8ReaderInternals<Inner>,
+    ) -> usize {
+        max(
+            Self::minimum_buffer_size(internals),
+            internals.inner().suggested_buffer_size(),
+        )
+    }
+
+    #[inline]
     pub(crate) fn read<Inner: ReadExt>(
         internals: &mut impl Utf8ReaderInternals<Inner>,
         buf: &mut [u8],
@@ -221,10 +243,10 @@ impl Utf8Input {
         default_read_vectored(internals, bufs)
     }
 
-    #[cfg(feature = "nightly")]
+    #[cfg(can_vector)]
     #[inline]
     pub(crate) fn is_read_vectored<Inner: ReadExt>(
-        &internals: &Utf8ReaderInternals<Inner>,
+        internals: &impl Utf8ReaderInternals<Inner>,
     ) -> bool {
         default_is_read_vectored(internals)
     }

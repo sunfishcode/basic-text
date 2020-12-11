@@ -1,24 +1,25 @@
-use crate::utf8_input::Utf8Input;
-use io_ext::{ReadExt, Status};
-use std::{io, str};
-
-/// Add a convenience method for reading into `str`.
-pub trait ReadStr: ReadExt {
-    /// Like `read_with_status` but produces the result in a `str`. Be sure to
-    /// check the `size` field of the return value to see how many bytes were
-    /// written.
-    fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)>;
-
-    /// Like `read_exact` but produces the result in a `str`.
-    fn read_exact_str(&mut self, buf: &mut str) -> io::Result<()>;
-}
+use crate::{utf8_input::Utf8Input, ReadStr};
+use io_ext::{Bufferable, ReadExt, Status};
+#[cfg(unix)]
+use std::os::unix::io::{AsRawFd, RawFd};
+#[cfg(target_os = "wasi")]
+use std::os::wasi::io::{AsRawFd, RawFd};
+use std::{
+    fmt,
+    io::{self, Read},
+    str,
+};
+#[cfg(feature = "terminal-support")]
+use terminal_support::{ReadTerminal, Terminal};
+#[cfg(windows)]
+use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
 /// A `Read` implementation which translates from an input `Read` producing
 /// an arbitrary byte sequence into a valid UTF-8 sequence with invalid
 /// sequences replaced by U+FFFD (REPLACEMENT CHARACTER) in the manner of
 /// `String::from_utf8_lossy`, where scalar value encodings never straddle `read`
 /// calls (callers can do `str::from_utf8` and it will always succeed).
-pub struct Utf8Reader<Inner: ReadExt> {
+pub struct Utf8Reader<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
@@ -36,6 +37,22 @@ impl<Inner: ReadExt> Utf8Reader<Inner> {
     }
 }
 
+#[cfg(feature = "terminal-support")]
+impl<Inner: ReadExt + ReadTerminal> Terminal for Utf8Reader<Inner> {}
+
+#[cfg(feature = "terminal-support")]
+impl<Inner: ReadExt + ReadTerminal> ReadTerminal for Utf8Reader<Inner> {
+    #[inline]
+    fn is_line_by_line(&self) -> bool {
+        self.inner.is_line_by_line()
+    }
+
+    #[inline]
+    fn is_input_terminal(&self) -> bool {
+        self.inner.is_input_terminal()
+    }
+}
+
 impl<Inner: ReadExt> ReadExt for Utf8Reader<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
@@ -45,6 +62,18 @@ impl<Inner: ReadExt> ReadExt for Utf8Reader<Inner> {
     #[inline]
     fn minimum_buffer_size(&self) -> usize {
         Utf8Input::minimum_buffer_size(self)
+    }
+}
+
+impl<Inner: ReadExt + Bufferable> Bufferable for Utf8Reader<Inner> {
+    #[inline]
+    fn abandon(&mut self) {
+        Utf8Input::abandon(self)
+    }
+
+    #[inline]
+    fn suggested_buffer_size(&self) -> usize {
+        Utf8Input::suggested_buffer_size(self)
     }
 }
 
@@ -60,7 +89,7 @@ impl<Inner: ReadExt> ReadStr for Utf8Reader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> io::Read for Utf8Reader<Inner> {
+impl<Inner: ReadExt> Read for Utf8Reader<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         Utf8Input::read(self, buf)
@@ -71,10 +100,10 @@ impl<Inner: ReadExt> io::Read for Utf8Reader<Inner> {
         Utf8Input::read_vectored(self, bufs)
     }
 
-    #[cfg(feature = "nightly")]
+    #[cfg(can_vector)]
     #[inline]
-    fn is_read_vectored(&self, inner: &Inner) -> bool {
-        Utf8Input::is_read_vectored(&self)
+    fn is_read_vectored(&self) -> bool {
+        Utf8Input::is_read_vectored(self)
     }
 
     #[inline]
@@ -93,10 +122,33 @@ impl<Inner: ReadExt> io::Read for Utf8Reader<Inner> {
     }
 }
 
+#[cfg(not(windows))]
+impl<Inner: ReadExt + AsRawFd> AsRawFd for Utf8Reader<Inner> {
+    #[inline]
+    fn as_raw_fd(&self) -> RawFd {
+        self.inner.as_raw_fd()
+    }
+}
+
+#[cfg(windows)]
+impl<Inner: ReadExt + AsRawHandleOrSocket> AsRawHandleOrSocket for Utf8Reader<Inner> {
+    #[inline]
+    fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
+        self.inner.as_raw_handle_or_socket()
+    }
+}
+
+impl<Inner: fmt::Debug> fmt::Debug for Utf8Reader<Inner> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut b = f.debug_struct("Utf8Reader");
+        b.field("inner", &self.inner);
+        b.finish()
+    }
+}
+
 #[cfg(test)]
-fn translate_via_std_reader(bytes: &[u8]) -> String {
-    use std::io::Read;
-    let mut reader = Utf8Reader::new(io_ext_adapters::StdReader::generic(bytes));
+fn translate_via_ext_reader(bytes: &[u8]) -> String {
+    let mut reader = Utf8Reader::new(io_ext_adapters::ExtReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -104,7 +156,6 @@ fn translate_via_std_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_via_slice_reader(bytes: &[u8]) -> String {
-    use std::io::Read;
     let mut reader = Utf8Reader::new(io_ext::SliceReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
@@ -128,7 +179,7 @@ fn translate_with_small_buffer(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn test(bytes: &[u8], s: &str) {
-    assert_eq!(translate_via_std_reader(bytes), s);
+    assert_eq!(translate_via_ext_reader(bytes), s);
     assert_eq!(translate_via_slice_reader(bytes), s);
     assert_eq!(translate_with_small_buffer(bytes), s);
 
@@ -136,7 +187,7 @@ fn test(bytes: &[u8], s: &str) {
         let mut v = vec![0u8; i + bytes.len()];
         v[i..i + bytes.len()].copy_from_slice(bytes);
         assert_eq!(
-            str::from_utf8(&translate_via_std_reader(&v).as_bytes()[i..]).unwrap(),
+            str::from_utf8(&translate_via_ext_reader(&v).as_bytes()[i..]).unwrap(),
             s
         );
         assert_eq!(

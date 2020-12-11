@@ -1,10 +1,22 @@
 use crate::{text_input::TextInput, ReadStr, Utf8Reader};
-use io_ext::{ReadExt, Status};
-use std::{io, str};
+use io_ext::{Bufferable, ReadExt, Status};
+#[cfg(unix)]
+use std::os::unix::io::{AsRawFd, RawFd};
+#[cfg(target_os = "wasi")]
+use std::os::wasi::io::{AsRawFd, RawFd};
+use std::{
+    fmt,
+    io::{self, Read},
+    str,
+};
+#[cfg(feature = "terminal-support")]
+use terminal_support::{ReadTerminal, Terminal};
+#[cfg(windows)]
+use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
 /// A `ReadExt` implementation which translates from an input `ReadExt`
 /// producing an arbitrary byte sequence into a valid plain text stream.
-pub struct TextReader<Inner: ReadExt> {
+pub struct TextReader<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Reader<Inner>,
 
@@ -22,6 +34,22 @@ impl<Inner: ReadExt> TextReader<Inner> {
     }
 }
 
+#[cfg(feature = "terminal-support")]
+impl<Inner: ReadExt + ReadTerminal> Terminal for TextReader<Inner> {}
+
+#[cfg(feature = "terminal-support")]
+impl<Inner: ReadExt + ReadTerminal> ReadTerminal for TextReader<Inner> {
+    #[inline]
+    fn is_line_by_line(&self) -> bool {
+        self.inner.is_line_by_line()
+    }
+
+    #[inline]
+    fn is_input_terminal(&self) -> bool {
+        self.inner.is_input_terminal()
+    }
+}
+
 impl<Inner: ReadExt> ReadExt for TextReader<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
@@ -34,7 +62,19 @@ impl<Inner: ReadExt> ReadExt for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt + ReadStr> ReadStr for TextReader<Inner> {
+impl<Inner: ReadExt> Bufferable for TextReader<Inner> {
+    #[inline]
+    fn abandon(&mut self) {
+        TextInput::abandon(self)
+    }
+
+    #[inline]
+    fn suggested_buffer_size(&self) -> usize {
+        TextInput::suggested_buffer_size(self)
+    }
+}
+
+impl<Inner: ReadExt> ReadStr for TextReader<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
         TextInput::read_str(self, buf)
@@ -46,7 +86,7 @@ impl<Inner: ReadExt + ReadStr> ReadStr for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> io::Read for TextReader<Inner> {
+impl<Inner: ReadExt> Read for TextReader<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         TextInput::read(self, buf)
@@ -57,7 +97,7 @@ impl<Inner: ReadExt> io::Read for TextReader<Inner> {
         TextInput::read_vectored(self, bufs)
     }
 
-    #[cfg(feature = "nightly")]
+    #[cfg(can_vector)]
     #[inline]
     fn is_read_vectored(&self) -> bool {
         TextInput::is_read_vectored(self)
@@ -79,10 +119,33 @@ impl<Inner: ReadExt> io::Read for TextReader<Inner> {
     }
 }
 
+#[cfg(not(windows))]
+impl<Inner: ReadExt + AsRawFd> AsRawFd for TextReader<Inner> {
+    #[inline]
+    fn as_raw_fd(&self) -> RawFd {
+        self.inner.as_raw_fd()
+    }
+}
+
+#[cfg(windows)]
+impl<Inner: ReadExt + AsRawHandleOrSocket> AsRawHandleOrSocket for TextReader<Inner> {
+    #[inline]
+    fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
+        self.inner.as_raw_handle_or_socket()
+    }
+}
+
+impl<Inner: fmt::Debug> fmt::Debug for TextReader<Inner> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut b = f.debug_struct("TextReader");
+        b.field("inner", &self.inner);
+        b.finish()
+    }
+}
+
 #[cfg(test)]
-fn translate_via_std_reader(bytes: &[u8]) -> String {
-    use std::io::Read;
-    let mut reader = TextReader::new(io_ext_adapters::StdReader::generic(bytes));
+fn translate_via_ext_reader(bytes: &[u8]) -> String {
+    let mut reader = TextReader::new(io_ext_adapters::ExtReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -90,7 +153,6 @@ fn translate_via_std_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_via_slice_reader(bytes: &[u8]) -> String {
-    use std::io::Read;
     let mut reader = TextReader::new(io_ext::SliceReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
@@ -114,7 +176,7 @@ fn translate_with_small_buffer(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn test(bytes: &[u8], s: &str) {
-    assert_eq!(translate_via_std_reader(bytes), s);
+    assert_eq!(translate_via_ext_reader(bytes), s);
     assert_eq!(translate_via_slice_reader(bytes), s);
     assert_eq!(translate_with_small_buffer(bytes), s);
 }
