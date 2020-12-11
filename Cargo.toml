@@ -10,6 +10,9 @@ repository = "https://github.com/sunfishcode/text-streams"
 edition = "2018"
 readme = "README.md"
 
+[build-dependencies]
+rustc_version = "0.3.0"
+
 [dependencies]
 io-ext = { path = "../io-ext" }
 io-ext-adapters = { path = "../io-ext-adapters" }
@@ -20,7 +23,7 @@ anyhow = "1.0.35"
 
 [features]
 default = []
-nightly = ["io-ext/nightly", "io-ext-adapters/nightly"]
+nightly = []
 
 [badges]
 maintenance = { status = "actively-developed" }
