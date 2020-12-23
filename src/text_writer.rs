@@ -1,4 +1,4 @@
-use crate::{text_output::TextOutput, Utf8Writer, WriteWrapper};
+use crate::{text_output::TextOutput, TextStr, Utf8Writer, WriteText, WriteWrapper};
 use io_ext::{Bufferable, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -15,7 +15,7 @@ use terminal_support::{Terminal, TerminalColorSupport, WriteTerminal};
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
 /// A `WriteExt` implementation which translates to an output `WriteExt`
-/// producing a valid plain text stream from an arbitrary byte sequence.
+/// producing a valid Basic Text stream from an arbitrary byte sequence.
 ///
 /// `write` is not guaranteed to perform a single operation, because short
 /// writes could produce invalid UTF-8, so `write` will retry as needed.
@@ -23,7 +23,7 @@ pub struct TextWriter<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Writer<Inner>,
 
-    /// Temporary staging buffer.
+    /// Text translation state.
     pub(crate) output: TextOutput,
 }
 
@@ -119,13 +119,20 @@ impl<Inner: WriteExt + WriteTerminal> WriteTerminal for TextWriter<Inner> {
 
 impl<Inner: WriteExt> WriteExt for TextWriter<Inner> {
     #[inline]
-    fn end(&mut self) -> io::Result<()> {
-        TextOutput::end(self)
+    fn close(&mut self) -> io::Result<()> {
+        TextOutput::close(self)
     }
 
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
+    }
+}
+
+impl<Inner: WriteExt> WriteText for TextWriter<Inner> {
+    #[inline]
+    fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
+        TextOutput::write_text(self, s)
     }
 }
 
@@ -221,7 +228,7 @@ fn test(bytes: &[u8], s: &str) {
 
 #[cfg(test)]
 fn test_error(bytes: &[u8]) {
-    assert!(translate_via_ext_writer(bytes).is_err());
+    translate_via_ext_writer(bytes).unwrap_err();
 }
 
 #[test]
@@ -243,18 +250,23 @@ fn test_nl() {
 #[test]
 fn test_bom() {
     test_error("\u{feff}".as_bytes());
+    test_error("\u{feff}\n".as_bytes());
     test_error("\u{feff}hello\u{feff}world\u{feff}".as_bytes());
-    test_error("\u{feff}hello world".as_bytes());
-    test_error("hello\u{feff}world".as_bytes());
+    test_error("\u{feff}hello\u{feff}world\u{feff}\n".as_bytes());
+    test_error("\u{feff}hello world\n".as_bytes());
+    test_error("hello\u{feff}world\n".as_bytes());
     test_error("hello world\u{feff}".as_bytes());
+    test_error("hello world\u{feff}\n".as_bytes());
 }
 
 #[test]
 fn test_crlf() {
     test_error(b"\r\n");
+    test_error(b"\r\nhello\r\nworld\r");
     test_error(b"\r\nhello\r\nworld\r\n");
-    test_error(b"\r\nhello world");
-    test_error(b"hello\r\nworld");
+    test_error(b"\r\nhello world\n");
+    test_error(b"hello\r\nworld\n");
+    test_error(b"hello world\r");
     test_error(b"hello world\r\n");
 }
 
@@ -262,27 +274,35 @@ fn test_crlf() {
 fn test_cr_plain() {
     test_error(b"\r");
     test_error(b"\rhello\rworld\r");
-    test_error(b"\rhello world");
-    test_error(b"hello\rworld");
+    test_error(b"\rhello\rworld\r\n");
+    test_error(b"\rhello world\n");
+    test_error(b"hello\rworld\n");
     test_error(b"hello world\r");
+    test_error(b"hello world\r\n");
 }
 
 #[test]
 fn test_ff() {
     test_error(b"\x0c");
+    test_error(b"\x0c\n");
     test_error(b"\x0chello\x0cworld\x0c");
-    test_error(b"\x0chello world");
-    test_error(b"hello\x0cworld");
+    test_error(b"\x0chello\x0cworld\x0c\n");
+    test_error(b"\x0chello world\n");
+    test_error(b"hello\x0cworld\n");
     test_error(b"hello world\x0c");
+    test_error(b"hello world\x0c\n");
 }
 
 #[test]
 fn test_del() {
     test_error(b"\x7f");
+    test_error(b"\x7f\n");
     test_error(b"\x7fhello\x7fworld\x7f");
-    test_error(b"\x7fhello world");
-    test_error(b"hello\x7fworld");
+    test_error(b"\x7fhello\x7fworld\x7f\n");
+    test_error(b"\x7fhello world\n");
+    test_error(b"hello\x7fworld\n");
     test_error(b"hello world\x7f");
+    test_error(b"hello world\x7f\n");
 }
 
 #[test]
@@ -315,6 +335,35 @@ fn test_non_text_c0() {
     test_error(b"\x1d");
     test_error(b"\x1e");
     test_error(b"\x1f");
+
+    test_error(b"\x00\n");
+    test_error(b"\x01\n");
+    test_error(b"\x02\n");
+    test_error(b"\x03\n");
+    test_error(b"\x04\n");
+    test_error(b"\x05\n");
+    test_error(b"\x06\n");
+    test_error(b"\x07\n");
+    test_error(b"\x08\n");
+    test_error(b"\x0b\n");
+    test_error(b"\x0e\n");
+    test_error(b"\x0f\n");
+    test_error(b"\x10\n");
+    test_error(b"\x11\n");
+    test_error(b"\x12\n");
+    test_error(b"\x13\n");
+    test_error(b"\x14\n");
+    test_error(b"\x15\n");
+    test_error(b"\x16\n");
+    test_error(b"\x17\n");
+    test_error(b"\x18\n");
+    test_error(b"\x19\n");
+    test_error(b"\x1a\n");
+    test_error(b"\x1b\n");
+    test_error(b"\x1c\n");
+    test_error(b"\x1d\n");
+    test_error(b"\x1e\n");
+    test_error(b"\x1f\n");
 }
 
 #[test]
@@ -351,10 +400,44 @@ fn test_c1() {
     test_error("\u{9d}".as_bytes());
     test_error("\u{9e}".as_bytes());
     test_error("\u{9f}".as_bytes());
+
+    test_error("\u{80}\n".as_bytes());
+    test_error("\u{81}\n".as_bytes());
+    test_error("\u{82}\n".as_bytes());
+    test_error("\u{83}\n".as_bytes());
+    test_error("\u{84}\n".as_bytes());
+    test_error("\u{85}\n".as_bytes());
+    test_error("\u{86}\n".as_bytes());
+    test_error("\u{87}\n".as_bytes());
+    test_error("\u{88}\n".as_bytes());
+    test_error("\u{89}\n".as_bytes());
+    test_error("\u{8a}\n".as_bytes());
+    test_error("\u{8b}\n".as_bytes());
+    test_error("\u{8c}\n".as_bytes());
+    test_error("\u{8d}\n".as_bytes());
+    test_error("\u{8e}\n".as_bytes());
+    test_error("\u{8f}\n".as_bytes());
+    test_error("\u{90}\n".as_bytes());
+    test_error("\u{91}\n".as_bytes());
+    test_error("\u{92}\n".as_bytes());
+    test_error("\u{93}\n".as_bytes());
+    test_error("\u{94}\n".as_bytes());
+    test_error("\u{95}\n".as_bytes());
+    test_error("\u{96}\n".as_bytes());
+    test_error("\u{97}\n".as_bytes());
+    test_error("\u{98}\n".as_bytes());
+    test_error("\u{99}\n".as_bytes());
+    test_error("\u{9a}\n".as_bytes());
+    test_error("\u{9b}\n".as_bytes());
+    test_error("\u{9c}\n".as_bytes());
+    test_error("\u{9d}\n".as_bytes());
+    test_error("\u{9e}\n".as_bytes());
+    test_error("\u{9f}\n".as_bytes());
 }
 
 #[test]
 fn test_nfc() {
+    test_error("\u{212b}".as_bytes());
     test_error("\u{212b}\n".as_bytes());
     test("\u{c5}\n".as_bytes(), "\u{c5}\n");
     test("\u{41}\u{30a}\n".as_bytes(), "\u{c5}\n");
@@ -363,34 +446,53 @@ fn test_nfc() {
 #[test]
 fn test_leading_nonstarters() {
     test_error("\u{30a}".as_bytes());
+    test_error("\u{30a}\n".as_bytes());
 }
 
 #[test]
 fn test_esc() {
     test_error(b"\x1b");
+    test_error(b"\x1b\n");
     test_error(b"\x1b@");
+    test_error(b"\x1b@\n");
     test_error(b"\x1b@hello\x1b@world\x1b@");
+    test_error(b"\x1b@hello\x1b@world\x1b@\n");
 }
 
 #[test]
 fn test_csi() {
     test_error(b"\x1b[");
+    test_error(b"\x1b[\n");
     test_error(b"\x1b[@hello\x1b[@world\x1b[@");
+    test_error(b"\x1b[@hello\x1b[@world\x1b[@\n");
     test_error(b"\x1b[+@hello\x1b[+@world\x1b[+@");
+    test_error(b"\x1b[+@hello\x1b[+@world\x1b[+@\n");
 }
 
 #[test]
 fn test_osc() {
     test_error(b"\x1b]");
+    test_error(b"\x1b]\n");
     test_error(b"\x1b]\x07hello\x1b]\x07world\x1b]\x07");
+    test_error(b"\x1b]\x07hello\x1b]\x07world\x1b]\x07\n");
     test_error(b"\x1b]message\x07hello\x1b]message\x07world\x1b]message\x07");
+    test_error(b"\x1b]message\x07hello\x1b]message\x07world\x1b]message\x07\n");
     test_error(b"\x1b]mes\ns\tage\x07hello\x1b]mes\ns\tage\x07world\x1b]mes\ns\tage\x07");
+    test_error(b"\x1b]mes\ns\tage\x07hello\x1b]mes\ns\tage\x07world\x1b]mes\ns\tage\x07\n");
 }
 
 #[test]
 fn test_linux() {
     test_error(b"\x1b[[A");
+    test_error(b"\x1b[[A\n");
     test_error(b"\x1b[[Ahello\x1b[[Aworld\x1b[[A");
+    test_error(b"\x1b[[Ahello\x1b[[Aworld\x1b[[A\n");
+}
+
+#[test]
+fn test_unassigned() {
+    // FIXME: test_error("\u{1d455}".as_bytes());
+    // FIXME: test_error("\u{1d455}\n".as_bytes());
 }
 
 // TODO: Test Stream-Safe

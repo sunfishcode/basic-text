@@ -7,7 +7,7 @@ use crate::{
         is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
     },
-    TextInteractor, TextReader, Utf8Interactor, Utf8Reader,
+    TextInteractor, TextReader, TextStr, Utf8Interactor, Utf8Reader,
 };
 #[cfg(can_vector)]
 use io_ext::default_is_read_vectored;
@@ -120,6 +120,28 @@ impl TextInput {
         buf: &mut str,
     ) -> io::Result<()> {
         // Safety: This is a UTF-8 stream so we can read into a `str`.
+        Self::read_exact(internals, unsafe { buf.as_bytes_mut() })
+    }
+
+    /// Like `read_with_status` but produces the result in a `TextStr`. Be sure
+    /// to check the `size` field of the return value to see how many bytes
+    /// were written.
+    #[inline]
+    pub fn read_text<Inner: ReadExt>(
+        internals: &mut impl TextReaderInternals<Inner>,
+        buf: &mut TextStr,
+    ) -> io::Result<(usize, Status)> {
+        // Safety: This is a UTF-8 stream so we can read into a `TextStr`.
+        Self::read_with_status(internals, unsafe { buf.as_bytes_mut() })
+    }
+
+    /// Like `read_exact` but produces the result in a `TextStr`.
+    #[inline]
+    pub fn read_exact_text<Inner: ReadExt>(
+        internals: &mut impl TextReaderInternals<Inner>,
+        buf: &mut TextStr,
+    ) -> io::Result<()> {
+        // Safety: This is a UTF-8 stream so we can read into a `TextStr`.
         Self::read_exact(internals, unsafe { buf.as_bytes_mut() })
     }
 

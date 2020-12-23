@@ -75,10 +75,10 @@ impl Utf8Output {
     }
 
     #[inline]
-    pub(crate) fn end<Inner: WriteExt>(
+    pub(crate) fn close<Inner: WriteExt>(
         internals: &mut impl Utf8WriterInternals<Inner>,
     ) -> io::Result<()> {
-        internals.inner_mut().end()
+        internals.inner_mut().close()
     }
 
     #[inline]

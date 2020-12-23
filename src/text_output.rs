@@ -3,7 +3,7 @@
 use crate::{
     categorize::Categorize,
     unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
-    TextInteractor, TextWriter, Utf8Interactor, Utf8Writer, WriteWrapper,
+    TextInteractor, TextStr, TextWriter, Utf8Interactor, Utf8Writer, WriteWrapper,
 };
 #[cfg(can_vector)]
 use io_ext::default_is_write_vectored;
@@ -200,6 +200,45 @@ impl TextOutput {
         Self::write_buffer(internals)
     }
 
+    fn normal_write_text<Inner: WriteExt>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        s: &TextStr,
+    ) -> io::Result<()> {
+        let impl_ = internals.impl_();
+        let s = s.as_ref(); // TODO: Avoid doing this.
+
+        impl_.buffer.push_str(s);
+        impl_.state = State::Ground(s.is_empty() || s.ends_with('\n'));
+
+        // Write to the underlying stream.
+        Self::write_buffer(internals)
+    }
+
+    fn crlf_write_text<Inner: WriteExt>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        s: &TextStr,
+    ) -> io::Result<()> {
+        let s: &str = s.as_ref(); // TODO: Avoid doing this.
+
+        // Translate "\n" into "\r\n".
+        let mut first = true;
+        for slice in s.split('\n') {
+            let impl_ = internals.impl_();
+            if first {
+                first = false;
+            } else {
+                impl_.state = State::Ground(true);
+                impl_.buffer.push_str("\r\n");
+            }
+
+            impl_.buffer.push_str(slice);
+            impl_.state = State::Ground(slice.ends_with('\n'));
+        }
+
+        // Write to the underlying stream.
+        Self::write_buffer(internals)
+    }
+
     fn write_buffer<Inner: WriteExt>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
@@ -217,7 +256,7 @@ impl TextOutput {
         }
 
         let buffer = replace(&mut internals.impl_().buffer, String::new());
-        match internals.utf8_inner_mut().write_str(&buffer) {
+        match internals.utf8_inner_mut().write_str(buffer.as_ref()) {
             Ok(()) => (),
             Err(e) => {
                 internals.abandon();
@@ -248,6 +287,7 @@ impl TextOutput {
                 (State::Ground(_), ESC) if impl_.ansi_color => {
                     impl_.state = State::Esc;
                     impl_.escape_sequence.clear();
+                    impl_.escape_sequence.push(ESC);
                 }
                 (State::Esc, '[') => {
                     impl_.state = State::Csi;
@@ -255,10 +295,9 @@ impl TextOutput {
                 }
                 (State::Csi, c) if matches!(c, ' '..='?') => impl_.escape_sequence.push(c),
                 (State::Csi, 'm') => {
-                    impl_.state = State::Ground(false);
-                    impl_.buffer.push(ESC);
+                    impl_.escape_sequence.push('m');
                     impl_.buffer.push_str(&impl_.escape_sequence);
-                    impl_.buffer.push('m');
+                    impl_.state = State::Ground(false);
                 }
 
                 (State::Ground(_), '\n') => {
@@ -319,12 +358,12 @@ impl TextOutput {
         }
     }
 
-    pub(crate) fn end<Inner: WriteExt>(
+    pub(crate) fn close<Inner: WriteExt>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         internals.impl_().expect_starter = true;
         Self::check_nl(internals)?;
-        internals.utf8_inner_mut().end()
+        internals.utf8_inner_mut().close()
     }
 
     pub(crate) fn abandon<Inner: WriteExt>(internals: &mut impl TextWriterInternals<Inner>) {
@@ -338,6 +377,17 @@ impl TextOutput {
         internals: &impl TextWriterInternals<Inner>,
     ) -> usize {
         internals.utf8_inner().suggested_buffer_size()
+    }
+
+    pub(crate) fn write_text<Inner: WriteExt>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        s: &TextStr,
+    ) -> io::Result<()> {
+        if internals.impl_().crlf_compatibility {
+            Self::crlf_write_text(internals, s)
+        } else {
+            Self::normal_write_text(internals, s)
+        }
     }
 
     pub(crate) fn write_str<Inner: WriteExt>(

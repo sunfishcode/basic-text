@@ -1,12 +1,12 @@
 [package]
-name = "text-streams"
+name = "text-formats"
 version = "0.0.0"
 description = "Library for working with text streams"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
 keywords = ["stream", "text"]
 categories = ["os", "text-processing"]
-repository = "https://github.com/sunfishcode/text-streams"
+repository = "https://github.com/sunfishcode/text-formats"
 edition = "2018"
 readme = "README.md"
 
@@ -20,7 +20,7 @@ unicode-normalization = { path = "../unicode-normalization" }
 terminal-support = { path = "../terminal-support", optional = true }
 
 [dev-dependencies]
-anyhow = "1.0.35"
+anyhow = "1.0.37"
 
 [badges]
 maintenance = { status = "actively-developed" }

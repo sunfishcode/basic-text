@@ -1,4 +1,4 @@
-use crate::{text_input::TextInput, ReadStr, Utf8Reader};
+use crate::{text_input::TextInput, ReadStr, ReadText, TextStr, Utf8Reader};
 use io_ext::{Bufferable, ReadExt, Status};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -15,11 +15,12 @@ use terminal_support::{ReadTerminal, Terminal};
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
 /// A `ReadExt` implementation which translates from an input `ReadExt`
-/// producing an arbitrary byte sequence into a valid plain text stream.
+/// producing an arbitrary byte sequence into a valid Basic Text stream.
 pub struct TextReader<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Reader<Inner>,
 
+    /// Text translation state.
     pub(crate) input: TextInput,
 }
 
@@ -83,6 +84,18 @@ impl<Inner: ReadExt> ReadStr for TextReader<Inner> {
     #[inline]
     fn read_exact_str(&mut self, buf: &mut str) -> io::Result<()> {
         TextInput::read_exact_str(self, buf)
+    }
+}
+
+impl<Inner: ReadExt> ReadText for TextReader<Inner> {
+    #[inline]
+    fn read_text(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
+        TextInput::read_text(self, buf)
+    }
+
+    #[inline]
+    fn read_exact_text(&mut self, buf: &mut TextStr) -> io::Result<()> {
+        TextInput::read_exact_text(self, buf)
     }
 }
 

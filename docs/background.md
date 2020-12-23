@@ -2,11 +2,11 @@
 
 ## NFC, Normalization
 
-[Text] normalizes to NFC. See [this page](nfc.md) for details.
+[Basic Text] normalizes to NFC. See [this page](nfc.md) for details.
 
 ## Newlines
 
-In [Text] content, U+000A, and nothing else, means *newline*.
+In [Basic Text] content, U+000A, and nothing else, means *newline*.
 
 Why not use the CRLF convention? It's what [IETF RFCs] use, and as of
 ASCII-1986 / ECMA-6:1985 at least, its what ASCII itself uses.
@@ -32,7 +32,7 @@ Why not follow the [Unicode Newline Guidelines' Recommendations]?
  - PS and LS aren't widely recognized or used in plain text.
  - FF is debatable (see below).
 
-PS and LS are valid in both [Text] and [Restricted Text], so higher-level
+PS and LS are valid in both [Basic Text] and [Restricted Text], so higher-level
 formats can use them, however they aren't treated as newlines as far as the
 formats defined here are concerned.
 
@@ -124,6 +124,24 @@ earlier in some cases), they're not restricted here.
 
 [Forbidden Characters]: https://unicode.org/reports/tr15/#Forbidding_Characters
 
+## "Ghost Characters"
+
+[Ghost characters] are characters which don't correspond to any existing
+written characters, and seem to have been created by accident. It's tempting
+to restrict them, however, Unicode itself has not deprecated them, and it's
+possible that they'll acquire meanings, so we don't restrict them here.
+
+[Ghost characters]: https://www.dampfkraft.com/ghost-characters.html
+
+## Hangul Compatibility Jamo
+
+The Hangul Compatibility Jamo block in Unicode is one of the blocks added
+to Unicode for compatibility with other standards, however it also turns
+out to be practical, for example for [displaying isolated Jamo], so we
+don't restrict them here.
+
+[displaying isolated Jamo]: http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html
+
 ## Relationship to IETF RFC 8264 "PRECIS"
 
 [PRECIS] is mostly focused on identifiers and has several restrictions that
@@ -144,8 +162,8 @@ A [*text file* in POSIX]:
  - excludes NUL
  - lines are at most `LINE_MAX` bytes long including the newline (TODO).
 
-[Text] excludes NUL (it's a C0 control), and requires content to consist of
-lines which all end in newlines.
+[Basic Text] excludes NUL (it's a C0 control), and requires content to consist
+of lines which all end in newlines.
 
 TODO: Should we have a `LINE_MAX`-like restriction?
 
@@ -153,7 +171,7 @@ A [*printable file* in POSIX] is a text file which contains no control
 codes other than [*whitespace* in POSIX] (space, tab, newline, carriage-return,
 form-feed, and vertical-tab) and [*backspace* in POSIX] (typically U+0008).
 
-[Text] excludes most of the same control codes. It doesn't include
+[Basic Text] excludes most of the same control codes. It doesn't include
 carriage-return, form-feed, vertical-tab, or backspace, as line printer
 commands aren't part of plain text content.
 
@@ -162,7 +180,7 @@ commands aren't part of plain text content.
 [*lines* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 [*whitespace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_442
 [*backspace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_38
-[Text]: text.md
+[Basic Text]: basic-text.md
 [Restricted Text]: restricted-text.md
 
 ## Relationship to Wikipedia's "plain text"
@@ -186,16 +204,32 @@ The plain text format here is a more specific version of the
 > Plain text must contain enough information to permit the text
 > to be rendered legibly, and nothing more.
 
-however it include code points which ring the terminal bell and other
-side effects, it often includes redundant ways to encode the same
-logical content, it includes numerous compatibility mechanisms, and
-it contains flexibility for parties with private agreements.
+however it include code points which ring the terminal bell and other side
+effects, it often includes redundant ways to encode the same logical content,
+it includes numerous compatibility mechanisms, and it contains flexibility for
+parties with private agreements.
 
-The [Text] format here is more focused on being just a plain text
-format with just enough information to permit the text to be rendered
-legibly.
+The [Basic Text] format here is more focused on being just a plain text format
+with just enough information to permit the text to be rendered legibly.
 
 [Unicode definition of "plain text"]: https://www.unicode.org/versions/Unicode13.0.0/ch02.pdf#G642
+
+## Relationship to "What makes a Unicode code point safe?"
+
+The blog post ["What makes a Unicode code point safe?"] has a list of safety
+criteria with much in common with the plain text format here. Both exclude
+unassigned codepoints, noncharacters, private-use characters, surrogate
+codepoints, and most control codes. And both require text be stable under
+normalization.
+
+The [Basic Text] format here permits format characters, whitespace characters,
+punctuation, and combining characters, as they are commonly used in plain text
+documents.
+
+The [Restricted Text] format requires NFKC, which excludes many, though not
+all, whitespace and formatting characters.
+
+["What makes a Unicode code point safe?"]: https://qntm.org/safe
 
 ## TODO
 

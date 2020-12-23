@@ -150,8 +150,8 @@ impl<Inner: InteractExt> Read for Utf8Interactor<Inner> {
 
 impl<Inner: InteractExt> WriteExt for Utf8Interactor<Inner> {
     #[inline]
-    fn end(&mut self) -> io::Result<()> {
-        Utf8Output::end(self)
+    fn close(&mut self) -> io::Result<()> {
+        Utf8Output::close(self)
     }
 
     #[inline]

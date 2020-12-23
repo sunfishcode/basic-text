@@ -1,7 +1,7 @@
 use io_ext::{ReadExt, WriteExt};
 use io_ext_adapters::{ExtReader, ExtWriter};
 use std::io::Write;
-use text_streams::{Utf8Reader, Utf8Writer};
+use text_formats::{Utf8Reader, Utf8Writer};
 
 fn main() -> anyhow::Result<()> {
     let mut reader = Utf8Reader::new(ExtReader::new(std::io::stdin()));

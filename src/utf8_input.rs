@@ -62,6 +62,7 @@ impl Utf8Input {
     /// Like `read_with_status` but produces the result in a `str`. Be sure to
     /// check the `size` field of the return value to see how many bytes were
     /// written.
+    #[inline]
     pub(crate) fn read_str<Inner: ReadExt>(
         internals: &mut impl Utf8ReaderInternals<Inner>,
         buf: &mut str,
@@ -75,6 +76,7 @@ impl Utf8Input {
     }
 
     /// Like `read_exact` but produces the result in a `str`.
+    #[inline]
     pub(crate) fn read_exact_str<Inner: ReadExt>(
         internals: &mut impl Utf8ReaderInternals<Inner>,
         buf: &mut str,

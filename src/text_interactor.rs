@@ -1,5 +1,6 @@
 use crate::{
-    text_input::TextInput, text_output::TextOutput, ReadStr, Utf8Interactor, WriteWrapper,
+    text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, Utf8Interactor,
+    WriteText, WriteWrapper,
 };
 use io_ext::{Bufferable, InteractExt, ReadExt, Status, WriteExt};
 #[cfg(unix)]
@@ -19,11 +20,14 @@ use terminal_support::{
 #[cfg(windows)]
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
-/// The combination of `TextReader` and `TextWriter`.
+/// An `InteractExt` implementation which translates to and from an inner
+/// `InteractExt` producing a valid Basic Text interactive stream from
+/// an arbitrary interactive byte stream.
 pub struct TextInteractor<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Interactor<Inner>,
 
+    /// Text translation state.
     pub(crate) input: TextInput,
     pub(crate) output: TextOutput,
 }
@@ -196,6 +200,27 @@ impl<Inner: InteractExt> ReadStr for TextInteractor<Inner> {
     }
 }
 
+impl<Inner: InteractExt> ReadText for TextInteractor<Inner> {
+    #[inline]
+    fn read_text(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
+        TextInput::read_text(self, buf)
+    }
+
+    #[inline]
+    fn read_exact_text(&mut self, buf: &mut TextStr) -> io::Result<()> {
+        TextInput::read_exact_text(self, buf)?;
+
+        // If the input ended with a newline, don't require the output to have
+        // ended with a newline.
+        TextOutput::newline(
+            self,
+            buf.as_bytes().get(buf.len() - 1).copied() == Some(b'\n'),
+        );
+
+        Ok(())
+    }
+}
+
 impl<Inner: InteractExt> Read for TextInteractor<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
@@ -231,13 +256,20 @@ impl<Inner: InteractExt> Read for TextInteractor<Inner> {
 
 impl<Inner: InteractExt> WriteExt for TextInteractor<Inner> {
     #[inline]
-    fn end(&mut self) -> io::Result<()> {
-        TextOutput::end(self)
+    fn close(&mut self) -> io::Result<()> {
+        TextOutput::close(self)
     }
 
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
+    }
+}
+
+impl<Inner: InteractExt> WriteText for TextInteractor<Inner> {
+    #[inline]
+    fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
+        TextOutput::write_text(self, s)
     }
 }
 

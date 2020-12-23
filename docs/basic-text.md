@@ -1,8 +1,10 @@
-# Text
+# Basic Text
 
-The *text* format is built on top of the [UTF-8] format. It is intended for
-general-purpose use most anywhere the informal notion of "plain text" is
-intended. It permits homoglyphs and other visual ambiguities; see
+The *basic text* format is built on top of the [UTF-8] format. It is intended
+for general-purpose use most anywhere the informal notion of "plain text" is
+intended.
+
+Basic text does permit homoglyphs and other visual ambiguities; see
 [Restricted Text] for an alternative which provides some mitigations.
 
 On input and output, data is implicitly converted into [NFC] by the

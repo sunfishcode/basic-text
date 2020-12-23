@@ -7,7 +7,7 @@ This repository describes and implements three formats.
    - Invalid bytes are translated to the Replacement Character (U+FFFD) on
      input, and rejected on output.
 
- - [Text](text.md)
+ - [Basic Text](basic-text.md)
    - Supports the semantics of any practical Unicode text content.
    - This is intended to realize the intuitive phrases "text" or "plain text"
      which are used in various ways in many contexts. It excludes control
@@ -16,10 +16,9 @@ This repository describes and implements three formats.
      sequences on input, and rejected on output.
 
  - [Restricted Text](restricted-text.md)
-   - Like Text, but with restrictions.
-   - This trades away some support for historical scripts, multiple-script
-     text, formatting, and symbols in exchange for reduced visual ambiguity and
-     simplified processing.
+   - Like Basic Text, but aims to reduce visual ambiguity, trading off
+     some support for historical scripts, multiple-script text, formatting,
+     and symbols.
    - Invalid scalar values and sequences are rejected, even on input, since it
      isn't always possible to preserve intent automatically.
    - TODO: This isn't implemented yet.

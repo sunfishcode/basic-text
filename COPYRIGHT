@@ -1,19 +1,19 @@
 Short version for non-lawyers:
 
-`text-streams` is triple-licensed under Apache 2.0 with the LLVM Exception,
+`text-formats` is triple-licensed under Apache 2.0 with the LLVM Exception,
 Apache 2.0, and MIT terms.
 
 
 Longer version:
 
-Copyrights in the `text-streams` project are retained by their contributors.
-No copyright assignment is required to contribute to the `text-streams`
+Copyrights in the `text-formats` project are retained by their contributors.
+No copyright assignment is required to contribute to the `text-formats`
 project.
 
 Some files include code derived from Rust's `libstd`; see the comments in
 the code for details.
 
-Except as otherwise noted (below and/or in individual files), `text-streams`
+Except as otherwise noted (below and/or in individual files), `text-formats`
 is licensed under:
 
  - the Apache License, Version 2.0, with the LLVM Exception

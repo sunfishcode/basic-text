@@ -22,7 +22,7 @@ At this time, it does seem to be. The following are some notes.
 
 NFC seems to be [by far the most widely used for text interchange], and mostly
 preserves the meaning of all practical Unicode text (see the following sections
-for more discussion), so it seems the best choice for the [Text] format.
+for more discussion), so it seems the best choice for the [Basic Text] format.
 
 Requiring that everything be compatibility-normalized can eliminate several
 cases of visual ambiguity, and NFKC is a subset of NFC, so it seems the best
@@ -174,4 +174,4 @@ inclined to accept problems if they are believed to merely be limitations
 of today's environments that can be fixed.
 
 [Restricted Text]: restricted-text.md
-[Text]: text.md
+[Basic Text]: basic-text.md

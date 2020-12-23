@@ -1,4 +1,4 @@
-use crate::utf8_output::Utf8Output;
+use crate::{utf8_output::Utf8Output, write_wrapper::WriteWrapper};
 use io_ext::{Bufferable, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -13,18 +13,6 @@ use std::{
 use terminal_support::{Terminal, TerminalColorSupport, WriteTerminal};
 #[cfg(windows)]
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
-
-/// Add methods for for finishing with a `WriteExt` and returning its
-/// inner `WriteExt`.
-pub trait WriteWrapper<Inner>: WriteExt {
-    /// Flush and close the underlying stream and return the underlying
-    /// stream object.
-    fn close_into_inner(self) -> io::Result<Inner>;
-
-    /// Discard and close the underlying stream and return the underlying
-    /// stream object.
-    fn abandon_into_inner(self) -> Inner;
-}
 
 /// A `WriteExt` implementation which translates into an output `WriteExt`
 /// producing a valid UTF-8 sequence from an arbitrary byte sequence from an
@@ -74,8 +62,8 @@ impl<Inner: WriteExt + WriteTerminal> WriteTerminal for Utf8Writer<Inner> {
 
 impl<Inner: WriteExt> WriteExt for Utf8Writer<Inner> {
     #[inline]
-    fn end(&mut self) -> io::Result<()> {
-        Utf8Output::end(self)
+    fn close(&mut self) -> io::Result<()> {
+        Utf8Output::close(self)
     }
 
     #[inline]

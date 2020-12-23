@@ -1,5 +1,5 @@
 [package]
-name = "text-streams-fuzz"
+name = "text-formats-fuzz"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -9,7 +9,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.3.4"
-text-streams = { path = ".." }
+text-formats = { path = ".." }
 unicode-normalization = { path = "../../unicode-normalization" }
 io-ext = { path = "../../io-ext" }
 io-ext-adapters = { path = "../../io-ext-adapters" }

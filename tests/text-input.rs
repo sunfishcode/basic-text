@@ -4,7 +4,7 @@ use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use io_ext_adapters::ExtReader;
 #[cfg(test)]
 use std::io::Read;
-use text_streams::TextReader;
+use text_formats::TextReader;
 
 fn to_text(input: &str) -> String {
     let mut reader = TextReader::new(ExtReader::new(input.as_bytes()));
