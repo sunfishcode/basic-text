@@ -7,7 +7,8 @@ use io_ext::{
 };
 use std::{
     cmp::{max, min},
-    io, str,
+    io::{self, copy, repeat, Cursor, Read},
+    str,
 };
 
 pub(crate) trait Utf8ReaderInternals<Inner: ReadExt>: ReadExt {
@@ -112,6 +113,16 @@ impl Utf8Input {
 
         let (size, status) = internals.inner_mut().read_with_status(&mut buf[nread..])?;
         nread += size;
+
+        // We may have overwritten part of a codepoint; overwrite the rest of
+        // the buffer.
+        // TODO: Use [`fill`] when it becomes available:
+        // https://doc.rust-lang.org/std/primitive.slice.html#method.fillbbbb
+        copy(
+            &mut repeat(b'\0').take((buf.len() - nread) as u64),
+            &mut Cursor::new(&mut buf[nread..]),
+        )
+        .unwrap();
 
         match str::from_utf8(&buf[..nread]) {
             Ok(_) => Ok((nread, status)),

@@ -3,7 +3,7 @@ mod disallowed_scalar_values;
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use io_ext_adapters::ExtWriter;
 use std::io::{self, Write};
-use text_formats::TextWriter;
+use textual::TextWriter;
 
 fn to_text(input: &str) -> io::Result<String> {
     let mut writer = TextWriter::new(ExtWriter::new(Vec::<u8>::new()));

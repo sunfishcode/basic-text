@@ -1,4 +1,4 @@
-//! Streams of UTF-8, text, and restricted text.
+//! Plain and restricted text I/O and strings
 
 #![deny(missing_docs)]
 #![cfg_attr(can_vector, feature(can_vector))]

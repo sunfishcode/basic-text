@@ -15,7 +15,11 @@ use io_ext::{
     default_read, default_read_exact, default_read_to_end, default_read_vectored, Bufferable,
     InteractExt, ReadExt, Status,
 };
-use std::{cmp::max, io, mem, str};
+use std::{
+    cmp::max,
+    io::{self, copy, repeat, Cursor, Read},
+    mem, str,
+};
 use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
 
 pub(crate) trait TextReaderInternals<Inner>: ReadExt {
@@ -293,6 +297,17 @@ impl TextInput {
         if internals.impl_().pending_status != Status::active() {
             internals.impl_().pending_status = Status::active();
             internals.impl_().expect_starter = true;
+
+            // We may have overwritten part of a codepoint; overwrite the rest
+            // of the buffer.
+            // TODO: Use [`fill`] when it becomes available:
+            // https://doc.rust-lang.org/std/primitive.slice.html#method.fillbbbb
+            copy(
+                &mut repeat(b'?').take((buf.len() - nread) as u64),
+                &mut Cursor::new(&mut buf[nread..]),
+            )
+            .unwrap();
+
             return Ok((nread, internals.impl_().pending_status));
         }
 
@@ -340,6 +355,14 @@ impl TextInput {
                 break;
             }
         }
+
+        // We may have overwritten part of a codepoint; overwrite the rest
+        // of the buffer.
+        copy(
+            &mut repeat(b'?').take((buf.len() - nread) as u64),
+            &mut Cursor::new(&mut buf[nread..]),
+        )
+        .unwrap();
 
         Ok((
             nread,

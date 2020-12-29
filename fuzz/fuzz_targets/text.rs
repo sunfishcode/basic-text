@@ -9,7 +9,7 @@ use std::{
     io::{Read, Write},
     str,
 };
-use text_streams::{TextReader, TextWriter};
+use textual::{TextReader, TextWriter};
 use unicode_normalization::UnicodeNormalization;
 
 fuzz_target!(|bytes: &[u8]| {

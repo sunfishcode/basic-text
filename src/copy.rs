@@ -59,11 +59,9 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
 
 #[test]
 fn test_copy_str() {
-    use std::str;
-    use std::io::Cursor;
-    use crate::{Utf8Reader, Utf8Writer};
+    use crate::{write_wrapper::WriteWrapper, Utf8Reader, Utf8Writer};
     use io_ext_adapters::{ExtReader, ExtWriter};
-    use crate::write_wrapper::WriteWrapper;
+    use std::{io::Cursor, str};
 
     let text = "hello world ☃";
     let mut input = Utf8Reader::new(ExtReader::new(Cursor::new(text.to_string())));
@@ -78,10 +76,9 @@ fn test_copy_str() {
 
 #[test]
 fn test_copy_text() {
-    use std::str;
-    use std::io::Cursor;
     use crate::{TextReader, TextWriter};
     use io_ext_adapters::{ExtReader, ExtWriter};
+    use std::{io::Cursor, str};
 
     let text = "hello world ☃\n";
     let mut input = TextReader::new(ExtReader::new(Cursor::new(text.to_string())));

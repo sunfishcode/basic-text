@@ -165,7 +165,7 @@ A [*text file* in POSIX]:
 [Basic Text] excludes NUL (it's a C0 control), and requires content to consist
 of lines which all end in newlines.
 
-TODO: Should we have a `LINE_MAX`-like restriction?
+[Basic Text] has no `LINE_MAX`-like restriction.
 
 A [*printable file* in POSIX] is a text file which contains no control
 codes other than [*whitespace* in POSIX] (space, tab, newline, carriage-return,
@@ -230,6 +230,15 @@ The [Restricted Text] format requires NFKC, which excludes many, though not
 all, whitespace and formatting characters.
 
 ["What makes a Unicode code point safe?"]: https://qntm.org/safe
+
+## Relationship to "Canonical Equivalence in Applications"
+
+[Unicode Technical Note #5] describes various considerations related to
+normalization, including two alternate normalization forms, called FCD
+and FCC. We aren't using these here, mainly because we're using NFC (and
+NFKC) and FCD and FCC aren't fully compatible with NFC.
+
+[Unicode Technical Note #5]: https://www.unicode.org/notes/tn5/
 
 ## TODO
 

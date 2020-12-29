@@ -1,12 +1,12 @@
 [package]
-name = "text-formats"
+name = "textual"
 version = "0.0.0"
-description = "Library for working with text streams"
+description = "Plain and restricted text I/O and strings"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
 keywords = ["stream", "text"]
 categories = ["os", "text-processing"]
-repository = "https://github.com/sunfishcode/text-formats"
+repository = "https://github.com/sunfishcode/textual"
 edition = "2018"
 readme = "README.md"
 

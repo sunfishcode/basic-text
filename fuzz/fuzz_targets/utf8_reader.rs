@@ -3,8 +3,10 @@
 #[macro_use]
 extern crate libfuzzer_sys;
 
-use std::str;
-use text_streams::{ExtReader, Read, Utf8Reader};
+use io_ext::ReadExt;
+use io_ext_adapters::ExtReader;
+use std::{io::Read, str};
+use textual::Utf8Reader;
 
 fuzz_target!(|bytes: &[u8]| {
     // Reading from a `Utf8Reader` should produce the same output as `String::from_utf8_lossy`.
@@ -14,10 +16,10 @@ fuzz_target!(|bytes: &[u8]| {
     let mut buf = [0; 4];
     let mut b4 = Vec::new();
     let r4 = loop {
-        match reader.read(&mut buf) {
-            Ok(outcome) => {
-                b4.extend_from_slice(&buf[..outcome.size]);
-                if outcome.status.is_end() {
+        match reader.read_with_status(&mut buf) {
+            Ok((size, status)) => {
+                b4.extend_from_slice(&buf[..size]);
+                if status.is_end() {
                     break Ok(());
                 }
             }
@@ -36,10 +38,10 @@ fuzz_target!(|bytes: &[u8]| {
     let mut buf = [0; 8];
     let mut b8 = Vec::new();
     let r8 = loop {
-        match reader.read(&mut buf) {
-            Ok(outcome) => {
-                b8.extend_from_slice(&buf[..outcome.size]);
-                if outcome.status.is_end() {
+        match reader.read_with_status(&mut buf) {
+            Ok((size, status)) => {
+                b8.extend_from_slice(&buf[..size]);
+                if status.is_end() {
                     break Ok(());
                 }
             }

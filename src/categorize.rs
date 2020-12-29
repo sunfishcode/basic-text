@@ -7,7 +7,7 @@ use std::{cell::RefCell, io, rc::Rc};
 pub(crate) struct Categorize<Iter: Iterator<Item = char>> {
     iter: Iter,
 
-    // Becuase we wrap this iterator in the NFC etc. iterator chain, it has
+    // Because we wrap this iterator in the NFC etc. iterator chain, it has
     // to yield `char`s, and can't directly return errors. We indicate errors
     // by returning the special `SUB` value, which we intercept on the other
     // side to report the error stored in this error field.
