@@ -2,7 +2,7 @@
 
 ## NFC, Normalization
 
-[Basic Text] normalizes to NFC. See [this page](nfc.md) for details.
+[Basic Text] normalizes to NFC. See [this page](NFC.md) for details.
 
 ## Newlines
 
@@ -68,11 +68,14 @@ new meaning.
 
 [some uses]: https://en.wikipedia.org/wiki/Page_break#Semantic_use
 
-## Horizontal Tab
+## Tab
 
 It's tempting to disallow tab in a similar spirit of reducing the set of
 things that text can do, however has much more mild effects, and lots of text
 in practice uses and even [depends on tab], so we allow it.
+
+We can refer to it as just "Tab" though, rather than "Horizontal Tab", since we
+don't support Vertical Tab.
 
 [depends on tab]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
 
@@ -149,8 +152,7 @@ are inappropriate for streams such as disallowing whitespace, but it also
 has a [Freeform Class (4.3)] which is similar in spirit to, and one of the
 inspirations of, the formats defined here.
 
-PRECIS doesn't permit horizontal tab characters; we include them for the
-reasons mentioned above.
+PRECIS doesn't permit tabs; we include them for the reasons mentioned above.
 
 [PRECIS]: https://tools.ietf.org/html/rfc8264
 [Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
@@ -180,8 +182,8 @@ commands aren't part of plain text content.
 [*lines* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 [*whitespace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_442
 [*backspace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_38
-[Basic Text]: basic-text.md
-[Restricted Text]: restricted-text.md
+[Basic Text]: BasicText.md
+[Restricted Text]: RestrictedText.md
 
 ## Relationship to Wikipedia's "plain text"
 

@@ -173,5 +173,5 @@ concerned about helping users use the Web today, so this format is more
 inclined to accept problems if they are believed to merely be limitations
 of today's environments that can be fixed.
 
-[Restricted Text]: restricted-text.md
-[Basic Text]: basic-text.md
+[Restricted Text]: RestrictedText.md
+[Basic Text]: BasicText.md
