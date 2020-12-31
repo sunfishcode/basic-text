@@ -19,20 +19,14 @@ A string is in Restricted Text form iff:
  - it is [Moderately Restricted] text, and
  - it does not contain any of the sequences listed in the [Tables].
 
-A substring is in Restricted Text form iff:
- - it is itself a string in Restricted Text form, and
- - it the boundaries of the substring within the parent string are
-   [Grapheme Cluster Boundaries].
-
 A stream is in Restricted Text form iff:
  - it is a stream in [Basic Text] form, and
  - it consists entirely of a string in Restricted Text form.
 
 A buffered stream is in Restricted Text form iff:
- - the stream is in Restricted Text form, and
  - the buffered stream is in [Basic Text] form, and
- - a successful buffer flush produces output which is a substring in Restricted
-   Text form.
+ - a flush of the buffer fails if the data up to that point is not a
+   string in Restricted Text form.
 
 Note that even though this excludes U+034F (COMBINING GRAPHEME JOINER), the
 [Stream Safe Text Format] is still required; content must simply avoid using
@@ -50,6 +44,8 @@ excessively long sequences of non-starters.
 | [U+E0100–U+E01EF]   | "Variation selectors are not required to be implemented" |
 | [Default Ignorable Code Points] | "Default Ignorable Code Points are not visually distinct" |
 | [Old Hangul Jamo]   | "Conjoining Hangul Jamo are restricted in RFC5892" |
+| [Tag Characters]    | "Tag Characters do not belong to textual content" |
+| [Private-Use Characters] | "Private-use characters depend on private agreements" |
 
 ## Conversion
 
@@ -99,3 +95,5 @@ constraint, or some other mechanism?
 [Mixed-Number Detection]: https://www.unicode.org/reports/tr39/#Mixed_Number_Detection
 [Optional Detection]: https://www.unicode.org/reports/tr39/#Optional_Detection
 [Normalization Process for Stabilized Strings]: https://unicode.org/reports/tr15/#Normalization_Process_for_Stabilized_Strings
+[Tag Characters]: https://www.unicode.org/versions/Unicode13.0.0/ch23.pdf#G30110
+[Private-Use Characters]: http://www.unicode.org/faq/private_use.html#private_use

@@ -10,16 +10,13 @@ for an alternative which focused on textual content.
 A string is in Unicode form iff:
  - it encodes a sequence of [Unicode Scalar Values].
 
-A substring is in Unicode form iff:
- - it is itself a string in Unicode form
-
 A stream is in Unicode form iff:
  - it consists entirely of a string in Unicode form
 
 A buffered stream is in Unicode form iff:
  - the stream is in Unicode form, and
- - a successful buffer flush produces output which is a substring in Unicode
-   form.
+ - a flush of the buffer fails if the data up to that point is not a
+   string in Unicode form.
 
 ## Conversion
 

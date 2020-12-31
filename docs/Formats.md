@@ -16,9 +16,9 @@ This repository describes and implements three formats.
      sequences on input, and rejected on output.
 
  - [Restricted Text](RestrictedText.md)
-   - Like Basic Text, but aims to reduce visual ambiguity, trading off
-     some support for historical scripts, multiple-script text, formatting,
-     and symbols.
+   - Like Basic Text, but aims to reduce visual ambiguity, trading off some
+     support for historical scripts, multiple-script text, formatting, and
+     symbols.
    - Invalid scalar values and sequences are rejected, even on input, since it
      isn't always possible to preserve intent automatically.
    - TODO: This isn't implemented yet.

@@ -1,23 +1,20 @@
 # Basic Text
 
-The *Basic Text* format is built on top of the [Unicode] format. It is intended
-for general-purpose use most anywhere the informal notion of "plain text" is
-intended.
+The *Basic Text* format is built on top of the [Unicode] format and meant to
+formalize the informal notion of "plain text".
 
-Basic text does permit homoglyphs and other visual ambiguities; see
+Basic text permits homoglyphs and other visual ambiguities; see
 [Restricted Text] for an alternative which provides some mitigations.
 
 ## Definitions
 
 A string is in Basic Text form iff:
  - it is a [Unicode] string in [Stream-Safe] [NFC] form, and
- - it starts with a [starter] other than U+200D (ZWJ), and
+ - it doesn't start with a [non-starter], or a scalar value with a
+   `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`, and
+ - it doesn't end with a scalar value with a `Grapheme_Cluster_Break` of `ZWJ`
+   or `Prepend`, and
  - it does not contain any of the sequences listed in the [Tables].
-
-A substring is in Basic Text form iff:
- - it is itself a string in Basic Text form, and
- - it the boundaries of the substring within the parent string are
-   [Grapheme Cluster Boundaries].
 
 A stream is in Basic Text form iff:
  - it consists entirely of a string in Basic Text form, and
@@ -25,13 +22,11 @@ A stream is in Basic Text form iff:
 
 A buffered stream is in Basic Text form iff:
  - the stream is in Basic Text form, and
- - a successful buffer flush produces output which is a substring in Basic Text
-   form.
+ - a flush of the buffer fails if the data up to that point is not a
+   string in Basic Text form.
 
 [Tables]: #tables
-[starter]: https://unicode.org/reports/tr15/#Description_Norm
 [non-starter]: https://unicode.org/reports/tr15/#Description_Norm
-[Grapheme Cluster Boundaries]: http://www.unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
 
 ## Tables
 
@@ -54,10 +49,10 @@ A buffered stream is in Basic Text form iff:
 | U+D                 | CR   | U+A               | "Use U+A to terminate a line"             |
 | U+C                 | FF   | U+20              | "Control character not valid in text"     |
 | U+1B U+5B \[U+20–U+3F\]\* U+6D                 | SGR | | "Color escape sequences are not enabled" |
-| U+1B+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence"           |
-| U+1B+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence"           |
-| U+1B+ \[U+40–U+7E\]?                           | ESC | | "Unrecognized escape sequence"           |
-| U+1B+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence"           |
+| U+1B+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence"    |
+| U+1B+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence"    |
+| U+1B+ \[U+40–U+7E\]?                           | ESC | | "Unrecognized escape sequence"    |
+| U+1B+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence"    |
 | \[U+0–U+8,U+B,U+E–U+1F\] | C0  | U+FFFD        | "Control character not valid in text"     |
 | U+7F                | DEL  | U+FFFD            | "Control character not valid in text"     |
 | U+85                | NEL  | U+20              | "Control character not valid in text"     |
@@ -71,13 +66,29 @@ A buffered stream is in Basic Text form iff:
 | U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
 | U+17B5              |      | U+FFFD            | "Unicode discourages use of U+17B5"       |
 | U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
-| U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in text"         |
-| U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
+| U+206A–U+206F       |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
+| \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in Basic Text"   |
 | \[U+FFF9–U+FFFB\]   |      | U+FFFD            | "Interlinear Annotations depend on out-of-band information" |
-| [Noncharacters]                | | U+FFFD      | "Noncharacters depend on private agreements" |
-| [Deprecated Format Characters] | | U+FFFD      | "Deprecated Format Characters are deprecated" |
-| [Private-Use Characters]       | | U+FFFD      | "Private-use characters depend on private agreements" |
-| [Tag Characters]               | | U+FFFD      | "Tag Characters do not belong to textual content" |
+| U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
+| \[U+FFFE,U+FFFF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+1FFFE,U+1FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+2FFFE,U+2FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+3FFFE,U+3FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+4FFFE,U+4FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+5FFFE,U+5FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+6FFFE,U+6FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+7FFFE,U+7FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+8FFFE,U+8FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+9FFFE,U+9FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+AFFFE,U+AFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+BFFFE,U+BFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+CFFFE,U+CFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+DFFFE,U+DFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| U+E0001             |      | U+FFFD            | "Language tagging is a deprecated mechanism" |
+| \[U+EFFFE,U+EFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+FFFFE,U+FFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| \[U+10FFFE,U+10FFFF\] |    | U+FFFD            | "Noncharacters are intended for internal use only" |
 
 ## Conversion
 
@@ -141,10 +152,6 @@ TODO: Validate [variation sequences]?
 [Stream-Safe Text Process (UAX15-D4)]: https://unicode.org/reports/tr15/#UAX15-D4
 [Standardized Variant]: https://www.unicode.org/Public/UNIDATA/StandardizedVariants.txt
 [Normalization Process for Stabilized Strings]: https://unicode.org/reports/tr15/#Normalization_Process_for_Stabilized_Strings
-[Noncharacters]: http://www.unicode.org/faq/private_use.html#noncharacters
-[Deprecated Format Characters]: https://www.unicode.org/versions/Unicode13.0.0/ch23.pdf#G19593
-[Private-Use Characters]: http://www.unicode.org/faq/private_use.html#private_use
-[Tag Characters]: https://www.unicode.org/versions/Unicode13.0.0/ch23.pdf#G30110
 [Restricted Text]: RestrictedText.md
 [Unicode]: Unicode.md
 [CJK Compatibility Ideographs]: http://www.unicode.org/versions/latest/ch23.pdf#G19053

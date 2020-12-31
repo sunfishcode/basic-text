@@ -145,6 +145,17 @@ don't restrict them here.
 
 [displaying isolated Jamo]: http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html
 
+## Noncharacters
+
+[Noncharacters] are like [Private-Use Characters], except they are not intended
+for interchange.
+
+As with U+0 or U+FFFC, applications wishing to use these for private use should
+use the plain [Unicode] format rather than the Basic Text format.
+
+[Noncharacters]: http://www.unicode.org/faq/private_use.html#noncharacters
+[Private-Use Characters]: http://www.unicode.org/faq/private_use.html#pua1
+
 ## Relationship to IETF RFC 8264 "PRECIS"
 
 [PRECIS] is mostly focused on identifiers and has several restrictions that
