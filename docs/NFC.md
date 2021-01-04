@@ -4,9 +4,10 @@ At this time, it does seem to be. The following are some notes.
 
 ## What are the advantages of normalizing?
 
- - Portability - Text that isn't normalized is interpreted and displayed in
-   different ways, depending on the environment. Normalization ensures that, in
-   aspects related to normalization, content is independent of the environment.
+ - Portability - Text that isn't normalized is sometimes interpreted and
+   displayed in different ways, depending on the environment. Normalization
+   ensures that, in aspects related to normalization, content is independent of
+   the environment.
 
    A common argument for non-normalized text is that some fonts render them
    differently from their normalized counterparts, and users may specifically
@@ -33,7 +34,7 @@ choice for the [Restricted Text] format.
 ## Specific concerns
 
 The following are some notes from researching situations where NFC has been
-considered to be semantically lossy.
+thought to be semantically lossy.
 
 ### CJK Compatibility Ideographs
 
@@ -66,15 +67,11 @@ not end up pursuing the idea.
 
 [As of Unicode 6.3], all 1002 of these scalar values have standardized
 variations which allow them to be normalized into a form which records the
-scalar value they were normalized from. We use a [modified version] of the NFC
-algorithm which uses these variation sequences instead of the standard
-canonical decompositions, which will produce valid NFC output, but which
-preserves the information about which specific CJK Compatibility Ideographs
-were used.
-
-TODO: Update this link once this PR either lands or is resolved in some other way.
-
-[modified version]: https://github.com/unicode-rs/unicode-normalization/pull/70
+scalar value they were normalized from. Lossy conversion into [Basic Text]
+includes a rule which uses these variation sequences instead of the standard
+canonical decompositions, which produces valid NFC output, but unlike plain
+`toNFC` preserves the information about which specific CJK Compatibility
+Ideographs were used.
 
 At this time, it appears most implementations don't currently implement these
 variation sequences, so the characters in this form still unfortunately will
@@ -108,45 +105,28 @@ TONOS mark, and several fonts developed at the time did as well. See:
 Unicode was updated to use a different appearance, and newer fonts seem to use
 it, and this seems to be a satisfactory solution.
 
-### Greek Ano Teleia (U+0387)
+### Greek Ano Teleia (U+387)
 
-Unicode canonicalizes the Greek Ano Teleia (U+0387) into
-Middle Dot (U+00B7), which doesn't preserve its appearance and
-creates problems with parsing because U+00B7 is often considered
-an identifier character (middle dot is used as such in languages
-such as Catalan), while the Greek actual ano teleia is considered
-punctuation. See the following links for details:
+Unicode canonicalizes the Greek Ano Teleia (U+387) into Middle Dot (U+B7),
+which doesn't preserve its appearance and creates problems with parsing because
+the Greek actual ano teleia is considered punctuation, however Middle Dot is
+considered an identifier character (reflecting its usage in Catalan, for
+example). See the following links for details:
 
  - http://archives.miloush.net/michkap/archive/2011/05/20/10166588.html
  - https://op111.net/2008/03/17/linux-greek-punctuation-ano-teleia/
 
-U+0387 was added, along with the canonical decomposition to U+00B7, in
-Unicode 3.1, published in March 2001.
-
-This issue [may not be Unicode-specific].
-
-According to (English) Wikipedia, this character is [infrequently encountered].
-
-Greek Wikipedia seems to use U+0387 and U+00B7 [interchangeably].
-
-The Unicode Standard, section 7.2 Greek, paragraph Compatibility Punctuation,
-addresses the display and compatibility concerns:
+The Unicode Standard's explanation, in section 7.2 Greek, paragraph
+Compatibility Punctuation, is:
 
 > ISO/IEC 8859-7 and most vendor code pages for Greek simply make use of
-semicolon and middle dot for the punctuation in question. Therefore, use of
-U+037E and U+0387 is not necessary for interoperating with legacy Greek data,
-and their use is not generally encouraged for representation of Greek
-punctuation.
+[...] middle dot for the punctuation in question. Therefore, use of [...] U+387
+is not necessary for interoperating with legacy Greek data, and [its] use is
+not generally encouraged for representation of Greek punctuation.
 
-That leaves the question of punctuation vs. identifier unaddressed though.
-Theoretically a solution to this might be to add a new scalar value to Unicode
-and transition Greek text content to using that instead of U+0387. However,
-as far as I'm aware no one has proposed this yet.
+According to (English) Wikipedia, U+387 is [infrequently encountered]. And Greek
+Wikipedia seems to use U+387 and U+B7 [interchangeably].
 
-Since this appears to be the only such issue, it doesn't by itself seem to
-be sufficient reason not to use normalization.
-
-[may not be Unicode-specific]: https://www.unicode.org/mail-arch/unicode-ml/y2004-m04/0218.html
 [infrequently encountered]: https://en.wikipedia.org/wiki/Interpunct#Greek
 [interchangeably]: https://el.wikipedia.org/wiki/%CE%86%CE%BD%CF%89_%CF%84%CE%B5%CE%BB%CE%B5%CE%AF%CE%B1
 

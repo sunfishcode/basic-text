@@ -34,9 +34,9 @@ A buffered stream is in Basic Text form iff:
 
 | Sequence            | aka  | Replacement       | Error                                     |
 | ------------------- | ---- | ----------------- | ----------------------------------------- |
-| U+2126              | `Ω`  | U+3A9             | "Use U+03A9 instead of U+2126"            |
-| U+212A              | `K`  | U+4B              | "Use U+004B instead of U+212A"            |
-| U+212B              | `Å`  | U+C5              | "Use U+00C5 instead of U+212B"            |
+| U+2126              | `Ω`  | U+3A9             | "Use U+3A9 instead of U+2126"             |
+| U+212A              | `K`  | U+4B              | "Use U+4B instead of U+212A"              |
+| U+212B              | `Å`  | U+C5              | "Use U+C5 instead of U+212B"              |
 | U+2329              | `〈` | U+3008            | "Unicode deprecated U+2329"               |
 | U+232A              | `〉` | U+3009            | "Unicode deprecated U+232A"               |
 | [CJK Compatibility Ideographs] | | [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
@@ -66,6 +66,8 @@ A buffered stream is in Basic Text form iff:
 | U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
 | U+17B5              |      | U+FFFD            | "Unicode discourages use of U+17B5"       |
 | U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
+| U+2028              | LS   | U+20              | "Line separation is a rich-text function" |
+| U+2029              | PS   | U+20              | "Paragraph separation is a rich-text function" |
 | \[U+206A–U+206F\]   |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
 | \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in Basic Text"   |
@@ -101,6 +103,8 @@ succeeds but potentially loses information:
  - Perform the Replacement actions from the [Pre-NFC Table].
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
+ - When [*NEL Compatibility*] is enabled, replace any U+85 with U+A.
+ - When [*LSPS Compatibility*] is enabled, replace any [U+2028,U+2029] with U+A.
  - Perform the Replacement actions from the [Main Table].
 
 ### String Conversion, Strict
@@ -126,9 +130,9 @@ succeeds but potentially loses information:
 
 To convert a [Unicode] stream into a Basic Text stream in a manner than never
 loses information but may fail:
- - When *BOM Compatibility* is enabled, insert a U+FEFF at the beginning of the
+ - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of the
    stream.
- - When *CRLF Compatibility* is enabled, replace any U+A with U+D U+A.
+ - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
  - Perform [String Conversion, Strict].
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
@@ -137,6 +141,22 @@ loses information but may fail:
 [Main Table]: #main-table
 [String Conversion, Lossy]: #string-conversion-lossy
 [String Conversion, Strict]: #string-conversion-strict
+[*BOM Compatibility*]: #options
+[*CRLF Compatibility*]: #options
+[*NEL Compatibility*]: #options
+[*LSPS Compatibility*]: #options
+
+## Options
+
+The following boolean options may be enabled for stream conversion, and are off
+by default:
+
+| Name               |
+| ------------------ |
+| BOM Compatibility  |
+| CRLF Compatibility |
+| NEL Compatibility  |
+| LSPS Compatibility |
 
 ## TODO
 

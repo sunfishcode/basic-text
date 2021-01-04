@@ -28,7 +28,7 @@ A buffered stream is in Restricted Text form iff:
  - a flush of the buffer fails if the data up to that point is not a
    string in Restricted Text form.
 
-Note that even though this excludes U+034F (COMBINING GRAPHEME JOINER), the
+Note that even though this excludes U+34F (COMBINING GRAPHEME JOINER), the
 [Stream Safe Text Format] is still required; content must simply avoid using
 excessively long sequences of non-starters.
 
@@ -76,7 +76,7 @@ TODO: [Mixed-Number Detection]
 
 TODO: Unicode Security Mechanisms also specifies some [Optional Detection] rules.
 
-TODO: U+2126 (OHM SIGN) normalizes to U+03A9 (GREEK CAPITAL LETTER OMEGA);
+TODO: U+2126 (OHM SIGN) normalizes to U+3A9 (GREEK CAPITAL LETTER OMEGA);
 does "Moderately Restricted" permit this Greek letter to be mixed with
 otherwise Latin script?
 

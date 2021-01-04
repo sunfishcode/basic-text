@@ -6,63 +6,75 @@
 
 ## Newlines
 
-In [Basic Text] content, U+000A, and nothing else, means *newline*.
+In [Basic Text] content, U+A, and nothing else, is a *line terminator*,
+sometimes also called a *newline*.
 
-Why not use the CRLF convention? It's what [IETF RFCs] use, and as of
-ASCII-1986 / ECMA-6:1985 at least, its what ASCII itself uses.
- - U+000A is what IEEE [POSIX] and ISO C and C++ use in program data.
- - The newline convention is only one byte, so it's simpler than CRLF and
+Why not use the CRLF convention? That's what [IETF RFCs] use, and after
+ASCII-1986 / ECMA-6:1985 at least, that's what ASCII itself uses.
+ - U+A is what IEEE [POSIX] and ISO C and C++ use in program data.
+ - The newline convention is only one scalar, so it's simpler than CRLF and
    avoids corner-case concerns of what to do when CR and LF are split apart.
- - All practical text editors and viewers today support the U+000A newline
+ - The newline convention is also only one byte in UTF-8, so it can be
+   recognized without full UTF-8 decoding.
+ - All practical text editors and viewers today support the U+A newline
    convention, [even Windows Notepad].
 
-Text input implicitly translates plain CR and CRLF into newline. Text output
-has an option to translate newlines into CRLFs, which is intended to ease
-compatibility with CRLF environments and IETF RFCs. U+085 (NEL) is translated
-into U+0020 (space) for compatibility with [ECMA-262 whitespace rules].
+Lossy text conversion implicitly translates plain CR and CRLF into newline,
+which is a common convention.
 
-Why not use U+0085 (NEL)? In theory it has the semantics we want, however:
- - It isn't used in many places, or supported in many environments.
- - It's in the C1 control block, which is otherwise obscure and obsolete.
- - It's a two-byte code in UTF-8, compared to U+000A being a one-byte code.
+By default, lossy text conversion translates NEL, LS, and PS into U+20 which,
+which for those rare formats which recognize these scalars at all, is
+compatible with how they're typically treated. As options, lossy text
+conversion can also translate NEL, or LS and PS, into newlines, for example to
+support the text conventions used in [XML 1.1] and [Javascript source code],
+respectively.
+
+[XML 1.1]: https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-line-ends
+[Javascript]: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
+
+By default, strict text conversion rejects CRLF and other line terminator
+sequences other than U+A. As an option, strict text conversion can translate
+U+A into CRLF, for example to support the text conventions used in [IETF RFCs].
 
 Why not follow the [Unicode Newline Guidelines' Recommendations]?
- - We generally don't know the exact usage of any *NLF*.
- - We effectively target a virtual platform with newline as the platform *NLF*.
- - PS and LS aren't widely recognized or used in plain text.
- - FF is debatable (see below).
+ - We effectively target a virtual platform with U+A as the platform *NLF*.
+ - Plain text does not have an inherent concept of paragraphs, so
+   recommendation R2 isn't meaningful. Paragraphs are only meaningful in
+   higher-level protocols (for example, see HTML's `<br>` and `<p>`).
+ - Recommendation R4's inclusion of FF, LS, and PS seems to be universally
+   ignored in line-reading functions of all mainstream programming languages
+   we've surveyed.
+ - NEL, LS, and PS are very rare in practice, and formats which even recognize
+   them are very rare in practice.
+ - Also, see the section on Form Feed below.
 
-PS and LS are valid in both [Basic Text] and [Restricted Text], so higher-level
-formats can use them, however they aren't treated as newlines as far as the
-formats defined here are concerned.
-
-One of the key observations here is that, at the layers these formats are meant
-to be used, it isn't important to distinguish between paragraphs and lines.
-That's a consideration for higher-level formats.
+Plain text uses line *terminators*, rather than line *separators*. This means
+that plain text streams end with a line terminator (if they are non-empty).
+Lossy conversion implicitly adds a line terminator at the end if needed, and
+strict conversion requires a line terminator at the end if needed.
 
 [POSIX uses]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_243
 [Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G10213
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
-[ECMA-262 whitespace rules]: https://www.ecma-international.org/ecma-262/10.0/#sec-white-space
 
 ## Form Feed
 
-Leaving U+000C (Form Feed) out simplifies the system by reducing the set of
-things text can do. It does have [some uses], however it's fairly obscure and
+Leaving U+C (Form Feed) out simplifies the system by reducing the set of
+things text can do. U+C does have [some uses], however it's fairly obscure and
 in many higher-level protocols it either already doesn't work or there are
 better alternatives.
 
-And, there is some ambiguity about whether U+000C is meant to position the
+And, there is some ambiguity about whether U+C is meant to position the
 cursor at the beginning of a line in the next page or at its previous column in
 the next page, and about whether it should be counted as starting a "new line",
 and it's not obviously worth the effort to try to describe what this control
 code does.
 
-And on devices where U+000C clears the current screen, that's a significant
+And on devices where U+C clears the current screen, that's a significant
 side effect which could interfere with the visibility of other unrelated data.
 
-U+0020 is chosen for translating U+000C so that it continues to function as
+U+20 is chosen for translating U+C so that it continues to function as
 whitespace for parsing purposes, but doesn't indicate a new line or acquire any
 new meaning.
 
@@ -70,19 +82,21 @@ new meaning.
 
 ## Tab
 
-It's tempting to disallow tab in a similar spirit of reducing the set of
-things that text can do, however has much more mild effects, and lots of text
-in practice uses and even [depends on tab], so we allow it.
+It might be tempting to disallow tab in a similar spirit of reducing the set of
+things that text can do, however Tab has much more mild effects, and lots of
+plain text in practice uses and sometimes even [depends on] Tab, so we allow it.
 
 We can refer to it as just "Tab" though, rather than "Horizontal Tab", since we
 don't support Vertical Tab.
 
-[depends on tab]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
+[depends on]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
 
 ## Backspace, Delete, Vertical Tab
 
-These appear in other "plain text" concepts. Here, plain text is meant
-to mean text that doesn't include control codes for cursor positioning.
+These do appear in some other "plain text" concepts, however they're very rare
+in practice. Here, plain text is meant to mean text that doesn't include control
+codes for cursor positioning. Cursor positioning controls are widely used with
+terminals, but that's a different use case than what [Basic Text] is targeting.
 
 ## Alert
 
@@ -94,9 +108,14 @@ and theoretically could even be used for side-channel communication.
 Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
 
+Basic Text includes some fairly conservative regular expressions for matching
+not just the U+1B, but also the sequences which commonly make up escape sequences,
+such as CSI and OSC, so that entire sequences are cleanly ignored, as is common
+with unrecognized escape sequences.
+
 ## Deprecated scalar values
 
-U+0149, U+0673, U+0F77, U+0F79, U+17A3, and U+17A4 are officially deprecated,
+U+149, U+673, U+F77, U+F79, U+17A3, and U+17A4 are officially deprecated,
 "their use is strongly discouraged", and they have recommended replacements.
 
 U+2329 and U+232A have canonical equivalents with different appearances
@@ -107,15 +126,18 @@ them with their canonical equivalents.
 
 Unicode [recommends] the "regular letter" forms be used in preference
 to the dedicated unit characters for U+2126 OHM SIGN, U+212A KELVIN SIGN,
-and U+212B ANGSTROM SIGN.
+and U+212B ANGSTROM SIGN. They already canonically decompose to the regular
+letter forms, so they're already excluded from NFC. Rejecting them in
+strict conversion means that any assumptions about them being handled
+differently from the regular letter forms will be promptly corrected.
 
 [recommends]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G25.14143
 
 ## Characters Whose Use Is Discouraged
 
 Khmer scalar values U+17B4 and U+17B5
-"should be considered errors in the encoding". Also, "the use of U+17D8
-Khmer sign beyyal is discouraged".
+"should be considered errors in the encoding". Also,
+"the use of U+17D8 Khmer sign beyyal is discouraged".
 
 ## "Forbidden Characters"
 
@@ -152,6 +174,9 @@ for interchange. These characters are not widely used, and when they are used,
 there is often confusion about what they mean or whether they are valid. Since
 they aren't text, we exclude them here to avoid the confusion.
 
+Also, some implementations are unable to handle U+FFFE because in UTF-16 it
+can interfere with endianness detection.
+
 Along with U+0, U+FFFC, and U+FFF9–U+FFFB, applications wishing to use these
 for private use should use the plain [Unicode] format rather than the
 [Basic Text] format.
@@ -185,7 +210,7 @@ of lines which all end in newlines.
 
 A [*printable file* in POSIX] is a text file which contains no control
 codes other than [*whitespace* in POSIX] (space, tab, newline, carriage-return,
-form-feed, and vertical-tab) and [*backspace* in POSIX] (typically U+0008).
+form-feed, and vertical-tab) and [*backspace* in POSIX] (typically U+8).
 
 [Basic Text] excludes most of the same control codes. It doesn't include
 carriage-return, form-feed, vertical-tab, or backspace, as line printer
