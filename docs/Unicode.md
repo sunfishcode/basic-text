@@ -20,17 +20,11 @@ A buffered stream is in Unicode form iff:
 
 ## Conversion
 
-### String Conversion, Lossy
+### String Conversion, Infallible
 
 To convert a byte sequence into a Unicode String in a manner that always
-succeeds but potentially loses information:
+succeeds but potentially loses information about invalid encodings:
  - Perform [U+FFFD Substitution of Maximal Subparts].
-
-### String Conversion, Strict
-
-To convert a byte sequence into a Unicode String in a manner that always
-succeeds but potentially loses information:
- - Report an error if an invalid encoding is encountered.
 
 [Basic Text]: BasicText.md
 [Unicode Scalar Values]: https://unicode.org/glossary/#unicode_scalar_value

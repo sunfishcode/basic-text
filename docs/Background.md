@@ -44,8 +44,8 @@ Why not follow the [Unicode Newline Guidelines' Recommendations]?
  - Recommendation R4's inclusion of FF, LS, and PS seems to be universally
    ignored in line-reading functions of all mainstream programming languages
    we've surveyed.
- - NEL, LS, and PS are very rare in practice, and formats which even recognize
-   them are very rare in practice.
+ - NEL, LS, and PS are rare in practice, and formats which even recognize them
+   are rare in practice.
  - Also, see the section on Form Feed below.
 
 Plain text uses line *terminators*, rather than line *separators*. This means
@@ -60,41 +60,42 @@ strict conversion requires a line terminator at the end if needed.
 
 ## Form Feed
 
-Leaving U+C (Form Feed) out simplifies the system by reducing the set of
-things text can do. U+C does have [some uses], however it's fairly obscure and
-in many higher-level protocols it either already doesn't work or there are
-better alternatives.
+Pagination control is primarily a feature of higher-level protocols, and not
+part of most informal notions of "plain text". U+C does have [some uses] in
+practice, however it's fairly obscure, and often not recognized.
 
-And, there is some ambiguity about whether U+C is meant to position the
-cursor at the beginning of a line in the next page or at its previous column in
-the next page, and about whether it should be counted as starting a "new line",
-and it's not obviously worth the effort to try to describe what this control
-code does.
+And even in places where U+C is recognized, there is ambiguity about what it
+means. Implementations differ on whether it's meant to position the cursor at
+the beginning of a line in the next page or at its previous column in
+the next page. And, they differ on whether it should be considered a line
+terminator.
 
-And on devices where U+C clears the current screen, that's a significant
+And, on devices where U+C clears the current screen, that's a significant
 side effect which could interfere with the visibility of other unrelated data.
 
-U+20 is chosen for translating U+C so that it continues to function as
-whitespace for parsing purposes, but doesn't indicate a new line or acquire any
-new meaning.
+So [Basic Text] excludes U+C. Lossy conversion translates it to U+20 so that it
+continues to function as whitespace for parsing purposes, but all ambiguity
+about its meaning is resolved.
 
 [some uses]: https://en.wikipedia.org/wiki/Page_break#Semantic_use
 
 ## Tab
 
-It might be tempting to disallow tab in a similar spirit of reducing the set of
-things that text can do, however Tab has much more mild effects, and lots of
-plain text in practice uses and sometimes even [depends on] Tab, so we allow it.
+It might be tempting to disallow tab on the basis of it being a control
+code primarily concerned with how text is aligned on the screen, which is
+typically considered a feature of higher-level protocols. However, Tab's effects
+are much more mild than other control codes, and in practice it has several uses,
+some of which [require] it, so we allow it.
 
-We can refer to it as just "Tab" though, rather than "Horizontal Tab", since we
-don't support Vertical Tab.
+We can refer to it as just "Tab" though, rather than "Horizontal Tab", since
+[Basic Text] excludes Vertical Tab.
 
 [depends on]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
 
 ## Backspace, Delete, Vertical Tab
 
-These do appear in some other "plain text" concepts, however they're very rare
-in practice. Here, plain text is meant to mean text that doesn't include control
+These do appear in some other "plain text" concepts, however they're rare in
+practice. Here, plain text is meant to mean text that doesn't include control
 codes for cursor positioning. Cursor positioning controls are widely used with
 terminals, but that's a different use case than what [Basic Text] is targeting.
 
@@ -143,9 +144,9 @@ Khmer scalar values U+17B4 and U+17B5
 
 There were a few errors in the Unicode normalization algorithm in before
 Unicode 4.1. The affected scalar values and sequences are identified as
-[Forbidden Characters]. However, they are described as being very rare in
-practice, and they're corrected since Unicode 4.1 published in 2005 (and
-earlier in some cases), they're not restricted here.
+[Forbidden Characters]. However, they are described as being rare in practice,
+and they're corrected since Unicode 4.1 published in 2005 (and earlier in some
+gases), they're not restricted here.
 
 [Forbidden Characters]: https://unicode.org/reports/tr15/#Forbidding_Characters
 
@@ -245,9 +246,9 @@ The plain text format here is a more specific version of the
 > Plain text must contain enough information to permit the text
 > to be rendered legibly, and nothing more.
 
-however it include code points which ring the terminal bell and other side
-effects, it often includes redundant ways to encode the same logical content,
-it includes numerous compatibility mechanisms, and it contains flexibility for
+however it include scalars which ring the terminal bell and other side effects,
+it often includes redundant ways to encode the same logical content, it
+includes numerous compatibility mechanisms, and it contains flexibility for
 parties with private agreements.
 
 The [Basic Text] format here is more focused on being just a plain text format

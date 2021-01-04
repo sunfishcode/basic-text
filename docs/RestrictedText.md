@@ -49,7 +49,7 @@ excessively long sequences of non-starters.
 
 ## Conversion
 
-### String Conversion, Strict
+### String Conversion, Fallible
 
 To convert a [Basic Text] string into a Restricted Text string in a manner that
 never loses information but may fail:
@@ -58,15 +58,15 @@ never loses information but may fail:
    error with "Restricted Text must be in NFKC form".
  - Perform the Error actions from the [Main Table].
 
-### Stream Conversion, Strict
+### Stream Conversion, Fallible
 
 To convert a [Basic Text] stream into a Restricted Text stream in a manner than
 never loses information but may fail:
- - Perform [String Conversion, Strict].
+ - Perform [String Conversion, Fallible].
 
 [Main Table]: #main-table
-[String Conversion, Lossy]: #string-conversion-lossy
-[String Conversion, Strict]: #string-conversion-strict
+[String Conversion, Infallible]: #string-conversion-infallible
+[String Conversion, Fallible]: #string-conversion-fallible
 
 ## TODO
 
@@ -80,10 +80,10 @@ TODO: U+2126 (OHM SIGN) normalizes to U+3A9 (GREEK CAPITAL LETTER OMEGA);
 does "Moderately Restricted" permit this Greek letter to be mixed with
 otherwise Latin script?
 
-TODO: Several codepoints such as U+2800, U+3164, U+1160, U+FFA0, U+115F,
-U+16FE4, and possibly others, often display as whitespace despite not being
-categorized as whitespace. Can we constraint them with a mixed-script
-constraint, or some other mechanism?
+TODO: Several scalars such as U+2800, U+3164, U+1160, U+FFA0, U+115F, U+16FE4,
+and possibly others, often display as whitespace despite not being categorized
+as whitespace. Can we constraint them with a mixed-script constraint, or some
+other mechanism?
 
 [NFKC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Moderately Restricted]: https://www.unicode.org/reports/tr39/#Restriction_Level_Detection

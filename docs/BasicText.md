@@ -1,9 +1,9 @@
 # Basic Text
 
-The *Basic Text* format is built on top of the [Unicode] format and meant to
-formalize the informal notion of "plain text".
+The *Basic Text* format is a subset of the [Unicode] format and meant to
+formalize common informal notions of "plain text".
 
-Basic text permits homoglyphs and other visual ambiguities; see
+Basic Text permits homoglyphs and other visual ambiguities; see
 [Restricted Text] for an alternative which provides some mitigations.
 
 ## Definitions
@@ -48,12 +48,12 @@ A buffered stream is in Basic Text form iff:
 | U+D U+A             | CRLF | U+A               | "Use U+A to terminate a line"             |
 | U+D                 | CR   | U+A               | "Use U+A to terminate a line"             |
 | U+C                 | FF   | U+20              | "Control character not valid in text"     |
-| U+1B U+5B \[U+20–U+3F\]\* U+6D                 | SGR | | "Color escape sequences are not enabled" |
-| U+1B+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence"    |
-| U+1B+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence"    |
-| U+1B+ \[U+40–U+7E\]?                           | ESC | | "Unrecognized escape sequence"    |
-| U+1B+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence"    |
-| \[U+0–U+8,U+B,U+E–U+1F\] | C0  | U+FFFD        | "Control character not valid in text"     |
+| U+1B U+5B \[U+20–U+3F\]\* U+6D                     | SGR | | "Color escape sequences are not enabled" |
+| \[U+1B\]+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence" |
+| \[U+1B\]+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence" |
+| \[U+1B\]+ \[U+40–U+7E\]?                           | ESC | | "Unrecognized escape sequence" |
+| \[U+1B\]+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence" |
+| \[U+0–U+8,U+B,U+E–U+1F\] | C0 | U+FFFD         | "Control character not valid in text"     |
 | U+7F                | DEL  | U+FFFD            | "Control character not valid in text"     |
 | U+85                | NEL  | U+20              | "Control character not valid in text"     |
 | \[U+80–U+84,U+86–U+9F\] | C1 | U+FFFD          | "Control character not valid in text"     |
@@ -94,10 +94,11 @@ A buffered stream is in Basic Text form iff:
 
 ## Conversion
 
-### String Conversion, Lossy
+### String Conversion, Permissive
 
 To convert a [Unicode] string into a Basic Text string in a manner that always
-succeeds but potentially loses information:
+succeeds, discarding information not usually considered meaningful or valid in
+plain text:
  - If the input starts with a [non-starter] or U+200D (ZWJ), replace it with
    U+FFFD.
  - Perform the Replacement actions from the [Pre-NFC Table].
@@ -107,10 +108,11 @@ succeeds but potentially loses information:
  - When [*LSPS Compatibility*] is enabled, replace any [U+2028,U+2029] with U+A.
  - Perform the Replacement actions from the [Main Table].
 
-### String Conversion, Strict
+### String Conversion, Fallible
 
-To convert a [Unicode] string into a Basic Text string in a manner that never
-loses information but may fail:
+To convert a [Unicode] string into a Basic Text string in a manner that dicards
+information not usually considered meaningful and otherwise fails if the
+content is not valid Basic Text:
  - If the input starts with a [non-starter] or U+200D (ZWJ), error with
    "Basic Text string must begin with a starter other than ZWJ"
  - Perform the Error actions from the [Pre-NFC Table].
@@ -118,29 +120,31 @@ loses information but may fail:
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
  - Perform the Error actions from the [Main Table].
 
-### Stream Conversion, Lossy
+### Stream Conversion, Permissive
 
 To convert a [Unicode] stream into a Basic Text stream in a manner than always
-succeeds but potentially loses information:
+succeeds, discarding information not usually considered meaningful or valid in
+plain text:
  - If the stream starts with U+FEFF, remove it.
- - Perform [String Conversion, Lossy].
+ - Perform [String Conversion, Permissive].
  - If the stream is non-empty and doesn't end with U+A, append a U+A.
 
-### Stream Conversion, Strict
+### Stream Conversion, Fallible
 
-To convert a [Unicode] stream into a Basic Text stream in a manner than never
-loses information but may fail:
+To convert a [Unicode] stream into a Basic Text string in a manner that dicards
+information not usually considered meaningful and otherwise fails if the
+content is not valid Basic Text:
  - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of the
    stream.
  - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
- - Perform [String Conversion, Strict].
+ - Perform [String Conversion, Fallible].
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
 
 [Pre-NFC Table]: #pre-nfc-table
 [Main Table]: #main-table
-[String Conversion, Lossy]: #string-conversion-lossy
-[String Conversion, Strict]: #string-conversion-strict
+[String Conversion, Permissive]: #string-conversion-permissive
+[String Conversion, Fallible]: #string-conversion-fallible
 [*BOM Compatibility*]: #options
 [*CRLF Compatibility*]: #options
 [*NEL Compatibility*]: #options
@@ -148,15 +152,14 @@ loses information but may fail:
 
 ## Options
 
-The following boolean options may be enabled for stream conversion, and are off
-by default:
+The following boolean options may be enabled for stream conversion:
 
-| Name               |
-| ------------------ |
-| BOM Compatibility  |
-| CRLF Compatibility |
-| NEL Compatibility  |
-| LSPS Compatibility |
+| Name               | Type    | Default |
+| ------------------ | ------- | ------- |
+| BOM Compatibility  | Boolean | `false` |
+| CRLF Compatibility | Boolean | `false` |
+| NEL Compatibility  | Boolean | `false` |
+| LSPS Compatibility | Boolean | `false` |
 
 ## TODO
 
