@@ -66,7 +66,7 @@ A buffered stream is in Basic Text form iff:
 | U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
 | U+17B5              |      | U+FFFD            | "Unicode discourages use of U+17B5"       |
 | U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
-| U+206A–U+206F       |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
+| \[U+206A–U+206F\]   |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
 | \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in Basic Text"   |
 | \[U+FFF9–U+FFFB\]   |      | U+FFFD            | "Interlinear Annotations depend on out-of-band information" |
