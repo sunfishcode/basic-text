@@ -29,7 +29,7 @@ pub struct Utf8Interactor<Inner> {
 impl<Inner> Utf8Interactor<Inner> {
     /// Construct a new instance of `Utf8Interactor` wrapping `inner`.
     #[inline]
-    pub fn new(inner: Inner) -> Self {
+    pub const fn new(inner: Inner) -> Self {
         Self {
             inner,
             input: Utf8Input::new(),

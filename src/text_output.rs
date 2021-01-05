@@ -92,7 +92,7 @@ pub(crate) struct TextOutput {
 impl TextOutput {
     /// Construct a new instance of `TextOutput`.
     #[inline]
-    pub(crate) fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             buffer: String::new(),
             crlf_compatibility: false,
@@ -114,7 +114,7 @@ impl TextOutput {
     /// [including Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
     #[inline]
-    pub(crate) fn with_crlf_compatibility() -> Self {
+    pub(crate) const fn with_crlf_compatibility() -> Self {
         let mut result = Self::new();
         result.crlf_compatibility = true;
         result

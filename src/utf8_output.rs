@@ -52,7 +52,7 @@ pub(crate) struct Utf8Output {}
 impl Utf8Output {
     /// Construct a new instance of `Utf8Output`.
     #[inline]
-    pub(crate) fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {}
     }
 

@@ -132,7 +132,7 @@ impl TextString {
     /// behavior results, as the rest of this crate assumes that `&TextStr`s
     /// are valid Basic Text.
     #[inline]
-    pub unsafe fn from_text_unchecked(s: String) -> Self {
+    pub const unsafe fn from_text_unchecked(s: String) -> Self {
         Self(s)
     }
 

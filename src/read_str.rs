@@ -9,6 +9,7 @@ pub trait ReadStr: ReadExt {
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)>;
 
     /// Like `read_exact` but produces the result in a `str`.
+    #[inline]
     fn read_exact_str(&mut self, buf: &mut str) -> io::Result<()> {
         default_read_exact_str(self, buf)
     }

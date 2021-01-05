@@ -54,7 +54,7 @@ pub(crate) struct Utf8Input {
 impl Utf8Input {
     /// Construct a new instance of `Utf8Input`.
     #[inline]
-    pub(crate) fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             overflow: Vec::new(),
         }
