@@ -148,10 +148,13 @@ don't restrict them here.
 ## Noncharacters
 
 [Noncharacters] are like [Private-Use Characters], except they are not intended
-for interchange.
+for interchange. These characters are not widely used, and when they are used,
+there is often confusion about what they mean or whether they are valid. Since
+they aren't text, we exclude them here to avoid the confusion.
 
-As with U+0 or U+FFFC, applications wishing to use these for private use should
-use the plain [Unicode] format rather than the Basic Text format.
+Along with U+0, U+FFFC, and U+FFF9–U+FFFB, applications wishing to use these
+for private use should use the plain [Unicode] format rather than the
+[Basic Text] format.
 
 [Noncharacters]: http://www.unicode.org/faq/private_use.html#noncharacters
 [Private-Use Characters]: http://www.unicode.org/faq/private_use.html#pua1
