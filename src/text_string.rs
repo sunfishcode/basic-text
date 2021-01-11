@@ -1,5 +1,4 @@
-use crate::{TextReader, TextWriter};
-use io_ext::WriteExt;
+use crate::{TextReader, TextWriter, WriteStr};
 use io_ext_adapters::{ExtReader, ExtWriter};
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
@@ -354,24 +353,38 @@ impl AddAssign<&TextStr> for TextString {
     }
 }
 
-impl<'a, 'b> PartialEq<&'a TextStr> for TextString {
+impl<'a> PartialEq<&'a TextStr> for TextString {
     #[inline]
     fn eq(&self, other: &&'a TextStr) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a, 'b> PartialEq<Cow<'a, TextStr>> for TextString {
+impl<'a> PartialEq<Cow<'a, TextStr>> for TextString {
     #[inline]
     fn eq(&self, other: &Cow<'a, TextStr>) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a, 'b> PartialEq<TextString> for Cow<'a, TextStr> {
+impl<'a> PartialEq<TextString> for Cow<'a, TextStr> {
     #[inline]
     fn eq(&self, other: &TextString) -> bool {
         self.0.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<str> for TextString {
+    #[inline]
+    fn eq(&self, other: &str) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl<'a> PartialEq<TextString> for &'a str {
+    #[inline]
+    fn eq(&self, other: &TextString) -> bool {
+        self.eq(&other.0)
     }
 }
 
@@ -546,6 +559,12 @@ impl TextStr {
     #[inline]
     pub fn as_mut_ptr(&mut self) -> *mut u8 {
         self.0.as_mut_ptr()
+    }
+
+    /// Extracts a UTF-8 string slice containing the entire `TextStr`.
+    #[inline]
+    pub fn as_utf8(&self) -> &str {
+        &self.0
     }
 
     /// Divide one text string slice into two at an index.
@@ -862,7 +881,7 @@ impl Ord for TextStr {
     }
 }
 
-impl<'a, 'b> PartialEq<Cow<'a, TextStr>> for TextStr {
+impl<'a> PartialEq<Cow<'a, TextStr>> for TextStr {
     #[inline]
     fn eq(&self, other: &Cow<'a, Self>) -> bool {
         self.0.eq(&other.0)
@@ -873,6 +892,13 @@ impl<'a, 'b> PartialEq<Cow<'a, TextStr>> for &'b TextStr {
     #[inline]
     fn eq(&self, other: &Cow<'a, TextStr>) -> bool {
         self.0.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<str> for TextStr {
+    #[inline]
+    fn eq(&self, other: &str) -> bool {
+        self.0.eq(other)
     }
 }
 
@@ -1026,13 +1052,20 @@ fn normalize_string() {
     let ring = "\u{030a}";
     let unnormal = "A\u{30a}";
     let unnormal_nl = "A\u{30a}\n";
+    eprintln!("A");
     let composed = TextStr::from_text("\u{c5}").unwrap();
+    eprintln!("B");
     let composed_nl = TextStr::from_text("\u{c5}\n").unwrap();
+    eprintln!("C");
 
     assert!(TextStr::from_text(unnormal).is_err());
+    eprintln!("D");
     assert!(TextStr::from_text(ring).is_err());
+    eprintln!("E");
     assert_eq!(composed, &TextString::from_text_lossy(unnormal));
+    eprintln!("F");
     assert_eq!(composed_nl, &TextString::from_text_lossy(unnormal_nl));
+    eprintln!("G");
 }
 
 #[test]

@@ -1,7 +1,7 @@
 use io_ext::{ReadExt, Status};
 use std::io;
 
-/// Add a convenience method for reading into `str`.
+/// Add a convenience and optimizing method for reading into `str`.
 pub trait ReadStr: ReadExt {
     /// Like `read_with_status` but produces the result in a `str`. Be sure to
     /// check the `size` field of the return value to see how many bytes were

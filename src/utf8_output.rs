@@ -1,6 +1,7 @@
-use crate::{Utf8Interactor, Utf8Writer, WriteWrapper};
-use io_ext::{default_write_fmt, InteractExt, WriteExt};
-use std::{fmt::Arguments, io, str};
+use crate::{default_write_str, Utf8Interactor, Utf8Writer, WriteWrapper};
+use interactive_streams::InteractExt;
+use io_ext::WriteExt;
+use std::{io, str};
 
 pub(crate) trait Utf8WriterInternals<Inner: WriteExt>:
     WriteExt + WriteWrapper<Inner>
@@ -98,7 +99,7 @@ impl Utf8Output {
         internals: &mut impl Utf8WriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
-        internals.inner_mut().write_str(s)
+        default_write_str(internals.inner_mut(), s)
     }
 
     pub(crate) fn write<Inner: WriteExt>(
@@ -123,13 +124,5 @@ impl Utf8Output {
         internals: &mut impl Utf8WriterInternals<Inner>,
     ) -> io::Result<()> {
         internals.inner_mut().flush()
-    }
-
-    #[inline]
-    pub(crate) fn write_fmt<Inner: WriteExt>(
-        internals: &mut impl Utf8WriterInternals<Inner>,
-        fmt: Arguments,
-    ) -> io::Result<()> {
-        default_write_fmt(internals, fmt)
     }
 }

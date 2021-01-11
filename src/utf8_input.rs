@@ -1,9 +1,10 @@
 use crate::{unicode::REPL, Utf8Interactor, Utf8Reader};
+use interactive_streams::InteractExt;
 #[cfg(can_vector)]
 use io_ext::default_is_read_vectored;
 use io_ext::{
     default_read, default_read_exact, default_read_to_end, default_read_to_string,
-    default_read_vectored, InteractExt, ReadExt, Status,
+    default_read_vectored, ReadExt, Status,
 };
 use std::{
     cmp::{max, min},

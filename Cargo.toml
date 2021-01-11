@@ -11,7 +11,7 @@ edition = "2018"
 readme = "README.md"
 
 [build-dependencies]
-rustc_version = "0.3.0"
+rustc_version = "0.3.2"
 
 [dependencies]
 interactive-streams = { git = "https://github.com/sunfishcode/interactive-streams", branch = "main" }

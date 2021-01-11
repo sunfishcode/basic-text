@@ -2,7 +2,6 @@ mod disallowed_scalar_values;
 
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use io_ext_adapters::ExtReader;
-#[cfg(test)]
 use std::io::Read;
 use textual::TextReader;
 
@@ -22,7 +21,7 @@ fn test_text_input_nfc() {
     // - Apply the [Stream-Safe Text Process (UAX15-D4)].
     // - Apply `toNFC` according to the [Normalization Process for Stabilized Strings].
     //
-    // TODO: Test that svar is done before NFC
+    // TODO: Test that cjk_compat_variants is done before NFC
     // TODO: Test that stream-safe is done before NFC
 }
 

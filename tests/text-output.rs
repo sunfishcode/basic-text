@@ -35,7 +35,7 @@ fn test_text_output_nfc() {
     // - Apply the [Stream-Safe Text Process (UAX15-D4)].
     // - Apply `toNFC` according to the [Normalization Process for Stabilized Strings].
     //
-    // TODO: Test that svar is done before NFC
+    // TODO: Test that cjk_compat_variants is done before NFC
     // TODO: Test that stream-safe is done before NFC
 }
 

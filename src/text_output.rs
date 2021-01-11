@@ -3,13 +3,16 @@
 use crate::{
     categorize::Categorize,
     unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
-    TextInteractor, TextStr, TextWriter, Utf8Interactor, Utf8Writer, WriteWrapper,
+    utf8_output::Utf8WriterInternals,
+    write_str::WriteStr,
+    TextInteractor, TextStr, TextWriter, Utf8Interactor,
 };
+use interactive_streams::InteractExt;
 #[cfg(can_vector)]
 use io_ext::default_is_write_vectored;
 #[cfg(write_all_vectored)]
 use io_ext::default_write_all_vectored;
-use io_ext::{default_write_vectored, Bufferable, InteractExt, WriteExt};
+use io_ext::{default_write_vectored, Bufferable, WriteExt};
 use std::{
     cell::RefCell,
     io::{self, Write},
@@ -21,50 +24,59 @@ use std::{
 use unicode_normalization::UnicodeNormalization;
 
 pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
-    type Utf8Inner: io::Write + WriteExt + WriteWrapper<Inner>;
+    type Inner: WriteExt;
     fn impl_(&mut self) -> &mut TextOutput;
-    fn utf8_inner(&self) -> &Self::Utf8Inner;
-    fn utf8_inner_mut(&mut self) -> &mut Self::Utf8Inner;
-    fn into_utf8_inner(self) -> Self::Utf8Inner;
+    fn inner(&self) -> &Self::Inner;
+    fn inner_mut(&mut self) -> &mut Self::Inner;
+    fn into_inner(self) -> Inner;
+    fn write_str(&mut self, s: &str) -> io::Result<()>;
 }
 
 impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
-    type Utf8Inner = Utf8Writer<Inner>;
+    type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextOutput {
         &mut self.output
     }
 
-    fn utf8_inner(&self) -> &Self::Utf8Inner {
+    fn inner(&self) -> &Self::Inner {
         &self.inner
     }
 
-    fn utf8_inner_mut(&mut self) -> &mut Self::Utf8Inner {
+    fn inner_mut(&mut self) -> &mut Self::Inner {
         &mut self.inner
     }
 
-    fn into_utf8_inner(self) -> Self::Utf8Inner {
+    fn into_inner(self) -> Self::Inner {
         self.inner
+    }
+
+    fn write_str(&mut self, s: &str) -> io::Result<()> {
+        self.inner.write_all(s.as_bytes())
     }
 }
 
 impl<Inner: InteractExt> TextWriterInternals<Inner> for TextInteractor<Inner> {
-    type Utf8Inner = Utf8Interactor<Inner>;
+    type Inner = Utf8Interactor<Inner>;
 
     fn impl_(&mut self) -> &mut TextOutput {
         &mut self.output
     }
 
-    fn utf8_inner(&self) -> &Self::Utf8Inner {
+    fn inner(&self) -> &Self::Inner {
         &self.inner
     }
 
-    fn utf8_inner_mut(&mut self) -> &mut Self::Utf8Inner {
+    fn inner_mut(&mut self) -> &mut Self::Inner {
         &mut self.inner
     }
 
-    fn into_utf8_inner(self) -> Self::Utf8Inner {
-        self.inner
+    fn into_inner(self) -> Inner {
+        self.inner.into_inner()
+    }
+
+    fn write_str(&mut self, s: &str) -> io::Result<()> {
+        self.inner.write_str(s)
     }
 }
 
@@ -129,7 +141,7 @@ impl TextOutput {
         let mut bom_bytes = [0_u8; MAX_UTF8_SIZE];
         let bom_len = BOM.encode_utf8(&mut bom_bytes).len();
         // Safety: `bom_bytes` is valid UTF-8 because we just encoded it.
-        internals.write_str(unsafe { str::from_utf8_unchecked(&bom_bytes[..bom_len]) })?;
+        internals.write_all(&bom_bytes[..bom_len])?;
 
         // The BOM is not part of the logical content, so leave the stream in
         // Ground(true) mode, meaning we don't require a newline if nothing
@@ -154,7 +166,7 @@ impl TextOutput {
         mut internals: impl TextWriterInternals<Inner>,
     ) -> io::Result<Inner> {
         Self::check_nl(&mut internals)?;
-        internals.into_utf8_inner().close_into_inner()
+        Ok(internals.into_inner())
     }
 
     /// Discard and close the underlying stream and return the underlying
@@ -165,7 +177,7 @@ impl TextOutput {
         // Don't enforce a trailing newline.
         internals.impl_().state = State::Ground(true);
 
-        internals.into_utf8_inner().abandon_into_inner()
+        internals.into_inner()
     }
 
     fn normal_write_str<Inner: WriteExt>(
@@ -256,7 +268,7 @@ impl TextOutput {
         }
 
         let buffer = replace(&mut internals.impl_().buffer, String::new());
-        match internals.utf8_inner_mut().write_str(buffer.as_ref()) {
+        match internals.write_str(&buffer) {
             Ok(()) => (),
             Err(e) => {
                 internals.abandon();
@@ -278,7 +290,7 @@ impl TextOutput {
         let error = Rc::new(RefCell::new(None));
         let impl_ = internals.impl_();
         for c in Categorize::new(s.chars(), Rc::clone(&error))
-            .svar()
+            .cjk_compat_variants()
             .stream_safe()
             .nfc()
         {
@@ -363,11 +375,11 @@ impl TextOutput {
     ) -> io::Result<()> {
         internals.impl_().expect_starter = true;
         Self::check_nl(internals)?;
-        internals.utf8_inner_mut().close()
+        internals.inner_mut().close()
     }
 
     pub(crate) fn abandon<Inner: WriteExt>(internals: &mut impl TextWriterInternals<Inner>) {
-        internals.utf8_inner_mut().abandon();
+        internals.inner_mut().abandon();
 
         // Don't enforce a trailing newline.
         internals.impl_().state = State::Ground(true);
@@ -376,7 +388,7 @@ impl TextOutput {
     pub(crate) fn suggested_buffer_size<Inner: WriteExt>(
         internals: &impl TextWriterInternals<Inner>,
     ) -> usize {
-        internals.utf8_inner().suggested_buffer_size()
+        internals.inner().suggested_buffer_size()
     }
 
     pub(crate) fn write_text<Inner: WriteExt>(
@@ -406,7 +418,7 @@ impl TextOutput {
         buf: &[u8],
     ) -> io::Result<usize> {
         match str::from_utf8(buf) {
-            Ok(s) => internals.write_str(s).map(|()| buf.len()),
+            Ok(s) => Self::write_str(internals, s).map(|()| buf.len()),
             // Safety: See the example code here:
             // https://doc.rust-lang.org/std/str/struct.Utf8Error.html#examples
             Err(error) if error.valid_up_to() != 0 => Self::write_str(internals, unsafe {
@@ -425,7 +437,7 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         internals.impl_().expect_starter = true;
-        internals.utf8_inner_mut().flush()
+        internals.inner_mut().flush()
     }
 
     #[inline]

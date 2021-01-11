@@ -1,12 +1,13 @@
-use crate::{utf8_input::Utf8Input, utf8_output::Utf8Output, ReadStr, WriteWrapper};
-use io_ext::{Bufferable, InteractExt, ReadExt, Status, WriteExt};
+use crate::{utf8_input::Utf8Input, utf8_output::Utf8Output, ReadStr, WriteStr, WriteWrapper};
+use interactive_streams::InteractExt;
+use io_ext::{Bufferable, ReadExt, Status, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
 use std::os::wasi::io::{AsRawFd, RawFd};
 use std::{
     cmp::max,
-    fmt::{self, Arguments},
+    fmt,
     io::{self, Read, Write},
     str,
 };
@@ -153,7 +154,9 @@ impl<Inner: InteractExt> WriteExt for Utf8Interactor<Inner> {
     fn close(&mut self) -> io::Result<()> {
         Utf8Output::close(self)
     }
+}
 
+impl<Inner: InteractExt> WriteStr for Utf8Interactor<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         Utf8Output::write_str(self, s)
@@ -183,11 +186,6 @@ impl<Inner: InteractExt> Write for Utf8Interactor<Inner> {
     #[inline]
     fn flush(&mut self) -> io::Result<()> {
         Utf8Output::flush(self)
-    }
-
-    #[inline]
-    fn write_fmt(&mut self, fmt: Arguments) -> io::Result<()> {
-        Utf8Output::write_fmt(self, fmt)
     }
 }
 

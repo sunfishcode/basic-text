@@ -1,11 +1,11 @@
-use crate::{utf8_output::Utf8Output, write_wrapper::WriteWrapper};
+use crate::{utf8_output::Utf8Output, write_wrapper::WriteWrapper, WriteStr};
 use io_ext::{Bufferable, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
 use std::os::wasi::io::{AsRawFd, RawFd};
 use std::{
-    fmt::{self, Arguments},
+    fmt,
     io::{self, Write},
     str,
 };
@@ -65,7 +65,9 @@ impl<Inner: WriteExt> WriteExt for Utf8Writer<Inner> {
     fn close(&mut self) -> io::Result<()> {
         Utf8Output::close(self)
     }
+}
 
+impl<Inner: WriteExt> WriteStr for Utf8Writer<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         Utf8Output::write_str(self, s)
@@ -105,11 +107,6 @@ impl<Inner: WriteExt> Write for Utf8Writer<Inner> {
     #[inline]
     fn flush(&mut self) -> io::Result<()> {
         Utf8Output::flush(self)
-    }
-
-    #[inline]
-    fn write_fmt(&mut self, fmt: Arguments) -> io::Result<()> {
-        Utf8Output::write_fmt(self, fmt)
     }
 }
 

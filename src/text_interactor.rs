@@ -1,8 +1,9 @@
 use crate::{
     text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, Utf8Interactor,
-    WriteText, WriteWrapper,
+    WriteStr, WriteText, WriteWrapper,
 };
-use io_ext::{Bufferable, InteractExt, ReadExt, Status, WriteExt};
+use interactive_streams::InteractExt;
+use io_ext::{Bufferable, ReadExt, Status, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
@@ -49,9 +50,8 @@ impl<Inner: InteractExt> TextInteractor<Inner> {
     #[inline]
     pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
         let output = TextOutput::with_bom_compatibility(&mut inner)?;
-        let utf8_interactor = Utf8Interactor::new(inner);
         Ok(Self {
-            inner: utf8_interactor,
+            inner: Utf8Interactor::new(inner),
             input: TextInput::new(),
             output,
         })
@@ -99,7 +99,7 @@ impl<Inner: InteractExt + InteractTerminal> TextInteractor<Inner> {
     pub fn with_ansi_color_output(inner: Inner) -> Self {
         let ansi_color = inner.color_support() != TerminalColorSupport::Monochrome;
         Self {
-            inner: Utf8Interactor::new(inner),
+            inner,
             input: TextInput::new(),
             output: TextOutput::with_ansi_color(ansi_color),
         }
@@ -259,7 +259,9 @@ impl<Inner: InteractExt> WriteExt for TextInteractor<Inner> {
     fn close(&mut self) -> io::Result<()> {
         TextOutput::close(self)
     }
+}
 
+impl<Inner: InteractExt> WriteStr for TextInteractor<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
@@ -282,8 +284,9 @@ impl<Inner: InteractExt> WriteWrapper<Inner> for TextInteractor<Inner> {
     }
 
     #[inline]
-    fn abandon_into_inner(self) -> Inner {
-        TextOutput::abandon_into_inner(self)
+    fn abandon_into_inner(mut self) -> Inner {
+        TextOutput::abandon(&mut self);
+        self.inner.abandon_into_inner()
     }
 }
 

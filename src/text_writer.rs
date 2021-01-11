@@ -1,4 +1,4 @@
-use crate::{text_output::TextOutput, TextStr, Utf8Writer, WriteText, WriteWrapper};
+use crate::{text_output::TextOutput, TextStr, WriteStr, WriteText, WriteWrapper};
 use io_ext::{Bufferable, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -21,7 +21,7 @@ use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 /// writes could produce invalid UTF-8, so `write` will retry as needed.
 pub struct TextWriter<Inner> {
     /// The wrapped byte stream.
-    pub(crate) inner: Utf8Writer<Inner>,
+    pub(crate) inner: Inner,
 
     /// Text translation state.
     pub(crate) output: TextOutput,
@@ -32,7 +32,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     #[inline]
     pub fn new(inner: Inner) -> Self {
         Self {
-            inner: Utf8Writer::new(inner),
+            inner,
             output: TextOutput::new(),
         }
     }
@@ -43,10 +43,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     #[inline]
     pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
         let output = TextOutput::with_bom_compatibility(&mut inner)?;
-        Ok(Self {
-            inner: Utf8Writer::new(inner),
-            output,
-        })
+        Ok(Self { inner, output })
     }
 
     /// Like `new`, but enables CRLF output mode, which translates "\n" to
@@ -62,7 +59,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
     #[inline]
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
         Self {
-            inner: Utf8Writer::new(inner),
+            inner,
             output: TextOutput::with_crlf_compatibility(),
         }
     }
@@ -122,7 +119,9 @@ impl<Inner: WriteExt> WriteExt for TextWriter<Inner> {
     fn close(&mut self) -> io::Result<()> {
         TextOutput::close(self)
     }
+}
 
+impl<Inner: WriteExt> WriteStr for TextWriter<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
@@ -155,8 +154,9 @@ impl<Inner: WriteExt> WriteWrapper<Inner> for TextWriter<Inner> {
     }
 
     #[inline]
-    fn abandon_into_inner(self) -> Inner {
-        TextOutput::abandon_into_inner(self)
+    fn abandon_into_inner(mut self) -> Inner {
+        TextOutput::abandon(&mut self);
+        self.inner
     }
 }
 

@@ -1,10 +1,10 @@
-use crate::{ReadStr, ReadText, TextStr, TextString, WriteText};
-use io_ext::{Bufferable, WriteExt};
+use crate::{ReadStr, ReadText, TextStr, TextString, WriteStr, WriteText};
+use io_ext::Bufferable;
 use std::{cmp::max, io};
 
 /// Like `std::io::copy`, but for streams that can operate directly on strings,
 /// so we can avoid re-validating them as UTF-8.
-pub fn copy_str<R: ReadStr + Bufferable + ?Sized, W: WriteExt + Bufferable + ?Sized>(
+pub fn copy_str<R: ReadStr + Bufferable + ?Sized, W: WriteStr + Bufferable + ?Sized>(
     reader: &mut R,
     writer: &mut W,
 ) -> io::Result<u64> {

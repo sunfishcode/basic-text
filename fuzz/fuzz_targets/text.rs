@@ -52,7 +52,14 @@ fuzz_target!(|bytes: &[u8]| {
             let result = writer
                 .write_all(bytes)
                 .and_then(|()| writer.close_into_inner());
-            if utf8.chars().svar().stream_safe().nfc().collect::<String>() == s {
+            if utf8
+                .chars()
+                .cjk_compat_variants()
+                .stream_safe()
+                .nfc()
+                .collect::<String>()
+                == s
+            {
                 result.unwrap();
             } else {
                 result.map(|_| ()).unwrap_err();

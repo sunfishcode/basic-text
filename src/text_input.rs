@@ -9,11 +9,12 @@ use crate::{
     },
     TextInteractor, TextReader, TextStr, Utf8Interactor, Utf8Reader,
 };
+use interactive_streams::InteractExt;
 #[cfg(can_vector)]
 use io_ext::default_is_read_vectored;
 use io_ext::{
     default_read, default_read_exact, default_read_to_end, default_read_vectored, Bufferable,
-    InteractExt, ReadExt, Status,
+    ReadExt, Status,
 };
 use std::{
     cmp::max,
@@ -158,7 +159,7 @@ impl TextInput {
                 return None;
             }
             self.queue_iter = Some(
-                ReplaceSelected::new(self.queue.iter().svar())
+                ReplaceSelected::new(self.queue.iter().cjk_compat_variants())
                     .stream_safe()
                     .nfc(),
             );
