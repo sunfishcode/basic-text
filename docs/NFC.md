@@ -67,11 +67,11 @@ not end up pursuing the idea.
 
 [As of Unicode 6.3], all 1002 of these scalar values have standardized
 variations which allow them to be normalized into a form which records the
-scalar value they were normalized from. Permissive conversion into [Basic Text]
-includes a rule which uses these variation sequences instead of the standard
-canonical decompositions, which produces valid NFC output, but unlike plain
-`toNFC` preserves the information about which specific CJK Compatibility
-Ideographs were used.
+scalar value they were normalized from. Conversion into [Basic Text] includes a
+rule which uses these variation sequences instead of the standard canonical
+decompositions, which produces valid NFC output, but unlike plain `toNFC`
+preserves the information about which specific CJK Compatibility Ideographs
+were used.
 
 At this time, it appears most implementations don't currently implement these
 variation sequences, so the characters in this form still unfortunately will

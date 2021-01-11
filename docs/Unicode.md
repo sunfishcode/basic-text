@@ -20,9 +20,9 @@ A buffered stream is in Unicode form iff:
 
 ## Conversion
 
-### String Conversion, Infallible
+### From byte sequence to Unicode string
 
-To convert a byte sequence into a Unicode String in a manner that always
+To convert a byte sequence into a Unicode string in a manner that always
 succeeds but potentially loses information about invalid encodings:
  - Perform [U+FFFD Substitution of Maximal Subparts].
 

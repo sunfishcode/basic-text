@@ -94,72 +94,89 @@ A buffered stream is in Basic Text form iff:
 
 ## Conversion
 
-### String Conversion, Permissive
+### From Unicode string to Basic Text string
 
 To convert a [Unicode] string into a Basic Text string in a manner that always
 succeeds, discarding information not usually considered meaningful or valid in
 plain text:
- - If the input starts with a [non-starter] or U+200D (ZWJ), replace it with
+ - If the string starts with a [non-starter] or U+200D (ZWJ), replace it with
    U+FFFD.
  - Perform the Replacement actions from the [Pre-NFC Table].
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
  - When [*NEL Compatibility*] is enabled, replace any U+85 with U+A.
- - When [*LSPS Compatibility*] is enabled, replace any [U+2028,U+2029] with U+A.
+ - When [*LSPS Compatibility*] is enabled, replace any U+2028 or U+2029 with
+   U+A.
  - Perform the Replacement actions from the [Main Table].
 
-### String Conversion, Fallible
+[*NEL Compatibility*]: #options
+[*LSPS Compatibility*]: #options
+
+#### Options
+
+The following boolean options may be enabled:
+
+| Name               | Type    | Default |
+| ------------------ | ------- | ------- |
+| NEL Compatibility  | Boolean | `false` |
+| LSPS Compatibility | Boolean | `false` |
+
+### From Basic Text string to Unicode string
 
 To convert a [Unicode] string into a Basic Text string in a manner that dicards
 information not usually considered meaningful and otherwise fails if the
 content is not valid Basic Text:
- - If the input starts with a [non-starter] or U+200D (ZWJ), error with
+ - If the string starts with a [non-starter] or U+200D (ZWJ), error with
    "Basic Text string must begin with a starter other than ZWJ"
  - Perform the Error actions from the [Pre-NFC Table].
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
  - Perform the Error actions from the [Main Table].
+ - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
 
-### Stream Conversion, Permissive
+[*CRLF Compatibility*]: #options
+
+#### Options
+
+The following options may be enabled:
+
+| Name               | Type    | Default |
+| ------------------ | ------- | ------- |
+| CRLF Compatibility | Boolean | `false` |
+
+### From Unicode stream to Basic Text stream
 
 To convert a [Unicode] stream into a Basic Text stream in a manner than always
 succeeds, discarding information not usually considered meaningful or valid in
 plain text:
  - If the stream starts with U+FEFF, remove it.
- - Perform [String Conversion, Permissive].
+ - Perform [From Unicode string to Basic Text string].
  - If the stream is non-empty and doesn't end with U+A, append a U+A.
 
-### Stream Conversion, Fallible
+### From Basic Text stream to Unicode stream
 
-To convert a [Unicode] stream into a Basic Text string in a manner that dicards
+To convert a [Unicode] stream into a Basic Text stream in a manner that dicards
 information not usually considered meaningful and otherwise fails if the
 content is not valid Basic Text:
  - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of the
    stream.
- - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
- - Perform [String Conversion, Fallible].
+ - Perform [From Basic Text string to Unicode string].
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
 
 [Pre-NFC Table]: #pre-nfc-table
 [Main Table]: #main-table
-[String Conversion, Permissive]: #string-conversion-permissive
-[String Conversion, Fallible]: #string-conversion-fallible
+[From Unicode string to Basic Text string]: #from-unicode-string-to-basic-text-string
+[From Basic Text string to Unicode string]: #from-basic-text-string-to-unicode-string
 [*BOM Compatibility*]: #options
-[*CRLF Compatibility*]: #options
-[*NEL Compatibility*]: #options
-[*LSPS Compatibility*]: #options
 
-## Options
+#### Options
 
-The following boolean options may be enabled for stream conversion:
+The following options may be enabled:
 
 | Name               | Type    | Default |
 | ------------------ | ------- | ------- |
 | BOM Compatibility  | Boolean | `false` |
-| CRLF Compatibility | Boolean | `false` |
-| NEL Compatibility  | Boolean | `false` |
-| LSPS Compatibility | Boolean | `false` |
 
 ## TODO
 

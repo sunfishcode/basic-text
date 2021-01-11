@@ -1,21 +1,22 @@
 # Restricted Text
 
-The *Restricted Text* format is built on top of the [Basic Text] format. It
-incorporates several restrictions which reduce the expressiveness of the
-format in order to reduce visual ambiguity.
+The *Restricted Text* format is a subset of the [Basic Text] format. It
+incorporates several restrictions which reduce the expressiveness of the format
+in order to reduce visual ambiguity.
 
 TODO: This isn't implemented yet.
 
-This format does not define lossy conversions, as that may cause meaning to
-be silently lost. Instead, errors should be reported when content not meeting
-these restrictions is encountered, on input or output, in a context where
-restricted text is required. See [Basic Text] for an unrestricted alternative.
+This format does not define conversion from Basic Text or other less
+restrictive formats, as that may cause meaning to be silently lost. Instead,
+errors should be reported when content not meeting these restrictions is
+encountered in any context where restricted text is expected. See
+[Basic Text] for an unrestricted alternative.
 
 ## Definitions
 
 A string is in Restricted Text form iff:
  - it is in [Basic Text] form, and
- - it is in [NFKC], and
+ - it is in [NFKC] form, and
  - it is [Moderately Restricted] text, and
  - it does not contain any of the sequences listed in the [Tables].
 
@@ -25,8 +26,8 @@ A stream is in Restricted Text form iff:
 
 A buffered stream is in Restricted Text form iff:
  - the buffered stream is in [Basic Text] form, and
- - a flush of the buffer fails if the data up to that point is not a
-   string in Restricted Text form.
+ - a flush of the buffer fails if the data up to that point is not a string in
+   Restricted Text form.
 
 Note that even though this excludes U+34F (COMBINING GRAPHEME JOINER), the
 [Stream Safe Text Format] is still required; content must simply avoid using
@@ -38,18 +39,18 @@ excessively long sequences of non-starters.
 
 ### Main Table
 
-| Sequence            | Error                                                    |
-| ------------------- | -------------------------------------------------------- |
-| [U+FE00–U+FE0F]     | "Variation selectors are not required to be implemented" |
-| [U+E0100–U+E01EF]   | "Variation selectors are not required to be implemented" |
+| Sequence            | Error                                                 |
+| ------------------- | ----------------------------------------------------- |
+| \[U+FE00–U+FE0F\]   | "Variation selectors are not always visually distinct" |
+| \[U+E0100–U+E01EF\] | "Variation selectors are not always visually distinct" |
 | [Default Ignorable Code Points] | "Default Ignorable Code Points are not visually distinct" |
-| [Old Hangul Jamo]   | "Conjoining Hangul Jamo are restricted in RFC5892" |
-| [Tag Characters]    | "Tag Characters do not belong to textual content" |
+| [Old Hangul Jamo]   | "Conjoining Hangul Jamo are restricted in RFC5892"    |
+| [Tag Characters]    | "Tag Characters do not belong to textual content"     |
 | [Private-Use Characters] | "Private-use characters depend on private agreements" |
 
 ## Conversion
 
-### String Conversion, Fallible
+### From Basic Text string to Restricted Text string
 
 To convert a [Basic Text] string into a Restricted Text string in a manner that
 never loses information but may fail:
@@ -58,15 +59,15 @@ never loses information but may fail:
    error with "Restricted Text must be in NFKC form".
  - Perform the Error actions from the [Main Table].
 
-### Stream Conversion, Fallible
+[Main Table]: #main-table
+
+### From Basic Text stream to Restricted Text string
 
 To convert a [Basic Text] stream into a Restricted Text stream in a manner than
 never loses information but may fail:
- - Perform [String Conversion, Fallible].
+ - Perform [From Basic Text string to Restricted Text string].
 
-[Main Table]: #main-table
-[String Conversion, Infallible]: #string-conversion-infallible
-[String Conversion, Fallible]: #string-conversion-fallible
+[From Basic Text string to Restricted Text string]: #from-basic-text-string-to-restricted-text-string
 
 ## TODO
 
@@ -80,9 +81,12 @@ TODO: U+2126 (OHM SIGN) normalizes to U+3A9 (GREEK CAPITAL LETTER OMEGA);
 does "Moderately Restricted" permit this Greek letter to be mixed with
 otherwise Latin script?
 
-TODO: Several scalars such as U+2800, U+3164, U+1160, U+FFA0, U+115F, U+16FE4,
-and possibly others, often display as whitespace despite not being categorized
-as whitespace. Can we constraint them with a mixed-script constraint, or some
+TODO: Several Braille scalars have visual similarities with other scalars, such
+as U+2800 and U+20, U+2802 and U+B7, and so on.
+
+TODO: Several scalars such as U+1160, U+2062, U+FFA0, U+115F, U+16FE4, and
+possibly others, may display as whitespace despite not being categorized as
+whitespace. Can we constrain them with a mixed-script constraint, or some
 other mechanism?
 
 [NFKC]: https://unicode.org/reports/tr15/#Norm_Forms
@@ -90,7 +94,6 @@ other mechanism?
 [Stream Safe Text Format]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
 [Old Hangul Jamo]: https://tools.ietf.org/html/rfc5892#section-2.9
 [Default Ignorable Code Points]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G7730
-[Section 23.8 of the Unicode Standard]: https://www.unicode.org/versions/Unicode13.0.0/ch23.pdf#G19635
 [Basic Text]: BasicText.md
 [Mixed-Number Detection]: https://www.unicode.org/reports/tr39/#Mixed_Number_Detection
 [Optional Detection]: https://www.unicode.org/reports/tr39/#Optional_Detection
