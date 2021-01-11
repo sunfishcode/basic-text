@@ -10,9 +10,9 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.3.4"
 textual = { path = ".." }
-unicode-normalization = { path = "../../unicode-normalization" }
-io-ext = { path = "../../io-ext" }
-io-ext-adapters = { path = "../../io-ext-adapters" }
+unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }
+io-ext = { git = "https://github.com/sunfishcode/io-ext", branch = "main" }
+io-ext-adapters = { git = "https://github.com/sunfishcode/io-ext-adapters", branch = "main" }
 
 [[bin]]
 name = "text"

@@ -14,10 +14,11 @@ readme = "README.md"
 rustc_version = "0.3.0"
 
 [dependencies]
-io-ext = { path = "../io-ext" }
-io-ext-adapters = { path = "../io-ext-adapters" }
-unicode-normalization = { path = "../unicode-normalization" }
-terminal-support = { path = "../terminal-support", optional = true }
+interactive-streams = { git = "https://github.com/sunfishcode/interactive-streams", branch = "main" }
+io-ext = { git = "https://github.com/sunfishcode/io-ext", branch = "main" }
+io-ext-adapters = { git = "https://github.com/sunfishcode/io-ext-adapters", branch = "main" }
+unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }
+terminal-support = { git = "https://github.com/sunfishcode/terminal-support", branch = "main", optional = true }
 
 [dev-dependencies]
 anyhow = "1.0.37"
