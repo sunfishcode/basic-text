@@ -45,7 +45,7 @@ excessively long sequences of non-starters.
 | \[U+E0100–U+E01EF\] | "Variation selectors are not always visually distinct" |
 | [Default Ignorable Code Points] | "Default Ignorable Code Points are not visually distinct" |
 | [Old Hangul Jamo]   | "Conjoining Hangul Jamo are restricted in RFC5892"    |
-| [Tag Characters]    | "Tag Characters do not belong to textual content"     |
+| [Tag Characters]    | "Tag Characters are not permitted"                    |
 | [Private-Use Characters] | "Private-use characters depend on private agreements" |
 
 ## Conversion
