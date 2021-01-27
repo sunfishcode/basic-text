@@ -7,7 +7,7 @@ use crate::{
         is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
     },
-    TextInteractor, TextReader, TextStr, Utf8Interactor, Utf8Reader,
+    TextInteractor, TextReader, TextStr, WriteStr,
 };
 use interact_trait::InteractExt;
 #[cfg(can_vector)]
@@ -24,40 +24,40 @@ use std::{
 use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
 
 pub(crate) trait TextReaderInternals<Inner>: ReadExt {
-    type Utf8Inner: ReadExt;
+    type Inner: ReadExt;
     fn impl_(&mut self) -> &mut TextInput;
-    fn inner(&self) -> &Self::Utf8Inner;
-    fn inner_mut(&mut self) -> &mut Self::Utf8Inner;
+    fn inner(&self) -> &Self::Inner;
+    fn inner_mut(&mut self) -> &mut Self::Inner;
 }
 
 impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
-    type Utf8Inner = Utf8Reader<Inner>;
+    type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextInput {
         &mut self.input
     }
 
-    fn inner(&self) -> &Self::Utf8Inner {
+    fn inner(&self) -> &Self::Inner {
         &self.inner
     }
 
-    fn inner_mut(&mut self) -> &mut Self::Utf8Inner {
+    fn inner_mut(&mut self) -> &mut Self::Inner {
         &mut self.inner
     }
 }
 
-impl<Inner: InteractExt> TextReaderInternals<Inner> for TextInteractor<Inner> {
-    type Utf8Inner = Utf8Interactor<Inner>;
+impl<Inner: InteractExt + WriteStr> TextReaderInternals<Inner> for TextInteractor<Inner> {
+    type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextInput {
         &mut self.input
     }
 
-    fn inner(&self) -> &Self::Utf8Inner {
+    fn inner(&self) -> &Self::Inner {
         &self.inner
     }
 
-    fn inner_mut(&mut self) -> &mut Self::Utf8Inner {
+    fn inner_mut(&mut self) -> &mut Self::Inner {
         &mut self.inner
     }
 }

@@ -1,4 +1,4 @@
-use crate::{text_input::TextInput, ReadStr, ReadText, TextStr, Utf8Reader};
+use crate::{text_input::TextInput, ReadStr, ReadText, TextStr};
 use io_ext::{Bufferable, ReadExt, Status};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -18,7 +18,7 @@ use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 /// producing an arbitrary byte sequence into a valid Basic Text stream.
 pub struct TextReader<Inner> {
     /// The wrapped byte stream.
-    pub(crate) inner: Utf8Reader<Inner>,
+    pub(crate) inner: Inner,
 
     /// Text translation state.
     pub(crate) input: TextInput,
@@ -29,7 +29,7 @@ impl<Inner: ReadExt> TextReader<Inner> {
     #[inline]
     pub fn new(inner: Inner) -> Self {
         Self {
-            inner: Utf8Reader::new(inner),
+            inner: inner,
             input: TextInput::new(),
         }
     }

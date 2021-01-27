@@ -87,7 +87,7 @@ impl<Inner: WriteExt + WriteTerminal> TextWriter<Inner> {
     pub fn with_ansi_color_output(inner: Inner) -> Self {
         let ansi_color = inner.color_support() != TerminalColorSupport::Monochrome;
         Self {
-            inner: Utf8Writer::new(inner),
+            inner,
             output: TextOutput::with_ansi_color(ansi_color),
         }
     }

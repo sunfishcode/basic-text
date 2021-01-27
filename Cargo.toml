@@ -20,6 +20,9 @@ io-ext-adapters = { git = "https://github.com/sunfishcode/io-ext-adapters", bran
 unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }
 terminal-support = { git = "https://github.com/sunfishcode/terminal-support", branch = "main", optional = true }
 
+[target.'cfg(windows)'.dependencies]
+unsafe-io = "0.3.0"
+
 [dev-dependencies]
 anyhow = "1.0.37"
 
