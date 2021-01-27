@@ -765,7 +765,7 @@ impl TextStr {
     where
         F: FromStr,
     {
-        // TODO: Is there a way we could have a `FromTextStr` trait to allow
+        // TODO: Is there a way we could use `TryFrom<&TextStr>` to allow
         // parsers to work from a `TextStr` instead of just a `str`?
         self.0.parse()
     }
