@@ -1,4 +1,4 @@
-use crate::{utf8_output::Utf8Output, write_wrapper::WriteWrapper, WriteStr};
+use crate::{utf8_output::Utf8Output, WriteStr};
 use io_ext::{Bufferable, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -36,6 +36,20 @@ impl<Inner: WriteExt> Utf8Writer<Inner> {
             inner,
             output: Utf8Output::new(),
         }
+    }
+
+    /// Flush and close the underlying stream and return the underlying
+    /// stream object.
+    #[inline]
+    pub fn close_into_inner(self) -> io::Result<Inner> {
+        Utf8Output::close_into_inner(self)
+    }
+
+    /// Discard and close the underlying stream and return the underlying
+    /// stream object.
+    #[inline]
+    pub fn abandon_into_inner(self) -> Inner {
+        Utf8Output::abandon_into_inner(self)
     }
 }
 
@@ -83,18 +97,6 @@ impl<Inner: WriteExt> Bufferable for Utf8Writer<Inner> {
     #[inline]
     fn suggested_buffer_size(&self) -> usize {
         Utf8Output::suggested_buffer_size(self)
-    }
-}
-
-impl<Inner: WriteExt> WriteWrapper<Inner> for Utf8Writer<Inner> {
-    #[inline]
-    fn close_into_inner(self) -> io::Result<Inner> {
-        Utf8Output::close_into_inner(self)
-    }
-
-    #[inline]
-    fn abandon_into_inner(self) -> Inner {
-        Utf8Output::abandon_into_inner(self)
     }
 }
 

@@ -7,7 +7,7 @@ use crate::{
         is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
     },
-    TextInteractor, TextReader, TextStr, WriteStr,
+    ReadStr, TextInteractor, TextReader, TextStr, WriteStr,
 };
 use interact_trait::InteractExt;
 #[cfg(can_vector)]
@@ -46,7 +46,7 @@ impl<Inner: ReadExt> TextReaderInternals<Inner> for TextReader<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> TextReaderInternals<Inner> for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> TextReaderInternals<Inner> for TextInteractor<Inner> {
     type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextInput {

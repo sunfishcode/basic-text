@@ -1,4 +1,4 @@
-use crate::{text_output::TextOutput, TextStr, WriteStr, WriteText, WriteWrapper};
+use crate::{text_output::TextOutput, TextStr, WriteStr, WriteText};
 use io_ext::{Bufferable, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -144,19 +144,6 @@ impl<Inner: WriteExt> Bufferable for TextWriter<Inner> {
     #[inline]
     fn suggested_buffer_size(&self) -> usize {
         TextOutput::suggested_buffer_size(self)
-    }
-}
-
-impl<Inner: WriteExt> WriteWrapper<Inner> for TextWriter<Inner> {
-    #[inline]
-    fn close_into_inner(self) -> io::Result<Inner> {
-        TextOutput::close_into_inner(self)
-    }
-
-    #[inline]
-    fn abandon_into_inner(mut self) -> Inner {
-        TextOutput::abandon(&mut self);
-        self.inner
     }
 }
 

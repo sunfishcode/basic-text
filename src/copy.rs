@@ -59,7 +59,7 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
 
 #[test]
 fn test_copy_str() {
-    use crate::{write_wrapper::WriteWrapper, Utf8Reader, Utf8Writer};
+    use crate::{Utf8Reader, Utf8Writer};
     use io_ext_adapters::{ExtReader, ExtWriter};
     use std::{io::Cursor, str};
 

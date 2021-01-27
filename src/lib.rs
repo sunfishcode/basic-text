@@ -27,7 +27,6 @@ mod utf8_reader;
 mod utf8_writer;
 mod write_str;
 mod write_text;
-mod write_wrapper;
 
 pub use copy::{copy_str, copy_text};
 pub use read_str::{default_read_exact_str, ReadStr};
@@ -42,4 +41,3 @@ pub use utf8_reader::Utf8Reader;
 pub use utf8_writer::Utf8Writer;
 pub use write_str::{default_write_fmt, default_write_str, WriteStr};
 pub use write_text::{default_write_text, WriteText};
-pub use write_wrapper::WriteWrapper;

@@ -1,4 +1,4 @@
-use crate::{utf8_input::Utf8Input, utf8_output::Utf8Output, ReadStr, WriteStr, WriteWrapper};
+use crate::{utf8_input::Utf8Input, utf8_output::Utf8Output, ReadStr, WriteStr};
 use interact_trait::{Interact, InteractExt};
 use io_ext::{Bufferable, ReadExt, Status, WriteExt};
 #[cfg(unix)]
@@ -36,6 +36,22 @@ impl<Inner> Utf8Interactor<Inner> {
             input: Utf8Input::new(),
             output: Utf8Output::new(),
         }
+    }
+}
+
+impl<Inner: InteractExt> Utf8Interactor<Inner> {
+    /// Flush and close the underlying stream and return the underlying
+    /// stream object.
+    #[inline]
+    pub fn close_into_inner(self) -> io::Result<Inner> {
+        Utf8Output::close_into_inner(self)
+    }
+
+    /// Discard and close the underlying stream and return the underlying
+    /// stream object.
+    #[inline]
+    pub fn abandon_into_inner(self) -> Inner {
+        Utf8Output::abandon_into_inner(self)
     }
 }
 
@@ -164,18 +180,6 @@ impl<Inner: InteractExt> WriteStr for Utf8Interactor<Inner> {
 }
 
 impl<Inner: InteractExt> Interact for Utf8Interactor<Inner> {}
-
-impl<Inner: InteractExt> WriteWrapper<Inner> for Utf8Interactor<Inner> {
-    #[inline]
-    fn close_into_inner(self) -> io::Result<Inner> {
-        Utf8Output::close_into_inner(self)
-    }
-
-    #[inline]
-    fn abandon_into_inner(self) -> Inner {
-        Utf8Output::abandon_into_inner(self)
-    }
-}
 
 impl<Inner: InteractExt> Write for Utf8Interactor<Inner> {
     #[inline]

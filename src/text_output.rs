@@ -3,8 +3,7 @@
 use crate::{
     categorize::Categorize,
     unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
-    write_str::WriteStr,
-    TextInteractor, TextStr, TextWriter,
+    ReadStr, TextInteractor, TextStr, TextWriter, WriteStr,
 };
 use interact_trait::InteractExt;
 #[cfg(can_vector)]
@@ -55,7 +54,7 @@ impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> TextWriterInternals<Inner> for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> TextWriterInternals<Inner> for TextInteractor<Inner> {
     type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextOutput {

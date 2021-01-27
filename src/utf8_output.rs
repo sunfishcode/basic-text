@@ -1,11 +1,9 @@
-use crate::{default_write_str, Utf8Interactor, Utf8Writer, WriteWrapper};
+use crate::{default_write_str, Utf8Interactor, Utf8Writer};
 use interact_trait::InteractExt;
 use io_ext::WriteExt;
 use std::{io, str};
 
-pub(crate) trait Utf8WriterInternals<Inner: WriteExt>:
-    WriteExt + WriteWrapper<Inner>
-{
+pub(crate) trait Utf8WriterInternals<Inner: WriteExt>: WriteExt {
     fn impl_(&mut self) -> &mut Utf8Output;
     fn inner(&self) -> &Inner;
     fn inner_mut(&mut self) -> &mut Inner;

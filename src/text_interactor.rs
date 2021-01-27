@@ -1,6 +1,5 @@
 use crate::{
-    text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, WriteStr,
-    WriteText, WriteWrapper,
+    text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, WriteStr, WriteText,
 };
 use interact_trait::{Interact, InteractExt};
 use io_ext::{Bufferable, ReadExt, Status, WriteExt};
@@ -33,7 +32,7 @@ pub struct TextInteractor<Inner: InteractExt> {
     pub(crate) output: TextOutput,
 }
 
-impl<Inner: InteractExt + WriteStr> TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> TextInteractor<Inner> {
     /// Construct a new instance of `TextReader` wrapping `inner`.
     #[inline]
     pub fn new(inner: Inner) -> Self {
@@ -110,7 +109,9 @@ impl<Inner: InteractExt + InteractTerminal> TextInteractor<Inner> {
 impl<Inner: InteractExt + InteractTerminal> Terminal for TextInteractor<Inner> {}
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + WriteStr + InteractTerminal> ReadTerminal for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> ReadTerminal
+    for TextInteractor<Inner>
+{
     #[inline]
     fn is_line_by_line(&self) -> bool {
         self.inner.is_line_by_line()
@@ -123,7 +124,9 @@ impl<Inner: InteractExt + WriteStr + InteractTerminal> ReadTerminal for TextInte
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + WriteStr + InteractTerminal> WriteTerminal for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> WriteTerminal
+    for TextInteractor<Inner>
+{
     #[inline]
     fn color_support(&self) -> TerminalColorSupport {
         self.inner.color_support()
@@ -141,9 +144,12 @@ impl<Inner: InteractExt + WriteStr + InteractTerminal> WriteTerminal for TextInt
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + WriteStr + InteractTerminal> InteractTerminal for TextInteractor<Inner> {}
+impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> InteractTerminal
+    for TextInteractor<Inner>
+{
+}
 
-impl<Inner: InteractExt + WriteStr> ReadExt for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> ReadExt for TextInteractor<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
         let (size, status) = TextInput::read_with_status(self, buf)?;
@@ -163,7 +169,7 @@ impl<Inner: InteractExt + WriteStr> ReadExt for TextInteractor<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> Bufferable for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> Bufferable for TextInteractor<Inner> {
     #[inline]
     fn suggested_buffer_size(&self) -> usize {
         max(
@@ -179,7 +185,7 @@ impl<Inner: InteractExt + WriteStr> Bufferable for TextInteractor<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> ReadStr for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> ReadStr for TextInteractor<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
         TextInput::read_str(self, buf)
@@ -200,7 +206,7 @@ impl<Inner: InteractExt + WriteStr> ReadStr for TextInteractor<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> ReadText for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> ReadText for TextInteractor<Inner> {
     #[inline]
     fn read_text(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
         TextInput::read_text(self, buf)
@@ -221,7 +227,7 @@ impl<Inner: InteractExt + WriteStr> ReadText for TextInteractor<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> Read for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> Read for TextInteractor<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         TextInput::read(self, buf)
@@ -254,43 +260,30 @@ impl<Inner: InteractExt + WriteStr> Read for TextInteractor<Inner> {
     }
 }
 
-impl<Inner: InteractExt + WriteStr> WriteExt for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> WriteExt for TextInteractor<Inner> {
     #[inline]
     fn close(&mut self) -> io::Result<()> {
         TextOutput::close(self)
     }
 }
 
-impl<Inner: InteractExt + WriteStr> WriteStr for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> WriteStr for TextInteractor<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
     }
 }
 
-impl<Inner: InteractExt + WriteStr> WriteText for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> WriteText for TextInteractor<Inner> {
     #[inline]
     fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
         TextOutput::write_text(self, s)
     }
 }
 
-impl<Inner: InteractExt + WriteStr> Interact for TextInteractor<Inner> {}
+impl<Inner: InteractExt + ReadStr + WriteStr> Interact for TextInteractor<Inner> {}
 
-impl<Inner: InteractExt + WriteStr> WriteWrapper<Inner> for TextInteractor<Inner> {
-    #[inline]
-    fn close_into_inner(self) -> io::Result<Inner> {
-        TextOutput::close_into_inner(self)
-    }
-
-    #[inline]
-    fn abandon_into_inner(mut self) -> Inner {
-        TextOutput::abandon(&mut self);
-        self.inner
-    }
-}
-
-impl<Inner: InteractExt + WriteStr> Write for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr> Write for TextInteractor<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         TextOutput::write(self, buf)
@@ -320,7 +313,7 @@ impl<Inner: InteractExt + WriteStr> Write for TextInteractor<Inner> {
 }
 
 #[cfg(not(windows))]
-impl<Inner: InteractExt + WriteStr + AsRawFd> AsRawFd for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr + AsRawFd> AsRawFd for TextInteractor<Inner> {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
         self.inner.as_raw_fd()
@@ -328,7 +321,7 @@ impl<Inner: InteractExt + WriteStr + AsRawFd> AsRawFd for TextInteractor<Inner> 
 }
 
 #[cfg(windows)]
-impl<Inner: InteractExt + WriteStr + AsRawHandleOrSocket> AsRawHandleOrSocket
+impl<Inner: InteractExt + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawHandleOrSocket
     for TextInteractor<Inner>
 {
     #[inline]
@@ -337,7 +330,7 @@ impl<Inner: InteractExt + WriteStr + AsRawHandleOrSocket> AsRawHandleOrSocket
     }
 }
 
-impl<Inner: InteractExt + WriteStr + fmt::Debug> fmt::Debug for TextInteractor<Inner> {
+impl<Inner: InteractExt + ReadStr + WriteStr + fmt::Debug> fmt::Debug for TextInteractor<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("TextInteractor");
         b.field("inner", &self.inner);
