@@ -23,6 +23,8 @@ pub fn default_write_str<Inner: WriteExt + ?Sized>(inner: &mut Inner, buf: &str)
 
 /// Default implementation of [`Write::write_fmt`], in terms of
 /// [`WriteStr::write_str`].
+///
+/// [`Write::write_fmt`]: std::io::Write::write_fmt
 pub fn default_write_fmt<Inner: WriteStr + ?Sized>(
     inner: &mut Inner,
     fmt: Arguments,
