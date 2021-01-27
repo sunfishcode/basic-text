@@ -7,7 +7,7 @@ use crate::{
     write_str::WriteStr,
     TextInteractor, TextStr, TextWriter, Utf8Interactor,
 };
-use interactive_streams::InteractExt;
+use interact_trait::InteractExt;
 #[cfg(can_vector)]
 use io_ext::default_is_write_vectored;
 #[cfg(write_all_vectored)]

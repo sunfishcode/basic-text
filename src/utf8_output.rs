@@ -1,5 +1,5 @@
 use crate::{default_write_str, Utf8Interactor, Utf8Writer, WriteWrapper};
-use interactive_streams::InteractExt;
+use interact_trait::InteractExt;
 use io_ext::WriteExt;
 use std::{io, str};
 

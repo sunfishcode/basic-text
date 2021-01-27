@@ -2,7 +2,7 @@ use crate::{
     text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, Utf8Interactor,
     WriteStr, WriteText, WriteWrapper,
 };
-use interactive_streams::InteractExt;
+use interact_trait::{Interact, InteractExt};
 use io_ext::{Bufferable, ReadExt, Status, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -24,7 +24,7 @@ use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 /// An `InteractExt` implementation which translates to and from an inner
 /// `InteractExt` producing a valid Basic Text interactive stream from
 /// an arbitrary interactive byte stream.
-pub struct TextInteractor<Inner> {
+pub struct TextInteractor<Inner: InteractExt> {
     /// The wrapped byte stream.
     pub(crate) inner: Utf8Interactor<Inner>,
 
@@ -275,7 +275,7 @@ impl<Inner: InteractExt> WriteText for TextInteractor<Inner> {
     }
 }
 
-impl<Inner: InteractExt> InteractExt for TextInteractor<Inner> {}
+impl<Inner: InteractExt> Interact for TextInteractor<Inner> {}
 
 impl<Inner: InteractExt> WriteWrapper<Inner> for TextInteractor<Inner> {
     #[inline]
@@ -335,7 +335,7 @@ impl<Inner: InteractExt + AsRawHandleOrSocket> AsRawHandleOrSocket for TextInter
     }
 }
 
-impl<Inner: fmt::Debug> fmt::Debug for TextInteractor<Inner> {
+impl<Inner: InteractExt + fmt::Debug> fmt::Debug for TextInteractor<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("TextInteractor");
         b.field("inner", &self.inner);

@@ -14,7 +14,7 @@ readme = "README.md"
 rustc_version = "0.3.2"
 
 [dependencies]
-interactive-streams = { git = "https://github.com/sunfishcode/interactive-streams", branch = "main" }
+interact-trait = { git = "https://github.com/sunfishcode/interact-trait", branch = "main", features = ["io-ext"] }
 io-ext = { git = "https://github.com/sunfishcode/io-ext", branch = "main" }
 io-ext-adapters = { git = "https://github.com/sunfishcode/io-ext-adapters", branch = "main" }
 unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }

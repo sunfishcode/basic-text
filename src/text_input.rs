@@ -9,7 +9,7 @@ use crate::{
     },
     TextInteractor, TextReader, TextStr, Utf8Interactor, Utf8Reader,
 };
-use interactive_streams::InteractExt;
+use interact_trait::InteractExt;
 #[cfg(can_vector)]
 use io_ext::default_is_read_vectored;
 use io_ext::{

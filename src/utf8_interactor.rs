@@ -1,5 +1,5 @@
 use crate::{utf8_input::Utf8Input, utf8_output::Utf8Output, ReadStr, WriteStr, WriteWrapper};
-use interactive_streams::InteractExt;
+use interact_trait::{Interact, InteractExt};
 use io_ext::{Bufferable, ReadExt, Status, WriteExt};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
@@ -163,7 +163,7 @@ impl<Inner: InteractExt> WriteStr for Utf8Interactor<Inner> {
     }
 }
 
-impl<Inner: InteractExt> InteractExt for Utf8Interactor<Inner> {}
+impl<Inner: InteractExt> Interact for Utf8Interactor<Inner> {}
 
 impl<Inner: InteractExt> WriteWrapper<Inner> for Utf8Interactor<Inner> {
     #[inline]
