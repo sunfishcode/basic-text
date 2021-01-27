@@ -184,7 +184,7 @@ fn test(bytes: &[u8], s: &str) {
     assert_eq!(translate_with_small_buffer(bytes), s);
 
     for i in 1..4 {
-        let mut v = vec![0u8; i + bytes.len()];
+        let mut v = vec![0_u8; i + bytes.len()];
         v[i..i + bytes.len()].copy_from_slice(bytes);
         assert_eq!(
             str::from_utf8(&translate_via_ext_reader(&v).as_bytes()[i..]).unwrap(),
