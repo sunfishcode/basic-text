@@ -1,5 +1,5 @@
 [package]
-name = "textual-fuzz"
+name = "text-str-fuzz"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -9,20 +9,13 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.3.4"
-textual = { path = ".." }
+text-str = { path = ".." }
 unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }
-io-ext = { git = "https://github.com/sunfishcode/io-ext", branch = "main" }
-io-ext-adapters = { git = "https://github.com/sunfishcode/io-ext-adapters", branch = "main" }
+layered-io = "0.2.0"
 
 [[bin]]
 name = "text"
 path = "fuzz_targets/text.rs"
-test = false
-doc = false
-
-[[bin]]
-name = "utf8_reader"
-path = "fuzz_targets/utf8_reader.rs"
 test = false
 doc = false
 

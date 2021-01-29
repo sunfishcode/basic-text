@@ -1,26 +1,26 @@
 mod disallowed_scalar_values;
 
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
-use io_ext_adapters::ExtWriter;
+use layered_io::LayeredWriter;
 use std::io::{self, Write};
-use textual::TextWriter;
+use text_str::TextWriter;
 
 fn to_text(input: &str) -> io::Result<String> {
-    let mut writer = TextWriter::new(ExtWriter::new(Vec::<u8>::new()));
+    let mut writer = TextWriter::new(LayeredWriter::new(Vec::<u8>::new()));
     writer.write_all(input.as_bytes())?;
     let inner = writer.close_into_inner()?;
     Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
 }
 
 fn to_text_with_bom_compatibility(input: &str) -> io::Result<String> {
-    let mut writer = TextWriter::with_bom_compatibility(ExtWriter::new(Vec::<u8>::new())).unwrap();
+    let mut writer = TextWriter::with_bom_compatibility(LayeredWriter::new(Vec::<u8>::new())).unwrap();
     writer.write_all(input.as_bytes())?;
     let inner = writer.close_into_inner()?;
     Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
 }
 
 fn to_text_with_crlf_compatibility(input: &str) -> io::Result<String> {
-    let mut writer = TextWriter::with_crlf_compatibility(ExtWriter::new(Vec::<u8>::new()));
+    let mut writer = TextWriter::with_crlf_compatibility(LayeredWriter::new(Vec::<u8>::new()));
     writer.write_all(input.as_bytes())?;
     let inner = writer.close_into_inner()?;
     Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())

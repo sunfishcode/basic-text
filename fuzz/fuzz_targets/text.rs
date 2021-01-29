@@ -3,13 +3,13 @@
 #[macro_use]
 extern crate libfuzzer_sys;
 
-use io_ext::{SliceReader, WriteExt};
-use io_ext_adapters::ExtWriter;
+use io_ext::{SliceReader, WriteLayered};
+use io_ext_adapters::LayeredWriter;
 use std::{
     io::{Read, Write},
     str,
 };
-use textual::{TextReader, TextWriter};
+use text_string::{TextReader, TextWriter};
 use unicode_normalization::UnicodeNormalization;
 
 fuzz_target!(|bytes: &[u8]| {

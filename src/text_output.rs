@@ -1,16 +1,16 @@
-//! Text output for `TextWriter` and the writer half of `TextInteractor`.
+//! Text output for `TextWriter` and the writer half of `TextDuplexer`.
 
 use crate::{
     categorize::Categorize,
     unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
-    ReadStr, TextInteractor, TextStr, TextWriter, WriteStr,
+    ReadStr, TextDuplexer, TextStr, TextWriter, WriteStr,
 };
-use interact_trait::InteractExt;
+use layered_io::HalfDuplexLayered;
 #[cfg(can_vector)]
-use io_ext::default_is_write_vectored;
+use layered_io::default_is_write_vectored;
 #[cfg(write_all_vectored)]
-use io_ext::default_write_all_vectored;
-use io_ext::{default_write_vectored, Bufferable, WriteExt};
+use layered_io::default_write_all_vectored;
+use layered_io::{default_write_vectored, Bufferable, WriteLayered};
 use std::{
     cell::RefCell,
     io::{self, Write},
@@ -21,8 +21,8 @@ use std::{
 };
 use unicode_normalization::UnicodeNormalization;
 
-pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
-    type Inner: WriteExt;
+pub(crate) trait TextWriterInternals<Inner: WriteLayered>: WriteLayered {
+    type Inner: WriteLayered;
     fn impl_(&mut self) -> &mut TextOutput;
     fn inner(&self) -> &Self::Inner;
     fn inner_mut(&mut self) -> &mut Self::Inner;
@@ -30,7 +30,7 @@ pub(crate) trait TextWriterInternals<Inner: WriteExt>: WriteExt {
     fn write_str(&mut self, s: &str) -> io::Result<()>;
 }
 
-impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
+impl<Inner: WriteLayered> TextWriterInternals<Inner> for TextWriter<Inner> {
     type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextOutput {
@@ -54,7 +54,7 @@ impl<Inner: WriteExt> TextWriterInternals<Inner> for TextWriter<Inner> {
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> TextWriterInternals<Inner> for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> TextWriterInternals<Inner> for TextDuplexer<Inner> {
     type Inner = Inner;
 
     fn impl_(&mut self) -> &mut TextOutput {
@@ -131,7 +131,7 @@ impl TextOutput {
     }
 
     #[inline]
-    pub(crate) fn with_bom_compatibility<Inner: WriteExt>(
+    pub(crate) fn with_bom_compatibility<Inner: WriteLayered>(
         internals: &mut Inner,
     ) -> io::Result<Self> {
         let result = Self::new();
@@ -160,7 +160,7 @@ impl TextOutput {
 
     /// Flush and close the underlying stream and return the underlying
     /// stream object.
-    pub(crate) fn close_into_inner<Inner: WriteExt>(
+    pub(crate) fn close_into_inner<Inner: WriteLayered>(
         mut internals: impl TextWriterInternals<Inner>,
     ) -> io::Result<Inner> {
         Self::check_nl(&mut internals)?;
@@ -169,7 +169,7 @@ impl TextOutput {
 
     /// Discard and close the underlying stream and return the underlying
     /// stream object.
-    pub(crate) fn abandon_into_inner<Inner: WriteExt>(
+    pub(crate) fn abandon_into_inner<Inner: WriteLayered>(
         mut internals: impl TextWriterInternals<Inner>,
     ) -> Inner {
         // Don't enforce a trailing newline.
@@ -178,7 +178,7 @@ impl TextOutput {
         internals.into_inner()
     }
 
-    fn normal_write_str<Inner: WriteExt>(
+    fn normal_write_str<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
@@ -188,7 +188,7 @@ impl TextOutput {
         Self::write_buffer(internals)
     }
 
-    fn crlf_write_str<Inner: WriteExt>(
+    fn crlf_write_str<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
@@ -210,7 +210,7 @@ impl TextOutput {
         Self::write_buffer(internals)
     }
 
-    fn normal_write_text<Inner: WriteExt>(
+    fn normal_write_text<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &TextStr,
     ) -> io::Result<()> {
@@ -224,7 +224,7 @@ impl TextOutput {
         Self::write_buffer(internals)
     }
 
-    fn crlf_write_text<Inner: WriteExt>(
+    fn crlf_write_text<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &TextStr,
     ) -> io::Result<()> {
@@ -249,7 +249,7 @@ impl TextOutput {
         Self::write_buffer(internals)
     }
 
-    fn write_buffer<Inner: WriteExt>(
+    fn write_buffer<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         if internals.impl_().expect_starter {
@@ -281,7 +281,7 @@ impl TextOutput {
         Ok(())
     }
 
-    fn state_machine<Inner: WriteExt>(
+    fn state_machine<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
@@ -346,7 +346,7 @@ impl TextOutput {
         Ok(())
     }
 
-    fn check_nl<Inner: WriteExt>(
+    fn check_nl<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         match internals.impl_().state {
@@ -368,7 +368,7 @@ impl TextOutput {
         }
     }
 
-    pub(crate) fn close<Inner: WriteExt>(
+    pub(crate) fn close<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         internals.impl_().expect_starter = true;
@@ -376,20 +376,20 @@ impl TextOutput {
         internals.inner_mut().close()
     }
 
-    pub(crate) fn abandon<Inner: WriteExt>(internals: &mut impl TextWriterInternals<Inner>) {
+    pub(crate) fn abandon<Inner: WriteLayered>(internals: &mut impl TextWriterInternals<Inner>) {
         internals.inner_mut().abandon();
 
         // Don't enforce a trailing newline.
         internals.impl_().state = State::Ground(true);
     }
 
-    pub(crate) fn suggested_buffer_size<Inner: WriteExt>(
+    pub(crate) fn suggested_buffer_size<Inner: WriteLayered>(
         internals: &impl TextWriterInternals<Inner>,
     ) -> usize {
         internals.inner().suggested_buffer_size()
     }
 
-    pub(crate) fn write_text<Inner: WriteExt>(
+    pub(crate) fn write_text<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &TextStr,
     ) -> io::Result<()> {
@@ -400,7 +400,7 @@ impl TextOutput {
         }
     }
 
-    pub(crate) fn write_str<Inner: WriteExt>(
+    pub(crate) fn write_str<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
@@ -411,7 +411,7 @@ impl TextOutput {
         }
     }
 
-    pub(crate) fn write<Inner: WriteExt>(
+    pub(crate) fn write<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         buf: &[u8],
     ) -> io::Result<usize> {
@@ -431,7 +431,7 @@ impl TextOutput {
     }
 
     #[inline]
-    pub(crate) fn flush<Inner: WriteExt>(
+    pub(crate) fn flush<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         internals.impl_().expect_starter = true;
@@ -439,7 +439,7 @@ impl TextOutput {
     }
 
     #[inline]
-    pub(crate) fn write_vectored<Inner: WriteExt>(
+    pub(crate) fn write_vectored<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         bufs: &[io::IoSlice<'_>],
     ) -> io::Result<usize> {
@@ -448,7 +448,7 @@ impl TextOutput {
 
     #[cfg(can_vector)]
     #[inline]
-    pub(crate) fn is_write_vectored<Inner: WriteExt>(
+    pub(crate) fn is_write_vectored<Inner: WriteLayered>(
         internals: &impl TextWriterInternals<Inner>,
     ) -> bool {
         default_is_write_vectored(internals)
@@ -456,7 +456,7 @@ impl TextOutput {
 
     #[cfg(write_all_vectored)]
     #[inline]
-    pub(crate) fn write_all_vectored<Inner: WriteExt>(
+    pub(crate) fn write_all_vectored<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         bufs: &mut [io::IoSlice<'_>],
     ) -> io::Result<()> {
@@ -464,7 +464,7 @@ impl TextOutput {
     }
 
     #[inline]
-    pub(crate) fn newline<Inner: WriteExt>(
+    pub(crate) fn newline<Inner: WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         nl: bool,
     ) {

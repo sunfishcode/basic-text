@@ -1,4 +1,4 @@
-//! Plain and restricted text I/O and strings
+//! Basic Text strings and I/O streams
 
 #![deny(missing_docs)]
 #![cfg_attr(can_vector, feature(can_vector))]
@@ -14,30 +14,22 @@ mod read_str;
 mod read_text;
 mod replace_selected;
 mod text_input;
-mod text_interactor;
+mod text_duplexer;
 mod text_output;
 mod text_reader;
 mod text_string;
 mod text_writer;
 mod unicode;
-mod utf8_input;
-mod utf8_interactor;
-mod utf8_output;
-mod utf8_reader;
-mod utf8_writer;
 mod write_str;
 mod write_text;
 
 pub use copy::{copy_str, copy_text};
 pub use read_str::{default_read_exact_str, ReadStr};
 pub use read_text::{default_read_exact_text, ReadText};
-pub use text_interactor::TextInteractor;
+pub use text_duplexer::TextDuplexer;
 pub use text_reader::TextReader;
 pub use text_string::{TextStr, TextString};
 pub use text_writer::TextWriter;
 pub use unicode::NORMALIZATION_BUFFER_SIZE;
-pub use utf8_interactor::Utf8Interactor;
-pub use utf8_reader::Utf8Reader;
-pub use utf8_writer::Utf8Writer;
 pub use write_str::{default_write_fmt, default_write_str, WriteStr};
 pub use write_text::{default_write_text, WriteText};

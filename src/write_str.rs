@@ -1,11 +1,11 @@
-use io_ext::WriteExt;
+use layered_io::WriteLayered;
 use std::{
     fmt::{self, Arguments},
     io,
 };
 
 /// Add a convenience and optimizing method for writing from `str`.
-pub trait WriteStr: WriteExt {
+pub trait WriteStr: WriteLayered {
     /// Like `write_all`, but takes a `&str`, allowing implementors which
     /// require valid UTF-8 to avoid re-validating the data.
     fn write_str(&mut self, buf: &str) -> io::Result<()> {
@@ -16,7 +16,7 @@ pub trait WriteStr: WriteExt {
 /// Default implementation of [`WriteStr::write_str`], in terms of
 /// `Write::write_all`.
 #[inline]
-pub fn default_write_str<Inner: WriteExt + ?Sized>(inner: &mut Inner, buf: &str) -> io::Result<()> {
+pub fn default_write_str<Inner: WriteLayered + ?Sized>(inner: &mut Inner, buf: &str) -> io::Result<()> {
     // Default to just writing it as bytes.
     inner.write_all(buf.as_bytes())
 }

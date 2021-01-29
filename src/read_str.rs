@@ -1,8 +1,8 @@
-use io_ext::{ReadExt, Status};
+use layered_io::{ReadLayered, Status};
 use std::io;
 
 /// Add a convenience and optimizing method for reading into `str`.
-pub trait ReadStr: ReadExt {
+pub trait ReadStr: ReadLayered {
     /// Like `read_with_status` but produces the result in a `str`. Be sure to
     /// check the `size` field of the return value to see how many bytes were
     /// written.
@@ -23,8 +23,7 @@ pub fn default_read_exact_str<Inner: ReadStr + ?Sized>(
     while !buf.is_empty() {
         match inner.read_str(buf) {
             Ok((size, status)) => {
-                let t = buf;
-                buf = t.split_at_mut(size).1;
+                buf = buf.split_at_mut(size).1;
                 if status.is_end() {
                     break;
                 }

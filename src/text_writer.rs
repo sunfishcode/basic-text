@@ -1,5 +1,5 @@
 use crate::{text_output::TextOutput, TextStr, WriteStr, WriteText};
-use io_ext::{Bufferable, WriteExt};
+use layered_io::{Bufferable, WriteLayered};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
@@ -14,8 +14,9 @@ use terminal_support::{Terminal, TerminalColorSupport, WriteTerminal};
 #[cfg(windows)]
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
-/// A `WriteExt` implementation which translates to an output `WriteExt`
-/// producing a valid Basic Text stream from an arbitrary byte sequence.
+/// A `WriteLayered` implementation which translates to an output
+/// `WriteLayered` producing a valid Basic Text stream from an arbitrary
+/// byte sequence.
 ///
 /// `write` is not guaranteed to perform a single operation, because short
 /// writes could produce invalid UTF-8, so `write` will retry as needed.
@@ -27,7 +28,7 @@ pub struct TextWriter<Inner> {
     pub(crate) output: TextOutput,
 }
 
-impl<Inner: WriteExt> TextWriter<Inner> {
+impl<Inner: WriteLayered> TextWriter<Inner> {
     /// Construct a new instance of `TextWriter` wrapping `inner`.
     #[inline]
     pub fn new(inner: Inner) -> Self {
@@ -79,7 +80,7 @@ impl<Inner: WriteExt> TextWriter<Inner> {
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: WriteExt + WriteTerminal> TextWriter<Inner> {
+impl<Inner: WriteLayered + WriteTerminal> TextWriter<Inner> {
     /// Construct a new instance of `TextWriter` wrapping `inner` that
     /// optionally permits "ANSI"-style color escape sequences of the form
     /// `ESC [ ... m` on output.
@@ -94,10 +95,10 @@ impl<Inner: WriteExt + WriteTerminal> TextWriter<Inner> {
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: WriteExt + WriteTerminal> Terminal for TextWriter<Inner> {}
+impl<Inner: WriteLayered + WriteTerminal> Terminal for TextWriter<Inner> {}
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: WriteExt + WriteTerminal> WriteTerminal for TextWriter<Inner> {
+impl<Inner: WriteLayered + WriteTerminal> WriteTerminal for TextWriter<Inner> {
     #[inline]
     fn color_support(&self) -> TerminalColorSupport {
         self.inner.color_support()
@@ -114,28 +115,28 @@ impl<Inner: WriteExt + WriteTerminal> WriteTerminal for TextWriter<Inner> {
     }
 }
 
-impl<Inner: WriteExt> WriteExt for TextWriter<Inner> {
+impl<Inner: WriteLayered> WriteLayered for TextWriter<Inner> {
     #[inline]
     fn close(&mut self) -> io::Result<()> {
         TextOutput::close(self)
     }
 }
 
-impl<Inner: WriteExt> WriteStr for TextWriter<Inner> {
+impl<Inner: WriteLayered> WriteStr for TextWriter<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
     }
 }
 
-impl<Inner: WriteExt> WriteText for TextWriter<Inner> {
+impl<Inner: WriteLayered> WriteText for TextWriter<Inner> {
     #[inline]
     fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
         TextOutput::write_text(self, s)
     }
 }
 
-impl<Inner: WriteExt> Bufferable for TextWriter<Inner> {
+impl<Inner: WriteLayered> Bufferable for TextWriter<Inner> {
     #[inline]
     fn abandon(&mut self) {
         TextOutput::abandon(self)
@@ -147,7 +148,7 @@ impl<Inner: WriteExt> Bufferable for TextWriter<Inner> {
     }
 }
 
-impl<Inner: WriteExt> Write for TextWriter<Inner> {
+impl<Inner: WriteLayered> Write for TextWriter<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         TextOutput::write(self, buf)
@@ -177,7 +178,7 @@ impl<Inner: WriteExt> Write for TextWriter<Inner> {
 }
 
 #[cfg(not(windows))]
-impl<Inner: WriteExt + AsRawFd> AsRawFd for TextWriter<Inner> {
+impl<Inner: WriteLayered + AsRawFd> AsRawFd for TextWriter<Inner> {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
         self.inner.as_raw_fd()
@@ -185,7 +186,7 @@ impl<Inner: WriteExt + AsRawFd> AsRawFd for TextWriter<Inner> {
 }
 
 #[cfg(windows)]
-impl<Inner: WriteExt + AsRawHandleOrSocket> AsRawHandleOrSocket for TextWriter<Inner> {
+impl<Inner: WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for TextWriter<Inner> {
     #[inline]
     fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
         self.inner.as_raw_handle_or_socket()
@@ -202,7 +203,7 @@ impl<Inner: fmt::Debug> fmt::Debug for TextWriter<Inner> {
 
 #[cfg(test)]
 fn translate_via_ext_writer(bytes: &[u8]) -> io::Result<String> {
-    let mut writer = TextWriter::new(io_ext_adapters::ExtWriter::new(Vec::<u8>::new()));
+    let mut writer = TextWriter::new(layered_io::LayeredWriter::new(Vec::<u8>::new()));
     writer.write_all(bytes)?;
     let inner = writer.close_into_inner()?;
     Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())

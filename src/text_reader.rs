@@ -1,5 +1,5 @@
 use crate::{text_input::TextInput, ReadStr, ReadText, TextStr};
-use io_ext::{Bufferable, ReadExt, Status};
+use layered_io::{Bufferable, ReadLayered, Status};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
@@ -14,7 +14,7 @@ use terminal_support::{ReadTerminal, Terminal};
 #[cfg(windows)]
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
-/// A `ReadExt` implementation which translates from an input `ReadExt`
+/// A `ReadLayered` implementation which translates from an input `ReadLayered`
 /// producing an arbitrary byte sequence into a valid Basic Text stream.
 pub struct TextReader<Inner> {
     /// The wrapped byte stream.
@@ -24,7 +24,7 @@ pub struct TextReader<Inner> {
     pub(crate) input: TextInput,
 }
 
-impl<Inner: ReadExt> TextReader<Inner> {
+impl<Inner: ReadLayered> TextReader<Inner> {
     /// Construct a new instance of `TextReader` wrapping `inner`.
     #[inline]
     pub fn new(inner: Inner) -> Self {
@@ -36,10 +36,10 @@ impl<Inner: ReadExt> TextReader<Inner> {
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: ReadExt + ReadTerminal> Terminal for TextReader<Inner> {}
+impl<Inner: ReadLayered + ReadTerminal> Terminal for TextReader<Inner> {}
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: ReadExt + ReadTerminal> ReadTerminal for TextReader<Inner> {
+impl<Inner: ReadLayered + ReadTerminal> ReadTerminal for TextReader<Inner> {
     #[inline]
     fn is_line_by_line(&self) -> bool {
         self.inner.is_line_by_line()
@@ -51,7 +51,7 @@ impl<Inner: ReadExt + ReadTerminal> ReadTerminal for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> ReadExt for TextReader<Inner> {
+impl<Inner: ReadLayered> ReadLayered for TextReader<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
         TextInput::read_with_status(self, buf)
@@ -63,7 +63,7 @@ impl<Inner: ReadExt> ReadExt for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> Bufferable for TextReader<Inner> {
+impl<Inner: ReadLayered> Bufferable for TextReader<Inner> {
     #[inline]
     fn abandon(&mut self) {
         TextInput::abandon(self)
@@ -75,7 +75,7 @@ impl<Inner: ReadExt> Bufferable for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> ReadStr for TextReader<Inner> {
+impl<Inner: ReadLayered> ReadStr for TextReader<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
         TextInput::read_str(self, buf)
@@ -87,7 +87,7 @@ impl<Inner: ReadExt> ReadStr for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> ReadText for TextReader<Inner> {
+impl<Inner: ReadLayered> ReadText for TextReader<Inner> {
     #[inline]
     fn read_text(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
         TextInput::read_text(self, buf)
@@ -99,7 +99,7 @@ impl<Inner: ReadExt> ReadText for TextReader<Inner> {
     }
 }
 
-impl<Inner: ReadExt> Read for TextReader<Inner> {
+impl<Inner: ReadLayered> Read for TextReader<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         TextInput::read(self, buf)
@@ -125,15 +125,10 @@ impl<Inner: ReadExt> Read for TextReader<Inner> {
     fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
         TextInput::read_to_string(self, buf)
     }
-
-    #[inline]
-    fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
-        TextInput::read_exact(self, buf)
-    }
 }
 
 #[cfg(not(windows))]
-impl<Inner: ReadExt + AsRawFd> AsRawFd for TextReader<Inner> {
+impl<Inner: ReadLayered + AsRawFd> AsRawFd for TextReader<Inner> {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
         self.inner.as_raw_fd()
@@ -141,7 +136,7 @@ impl<Inner: ReadExt + AsRawFd> AsRawFd for TextReader<Inner> {
 }
 
 #[cfg(windows)]
-impl<Inner: ReadExt + AsRawHandleOrSocket> AsRawHandleOrSocket for TextReader<Inner> {
+impl<Inner: ReadLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for TextReader<Inner> {
     #[inline]
     fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
         self.inner.as_raw_handle_or_socket()
@@ -158,7 +153,7 @@ impl<Inner: fmt::Debug> fmt::Debug for TextReader<Inner> {
 
 #[cfg(test)]
 fn translate_via_ext_reader(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(io_ext_adapters::ExtReader::new(bytes));
+    let mut reader = TextReader::new(layered_io::LayeredReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -166,7 +161,7 @@ fn translate_via_ext_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_via_slice_reader(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(io_ext::SliceReader::new(bytes));
+    let mut reader = TextReader::new(layered_io::SliceReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -174,7 +169,7 @@ fn translate_via_slice_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_with_small_buffer(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(io_ext::SliceReader::new(bytes));
+    let mut reader = TextReader::new(layered_io::SliceReader::new(bytes));
     let mut v = Vec::new();
     let mut buf = [0; crate::unicode::NORMALIZATION_BUFFER_SIZE];
     loop {

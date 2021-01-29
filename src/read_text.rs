@@ -1,9 +1,9 @@
 use crate::TextStr;
-use io_ext::{ReadExt, Status};
+use layered_io::{ReadLayered, Status};
 use std::io;
 
 /// Add a convenience method for reading into `TextStr`.
-pub trait ReadText: ReadExt {
+pub trait ReadText: ReadLayered {
     /// Like `read_with_status` but produces the result in a `TextStr`. Be sure to
     /// check the `size` field of the return value to see how many bytes were
     /// written.

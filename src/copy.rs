@@ -1,5 +1,5 @@
 use crate::{ReadStr, ReadText, TextStr, TextString, WriteStr, WriteText};
-use io_ext::Bufferable;
+use layered_io::Bufferable;
 use std::{cmp::max, io};
 
 /// Like `std::io::copy`, but for streams that can operate directly on strings,
@@ -58,31 +58,14 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
 }
 
 #[test]
-fn test_copy_str() {
-    use crate::{Utf8Reader, Utf8Writer};
-    use io_ext_adapters::{ExtReader, ExtWriter};
-    use std::{io::Cursor, str};
-
-    let text = "hello world ☃";
-    let mut input = Utf8Reader::new(ExtReader::new(Cursor::new(text.to_string())));
-    let mut output = Utf8Writer::new(ExtWriter::new(Vec::new()));
-
-    copy_str(&mut input, &mut output).unwrap();
-
-    let ext = output.close_into_inner().unwrap();
-    let vec = ext.abandon_into_inner().unwrap();
-    assert_eq!(str::from_utf8(&vec).unwrap(), text);
-}
-
-#[test]
 fn test_copy_text() {
     use crate::{TextReader, TextWriter};
-    use io_ext_adapters::{ExtReader, ExtWriter};
+    use layered_io::{LayeredReader, LayeredWriter};
     use std::{io::Cursor, str};
 
     let text = "hello world ☃\n";
-    let mut input = TextReader::new(ExtReader::new(Cursor::new(text.to_string())));
-    let mut output = TextWriter::new(ExtWriter::new(Vec::new()));
+    let mut input = TextReader::new(LayeredReader::new(Cursor::new(text.to_string())));
+    let mut output = TextWriter::new(LayeredWriter::new(Vec::new()));
 
     copy_text(&mut input, &mut output).unwrap();
 

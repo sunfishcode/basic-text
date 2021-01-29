@@ -1,5 +1,5 @@
 use crate::{TextReader, TextWriter, WriteStr};
-use io_ext_adapters::{ExtReader, ExtWriter};
+use layered_io::{LayeredReader, LayeredWriter};
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
 #[cfg(pattern)]
@@ -69,7 +69,7 @@ impl TextString {
     #[inline]
     pub fn from_text(s: String) -> Result<Self, FromTextError> {
         let bytes: Vec<u8> = Vec::new();
-        let mut writer = TextWriter::new(ExtWriter::new(bytes));
+        let mut writer = TextWriter::new(LayeredWriter::new(bytes));
         writer.write_str(&s).map_err(|_err| FromTextError {
             bytes: s.into_bytes(),
             error: TextError {},
@@ -91,7 +91,7 @@ impl TextString {
     pub fn from_text_lossy(v: &str) -> Cow<TextStr> {
         // TODO: If `v` is already valid, fast-path to `Cow::Borrowed(v)`.
         // TODO: Also, this currently redoes UTF-8 validation for `v`.
-        let mut reader = TextReader::new(ExtReader::new(v.as_bytes()));
+        let mut reader = TextReader::new(LayeredReader::new(v.as_bytes()));
         let mut text = String::new();
         reader.read_to_string(&mut text).unwrap();
 

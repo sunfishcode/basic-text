@@ -1,8 +1,8 @@
 use crate::{
     text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, WriteStr, WriteText,
 };
-use interact_trait::{Interact, InteractExt};
-use io_ext::{Bufferable, ReadExt, Status, WriteExt};
+use duplex::Duplex;
+use layered_io::{Bufferable, ReadLayered, Status, WriteLayered, HalfDuplexLayered};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
@@ -20,10 +20,10 @@ use terminal_support::{
 #[cfg(windows)]
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
 
-/// An `InteractExt` implementation which translates to and from an inner
-/// `InteractExt` producing a valid Basic Text interactive stream from
+/// A `HalfDuplexLayered` implementation which translates to and from an inner
+/// `HalfDuplexLayered` producing a valid Basic Text interactive stream from
 /// an arbitrary interactive byte stream.
-pub struct TextInteractor<Inner: InteractExt> {
+pub struct TextDuplexer<Inner: HalfDuplexLayered> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
@@ -32,7 +32,7 @@ pub struct TextInteractor<Inner: InteractExt> {
     pub(crate) output: TextOutput,
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> TextDuplexer<Inner> {
     /// Construct a new instance of `TextReader` wrapping `inner`.
     #[inline]
     pub fn new(inner: Inner) -> Self {
@@ -90,7 +90,7 @@ impl<Inner: InteractExt + ReadStr + WriteStr> TextInteractor<Inner> {
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + InteractTerminal> TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + InteractTerminal> TextDuplexer<Inner> {
     /// Construct a new instance of `TextWriter` wrapping `inner` that
     /// optionally permits "ANSI"-style color escape sequences of the form
     /// `ESC [ ... m` on output.
@@ -106,11 +106,11 @@ impl<Inner: InteractExt + InteractTerminal> TextInteractor<Inner> {
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + InteractTerminal> Terminal for TextInteractor<Inner> {}
+impl<Inner: HalfDuplexLayered + InteractTerminal> Terminal for TextDuplexer<Inner> {}
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> ReadTerminal
-    for TextInteractor<Inner>
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> ReadTerminal
+    for TextDuplexer<Inner>
 {
     #[inline]
     fn is_line_by_line(&self) -> bool {
@@ -124,8 +124,8 @@ impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> ReadTerminal
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> WriteTerminal
-    for TextInteractor<Inner>
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> WriteTerminal
+    for TextDuplexer<Inner>
 {
     #[inline]
     fn color_support(&self) -> TerminalColorSupport {
@@ -144,12 +144,12 @@ impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> WriteTerminal
 }
 
 #[cfg(feature = "terminal-support")]
-impl<Inner: InteractExt + ReadStr + WriteStr + InteractTerminal> InteractTerminal
-    for TextInteractor<Inner>
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> InteractTerminal
+    for TextDuplexer<Inner>
 {
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> ReadExt for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadLayered for TextDuplexer<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
         let (size, status) = TextInput::read_with_status(self, buf)?;
@@ -169,7 +169,7 @@ impl<Inner: InteractExt + ReadStr + WriteStr> ReadExt for TextInteractor<Inner> 
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> Bufferable for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Bufferable for TextDuplexer<Inner> {
     #[inline]
     fn suggested_buffer_size(&self) -> usize {
         max(
@@ -185,7 +185,7 @@ impl<Inner: InteractExt + ReadStr + WriteStr> Bufferable for TextInteractor<Inne
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> ReadStr for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadStr for TextDuplexer<Inner> {
     #[inline]
     fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
         TextInput::read_str(self, buf)
@@ -206,7 +206,7 @@ impl<Inner: InteractExt + ReadStr + WriteStr> ReadStr for TextInteractor<Inner> 
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> ReadText for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadText for TextDuplexer<Inner> {
     #[inline]
     fn read_text(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
         TextInput::read_text(self, buf)
@@ -227,7 +227,7 @@ impl<Inner: InteractExt + ReadStr + WriteStr> ReadText for TextInteractor<Inner>
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> Read for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Read for TextDuplexer<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         TextInput::read(self, buf)
@@ -253,37 +253,32 @@ impl<Inner: InteractExt + ReadStr + WriteStr> Read for TextInteractor<Inner> {
     fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
         TextInput::read_to_string(self, buf)
     }
-
-    #[inline]
-    fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
-        TextInput::read_exact(self, buf)
-    }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> WriteExt for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> WriteLayered for TextDuplexer<Inner> {
     #[inline]
     fn close(&mut self) -> io::Result<()> {
         TextOutput::close(self)
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> WriteStr for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> WriteStr for TextDuplexer<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> WriteText for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> WriteText for TextDuplexer<Inner> {
     #[inline]
     fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
         TextOutput::write_text(self, s)
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr> Interact for TextInteractor<Inner> {}
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Duplex for TextDuplexer<Inner> {}
 
-impl<Inner: InteractExt + ReadStr + WriteStr> Write for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Write for TextDuplexer<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         TextOutput::write(self, buf)
@@ -313,7 +308,7 @@ impl<Inner: InteractExt + ReadStr + WriteStr> Write for TextInteractor<Inner> {
 }
 
 #[cfg(not(windows))]
-impl<Inner: InteractExt + ReadStr + WriteStr + AsRawFd> AsRawFd for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawFd> AsRawFd for TextDuplexer<Inner> {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
         self.inner.as_raw_fd()
@@ -321,8 +316,8 @@ impl<Inner: InteractExt + ReadStr + WriteStr + AsRawFd> AsRawFd for TextInteract
 }
 
 #[cfg(windows)]
-impl<Inner: InteractExt + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawHandleOrSocket
-    for TextInteractor<Inner>
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawHandleOrSocket
+    for TextDuplexer<Inner>
 {
     #[inline]
     fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
@@ -330,9 +325,9 @@ impl<Inner: InteractExt + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawHandleO
     }
 }
 
-impl<Inner: InteractExt + ReadStr + WriteStr + fmt::Debug> fmt::Debug for TextInteractor<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug for TextDuplexer<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut b = f.debug_struct("TextInteractor");
+        let mut b = f.debug_struct("TextDuplexer");
         b.field("inner", &self.inner);
         b.finish()
     }
