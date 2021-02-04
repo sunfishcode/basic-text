@@ -1,4 +1,4 @@
-use crate::{TextReader, TextWriter, WriteStr};
+use crate::{TextReader, TextWriter};
 use layered_io::{LayeredReader, LayeredWriter};
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
@@ -22,6 +22,7 @@ use std::{
     string::FromUtf8Error,
     vec,
 };
+use utf8_io::{Utf8Reader, Utf8Writer, WriteStr};
 
 /// A Basic Text encoded, growable string.
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -69,13 +70,19 @@ impl TextString {
     #[inline]
     pub fn from_text(s: String) -> Result<Self, FromTextError> {
         let bytes: Vec<u8> = Vec::new();
-        let mut writer = TextWriter::new(LayeredWriter::new(bytes));
+        let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(bytes)));
         writer.write_str(&s).map_err(|_err| FromTextError {
             bytes: s.into_bytes(),
             error: TextError {},
         })?;
         Ok(unsafe {
-            Self::from_text_vec_unchecked(writer.abandon_into_inner().abandon_into_inner().unwrap())
+            Self::from_text_vec_unchecked(
+                writer
+                    .abandon_into_inner()
+                    .abandon_into_inner()
+                    .abandon_into_inner()
+                    .unwrap(),
+            )
         })
     }
 
@@ -91,7 +98,7 @@ impl TextString {
     pub fn from_text_lossy(v: &str) -> Cow<TextStr> {
         // TODO: If `v` is already valid, fast-path to `Cow::Borrowed(v)`.
         // TODO: Also, this currently redoes UTF-8 validation for `v`.
-        let mut reader = TextReader::new(LayeredReader::new(v.as_bytes()));
+        let mut reader = TextReader::new(Utf8Reader::new(LayeredReader::new(v.as_bytes())));
         let mut text = String::new();
         reader.read_to_string(&mut text).unwrap();
 
@@ -378,6 +385,20 @@ impl<'a> PartialEq<str> for TextString {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.0.eq(other)
+    }
+}
+
+impl<'a> PartialEq<String> for TextString {
+    #[inline]
+    fn eq(&self, other: &String) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl<'a> PartialEq<TextString> for String {
+    #[inline]
+    fn eq(&self, other: &TextString) -> bool {
+        self.eq(&other.0)
     }
 }
 
@@ -899,6 +920,20 @@ impl<'a> PartialEq<str> for TextStr {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.0.eq(other)
+    }
+}
+
+impl<'a> PartialEq<String> for TextStr {
+    #[inline]
+    fn eq(&self, other: &String) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl<'a> PartialEq<TextStr> for String {
+    #[inline]
+    fn eq(&self, other: &TextStr) -> bool {
+        self.eq(&other.0)
     }
 }
 

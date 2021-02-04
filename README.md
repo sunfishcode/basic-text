@@ -1,18 +1,20 @@
 <div align="center">
-  <h1><code>text-str</code></h1>
+  <h1><code>basic-text</code></h1>
 
   <p>
     <strong>Basic Text strings and I/O streams</strong>
   </p>
 
   <p>
-    <a href="https://github.com/sunfishcode/text-str/actions?query=workflow%3ACI"><img src="https://github.com/sunfishcode/text-str/workflows/CI/badge.svg" alt="Github Actions CI Status" /></a>
-    <a href="https://crates.io/crates/text-str"><img src="https://img.shields.io/crates/v/text-str.svg" alt="crates.io page" /></a>
-    <a href="https://docs.rs/text-str"><img src="https://docs.rs/text-str/badge.svg" alt="docs.rs docs" /></a>
+    <a href="https://github.com/sunfishcode/basic-text/actions?query=workflow%3ACI"><img src="https://github.com/sunfishcode/basic-text/workflows/CI/badge.svg" alt="Github Actions CI Status" /></a>
+    <a href="https://crates.io/crates/basic-text"><img src="https://img.shields.io/crates/v/basic-text.svg" alt="crates.io page" /></a>
+    <a href="https://docs.rs/basic-text"><img src="https://docs.rs/basic-text/badge.svg" alt="docs.rs docs" /></a>
   </p>
 </div>
 
-`text-str` defines several utilities for working with a subset of Unicode
+*This is an early experiment! Both the code and the Basic Text format are actively evolving!*
+
+`basic-text` defines several utilities for working with a subset of Unicode
 called [Basic Text]:
 
  - [`TextString`] and [`TextStr`] are similar to [`String`] and [`str`] using
@@ -28,11 +30,11 @@ called [Basic Text]:
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
    text stream using Basic Text.
 
-[`TextString`]: https://docs.rs/text-str/latest/text_str/struct.TextString.html
-[`TextStr`]: https://docs.rs/text-str/latest/text_str/struct.TextStr.html
-[`TextReader`]: https://docs.rs/text-str/latest/text_str/struct.TextReader.html
-[`TextWriter`]: https://docs.rs/text-str/latest/text_str/struct.TextWriter.html
-[`TextDuplexer`]: https://docs.rs/text-str/latest/text_str/struct.TextDuplexer.html
+[`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
+[`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
+[`TextReader`]: https://docs.rs/basic-text/latest/basic_text/struct.TextReader.html
+[`TextWriter`]: https://docs.rs/basic-text/latest/basic_text/struct.TextWriter.html
+[`TextDuplexer`]: https://docs.rs/basic-text/latest/basic_text/struct.TextDuplexer.html
 [`str`]: https://doc.rust-lang.org/std/primitive.str.html
 [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
 [`Duplex`]: https://docs.rs/duplex/latest/duplex/trait.Duplex.html

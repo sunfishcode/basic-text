@@ -1,5 +1,5 @@
 [package]
-name = "text-str-fuzz"
+name = "basic-text-fuzz"
 version = "0.0.0"
 edition = "2018"
 publish = false
@@ -9,7 +9,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.3.4"
-text-str = { path = ".." }
+basic-text = { path = ".." }
 unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }
 layered-io = "0.2.0"
 

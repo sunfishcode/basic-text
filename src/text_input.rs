@@ -7,57 +7,59 @@ use crate::{
         is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
         NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
     },
-    ReadStr, TextDuplexer, TextReader, TextStr, WriteStr,
+    TextDuplexer, TextReader, TextStr,
 };
-#[cfg(can_vector)]
-use layered_io::default_is_read_vectored;
-use layered_io::{
-    default_read, default_read_to_end, default_read_vectored, Bufferable,
-    ReadLayered, Status, HalfDuplexLayered
-};
+use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
     cmp::max,
     io::{self, copy, repeat, Cursor, Read},
     mem, str,
 };
 use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
+use utf8_io::{ReadStrLayered, WriteStr};
 
-pub(crate) trait TextReaderInternals<Inner>: ReadLayered {
-    type Inner: ReadLayered;
+pub(crate) trait TextReaderInternals<Inner: ReadStrLayered>: ReadStrLayered {
     fn impl_(&mut self) -> &mut TextInput;
-    fn inner(&self) -> &Self::Inner;
-    fn inner_mut(&mut self) -> &mut Self::Inner;
+    fn inner(&self) -> &Inner;
+    fn inner_mut(&mut self) -> &mut Inner;
+    fn into_inner(self) -> Inner;
 }
 
-impl<Inner: ReadLayered> TextReaderInternals<Inner> for TextReader<Inner> {
-    type Inner = Inner;
-
+impl<Inner: ReadStrLayered> TextReaderInternals<Inner> for TextReader<Inner> {
     fn impl_(&mut self) -> &mut TextInput {
         &mut self.input
     }
 
-    fn inner(&self) -> &Self::Inner {
+    fn inner(&self) -> &Inner {
         &self.inner
     }
 
-    fn inner_mut(&mut self) -> &mut Self::Inner {
+    fn inner_mut(&mut self) -> &mut Inner {
         &mut self.inner
+    }
+
+    fn into_inner(self) -> Inner {
+        self.inner
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> TextReaderInternals<Inner> for TextDuplexer<Inner> {
-    type Inner = Inner;
-
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + WriteLayered> TextReaderInternals<Inner>
+    for TextDuplexer<Inner>
+{
     fn impl_(&mut self) -> &mut TextInput {
         &mut self.input
     }
 
-    fn inner(&self) -> &Self::Inner {
+    fn inner(&self) -> &Inner {
         &self.inner
     }
 
-    fn inner_mut(&mut self) -> &mut Self::Inner {
+    fn inner_mut(&mut self) -> &mut Inner {
         &mut self.inner
+    }
+
+    fn into_inner(self) -> Inner {
+        self.inner
     }
 }
 
@@ -92,7 +94,7 @@ pub(crate) struct TextInput {
 impl TextInput {
     /// Construct a new instance of `TextInput`.
     #[inline]
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         let queue = RcCharQueue::new();
         Self {
             raw_string: String::new(),
@@ -109,44 +111,103 @@ impl TextInput {
     /// check the `size` field of the return value to see how many bytes were
     /// written.
     #[inline]
-    pub fn read_str<Inner: ReadLayered>(
+    pub(crate) fn read_str<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut str,
-    ) -> io::Result<(usize, Status)> {
-        // Safety: This is a UTF-8 stream so we can read into a `str`.
-        Self::read_with_status(internals, unsafe { buf.as_bytes_mut() })
+    ) -> io::Result<usize> {
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        internals.read(unsafe { buf.as_bytes_mut() })
     }
 
     /// Like `read_exact` but produces the result in a `str`.
     #[inline]
-    pub fn read_exact_str<Inner: ReadLayered>(
+    pub(crate) fn read_exact_str<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<()> {
-        // Safety: This is a UTF-8 stream so we can read into a `str`.
-        Read::read_exact(internals, unsafe { buf.as_bytes_mut() })
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        internals.read_exact(unsafe { buf.as_bytes_mut() })
+    }
+
+    /// Like `read_with_status` but produces the result in a `str`. Be sure to
+    /// check the `size` field of the return value to see how many bytes were
+    /// written.
+    #[inline]
+    pub(crate) fn read_str_with_status<Inner: ReadStrLayered>(
+        internals: &mut impl TextReaderInternals<Inner>,
+        buf: &mut str,
+    ) -> io::Result<(usize, Status)> {
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        let (size, status) = internals.read_with_status(unsafe { buf.as_bytes_mut() })?;
+
+        debug_assert!(buf.is_char_boundary(size));
+
+        Ok((size, status))
+    }
+
+    /// Like `read_with_status` but produces the result in a `str`. Be sure to
+    /// check the `size` field of the return value to see how many bytes were
+    /// written.
+    #[inline]
+    pub(crate) fn read_exact_str_using_status<Inner: ReadStrLayered>(
+        internals: &mut impl TextReaderInternals<Inner>,
+        buf: &mut str,
+    ) -> io::Result<Status> {
+        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        internals.read_exact_using_status(unsafe { buf.as_bytes_mut() })
     }
 
     /// Like `read_with_status` but produces the result in a `TextStr`. Be sure
     /// to check the `size` field of the return value to see how many bytes
     /// were written.
     #[inline]
-    pub fn read_text<Inner: ReadLayered>(
+    pub(crate) fn read_text<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextStr,
-    ) -> io::Result<(usize, Status)> {
-        // Safety: This is a UTF-8 stream so we can read into a `TextStr`.
-        Self::read_with_status(internals, unsafe { buf.as_bytes_mut() })
+    ) -> io::Result<usize> {
+        // Safety: This is a UTF-8 stream so we can read directly into a
+        // `TextStr`.
+        internals.read(unsafe { buf.as_bytes_mut() })
     }
 
     /// Like `read_exact` but produces the result in a `TextStr`.
     #[inline]
-    pub fn read_exact_text<Inner: ReadLayered>(
+    pub(crate) fn read_exact_text<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextStr,
     ) -> io::Result<()> {
-        // Safety: This is a Text stream so we can read into a `TextStr`.
-        Read::read_exact(internals, unsafe { buf.as_bytes_mut() })
+        // Safety: This is a Text stream so we can read directly into a
+        // `TextStr`.
+        internals.read_exact(unsafe { buf.as_bytes_mut() })
+    }
+
+    /// Like `read_with_status` but produces the result in a `TextStr`. Be sure
+    /// to check the `size` field of the return value to see how many bytes
+    /// were written.
+    #[inline]
+    pub(crate) fn read_text_with_status<Inner: ReadStrLayered>(
+        internals: &mut impl TextReaderInternals<Inner>,
+        buf: &mut TextStr,
+    ) -> io::Result<(usize, Status)> {
+        // Safety: This is a text stream so we can read directly into a `TextStr`.
+        let (size, status) = internals.read_with_status(unsafe { buf.as_bytes_mut() })?;
+
+        // TODO
+        //debug_assert!(buf.is_char_boundary(size));
+
+        Ok((size, status))
+    }
+
+    /// Like `read_with_status` but produces the result in a `TextStr`. Be sure
+    /// to check the `size` field of the return value to see how many bytes
+    /// were written.
+    #[inline]
+    pub(crate) fn read_exact_text_using_status<Inner: ReadStrLayered>(
+        internals: &mut impl TextReaderInternals<Inner>,
+        buf: &mut TextStr,
+    ) -> io::Result<Status> {
+        // Safety: This is a text stream so we can read directly into a `str`.
+        internals.read_exact_using_status(unsafe { buf.as_bytes_mut() })
     }
 
     fn queue_next(&mut self, sequence_end: bool) -> Option<char> {
@@ -272,14 +333,14 @@ impl TextInput {
         }
     }
 
-    pub(crate) fn read_with_status<Inner: ReadLayered>(
+    pub(crate) fn read_with_status<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut [u8],
     ) -> io::Result<(usize, Status)> {
         if buf.len() < NORMALIZATION_BUFFER_SIZE {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "buffer for text input must be at least NORMALIZATION_BUFFER_SIZE bytes",
+                format!("buffer for text input is {} bytes; at least NORMALIZATION_BUFFER_SIZE bytes are required", buf.len())
             ));
         }
 
@@ -379,7 +440,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn minimum_buffer_size<Inner: ReadLayered>(
+    pub(crate) fn minimum_buffer_size<Inner: ReadStrLayered>(
         internals: &impl TextReaderInternals<Inner>,
     ) -> usize {
         max(
@@ -389,7 +450,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn abandon<Inner: ReadLayered>(internals: &mut impl TextReaderInternals<Inner>) {
+    pub(crate) fn abandon<Inner: ReadStrLayered>(internals: &mut impl TextReaderInternals<Inner>) {
         // Don't enforce a trailing newline.
         internals.impl_().state = State::Ground(true);
 
@@ -399,7 +460,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn suggested_buffer_size<Inner: ReadLayered>(
+    pub(crate) fn suggested_buffer_size<Inner: ReadStrLayered>(
         internals: &impl TextReaderInternals<Inner>,
     ) -> usize {
         max(
@@ -409,7 +470,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn read<Inner: ReadLayered>(
+    pub(crate) fn read<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut [u8],
     ) -> io::Result<usize> {
@@ -417,36 +478,12 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn read_vectored<Inner: ReadLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
-        bufs: &mut [io::IoSliceMut<'_>],
-    ) -> io::Result<usize> {
-        default_read_vectored(internals, bufs)
-    }
-
-    #[cfg(can_vector)]
-    #[inline]
-    pub(crate) fn is_read_vectored<Inner: ReadLayered>(
-        internals: &impl TextReaderInternals<Inner>,
-    ) -> bool {
-        default_is_read_vectored(internals)
-    }
-
-    #[inline]
-    pub(crate) fn read_to_end<Inner: ReadLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
-        buf: &mut Vec<u8>,
-    ) -> io::Result<usize> {
-        default_read_to_end(internals, buf)
-    }
-
-    #[inline]
-    pub(crate) fn read_to_string<Inner: ReadLayered>(
+    pub(crate) fn read_to_string<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut String,
     ) -> io::Result<usize> {
         // Safety: This is a UTF-8 stream so we can read into a `String`.
-        default_read_to_end(internals, unsafe { buf.as_mut_vec() })
+        internals.read_to_end(unsafe { buf.as_mut_vec() })
     }
 }
 

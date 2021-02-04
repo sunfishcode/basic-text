@@ -1,8 +1,8 @@
-use crate::{
-    text_input::TextInput, text_output::TextOutput, ReadStr, ReadText, TextStr, WriteStr, WriteText,
+use crate::{text_input::TextInput, text_output::TextOutput, ReadText, TextStr, WriteText};
+use duplex::{Duplex, HalfDuplex};
+use layered_io::{
+    default_read_to_end, Bufferable, HalfDuplexLayered, ReadLayered, Status, WriteLayered,
 };
-use duplex::Duplex;
-use layered_io::{Bufferable, ReadLayered, Status, WriteLayered, HalfDuplexLayered};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, RawFd};
 #[cfg(target_os = "wasi")]
@@ -13,17 +13,16 @@ use std::{
     io::{self, Read, Write},
     str,
 };
-#[cfg(feature = "terminal-support")]
-use terminal_support::{
-    InteractTerminal, ReadTerminal, Terminal, TerminalColorSupport, WriteTerminal,
-};
+#[cfg(feature = "terminal-io")]
+use terminal_io::{DuplexTerminal, ReadTerminal, Terminal, TerminalColorSupport, WriteTerminal};
 #[cfg(windows)]
 use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use utf8_io::{ReadStr, ReadStrLayered, WriteStr};
 
-/// A `HalfDuplexLayered` implementation which translates to and from an inner
-/// `HalfDuplexLayered` producing a valid Basic Text interactive stream from
-/// an arbitrary interactive byte stream.
-pub struct TextDuplexer<Inner: HalfDuplexLayered> {
+/// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`
+/// implementation producing an arbitrary byte sequence into a valid Basic Text
+/// stream.
+pub struct TextDuplexer<Inner: HalfDuplex + ReadStr + WriteStr> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
 
@@ -32,7 +31,9 @@ pub struct TextDuplexer<Inner: HalfDuplexLayered> {
     pub(crate) output: TextOutput,
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> TextDuplexer<Inner> {
+impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + WriteLayered>
+    TextDuplexer<Inner>
+{
     /// Construct a new instance of `TextReader` wrapping `inner`.
     #[inline]
     pub fn new(inner: Inner) -> Self {
@@ -89,8 +90,8 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> TextDuplexer<Inner> {
     }
 }
 
-#[cfg(feature = "terminal-support")]
-impl<Inner: HalfDuplexLayered + InteractTerminal> TextDuplexer<Inner> {
+#[cfg(feature = "terminal-io")]
+impl<Inner: HalfDuplex + ReadStr + WriteStr + DuplexTerminal> TextDuplexer<Inner> {
     /// Construct a new instance of `TextWriter` wrapping `inner` that
     /// optionally permits "ANSI"-style color escape sequences of the form
     /// `ESC [ ... m` on output.
@@ -105,11 +106,11 @@ impl<Inner: HalfDuplexLayered + InteractTerminal> TextDuplexer<Inner> {
     }
 }
 
-#[cfg(feature = "terminal-support")]
-impl<Inner: HalfDuplexLayered + InteractTerminal> Terminal for TextDuplexer<Inner> {}
+#[cfg(feature = "terminal-io")]
+impl<Inner: HalfDuplex + ReadStr + WriteStr + DuplexTerminal> Terminal for TextDuplexer<Inner> {}
 
-#[cfg(feature = "terminal-support")]
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> ReadTerminal
+#[cfg(feature = "terminal-io")]
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + DuplexTerminal> ReadTerminal
     for TextDuplexer<Inner>
 {
     #[inline]
@@ -123,8 +124,8 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> ReadTermi
     }
 }
 
-#[cfg(feature = "terminal-support")]
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> WriteTerminal
+#[cfg(feature = "terminal-io")]
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + DuplexTerminal> WriteTerminal
     for TextDuplexer<Inner>
 {
     #[inline]
@@ -143,13 +144,13 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> WriteTerm
     }
 }
 
-#[cfg(feature = "terminal-support")]
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + InteractTerminal> InteractTerminal
+#[cfg(feature = "terminal-io")]
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + DuplexTerminal> DuplexTerminal
     for TextDuplexer<Inner>
 {
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadLayered for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadLayered for TextDuplexer<Inner> {
     #[inline]
     fn read_with_status(&mut self, buf: &mut [u8]) -> io::Result<(usize, Status)> {
         let (size, status) = TextInput::read_with_status(self, buf)?;
@@ -169,7 +170,7 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadLayered for TextDuplexer
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Bufferable for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> Bufferable for TextDuplexer<Inner> {
     #[inline]
     fn suggested_buffer_size(&self) -> usize {
         max(
@@ -185,9 +186,9 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Bufferable for TextDuplexer<
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadStr for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadStr for TextDuplexer<Inner> {
     #[inline]
-    fn read_str(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
+    fn read_str(&mut self, buf: &mut str) -> io::Result<usize> {
         TextInput::read_str(self, buf)
     }
 
@@ -206,9 +207,21 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadStr for TextDuplexer<Inn
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadText for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadStrLayered for TextDuplexer<Inner> {
     #[inline]
-    fn read_text(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
+    fn read_str_with_status(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
+        TextInput::read_str_with_status(self, buf)
+    }
+
+    #[inline]
+    fn read_exact_str_using_status(&mut self, buf: &mut str) -> io::Result<Status> {
+        TextInput::read_exact_str_using_status(self, buf)
+    }
+}
+
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDuplexer<Inner> {
+    #[inline]
+    fn read_text(&mut self, buf: &mut TextStr) -> io::Result<usize> {
         TextInput::read_text(self, buf)
     }
 
@@ -227,26 +240,15 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> ReadText for TextDuplexer<In
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Read for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> Read for TextDuplexer<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         TextInput::read(self, buf)
     }
 
     #[inline]
-    fn read_vectored(&mut self, bufs: &mut [io::IoSliceMut<'_>]) -> io::Result<usize> {
-        TextInput::read_vectored(self, bufs)
-    }
-
-    #[cfg(can_vector)]
-    #[inline]
-    fn is_read_vectored(&self) -> bool {
-        TextInput::is_read_vectored(self)
-    }
-
-    #[inline]
     fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
-        TextInput::read_to_end(self, buf)
+        default_read_to_end(self, buf)
     }
 
     #[inline]
@@ -255,30 +257,30 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Read for TextDuplexer<Inner>
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> WriteLayered for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteLayered for TextDuplexer<Inner> {
     #[inline]
     fn close(&mut self) -> io::Result<()> {
         TextOutput::close(self)
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> WriteStr for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteStr for TextDuplexer<Inner> {
     #[inline]
     fn write_str(&mut self, s: &str) -> io::Result<()> {
         TextOutput::write_str(self, s)
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> WriteText for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteText for TextDuplexer<Inner> {
     #[inline]
     fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
         TextOutput::write_text(self, s)
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Duplex for TextDuplexer<Inner> {}
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> Duplex for TextDuplexer<Inner> {}
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr> Write for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> Write for TextDuplexer<Inner> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         TextOutput::write(self, buf)
@@ -325,7 +327,9 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawH
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug for TextDuplexer<Inner> {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug
+    for TextDuplexer<Inner>
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("TextDuplexer");
         b.field("inner", &self.inner);
