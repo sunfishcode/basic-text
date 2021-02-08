@@ -74,6 +74,30 @@ A buffered stream is in Basic Text form iff:
 | \[U+FFF9–U+FFFB\]   |      | U+FFFD            | "Interlinear Annotations depend on out-of-band information" |
 | U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
 | \[U+FFFE,U+FFFF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| U+1D455             | ℎ    | U+FFFD            | "Use U+210E instead of U+1D455" |
+| U+1D49D             | ℬ    | U+FFFD            | "Use U+212C instead of U+1D49D" |
+| U+1D4A0             | ℰ    | U+FFFD            | "Use U+2130 instead of U+1D4A0" |
+| U+1D4A1             | ℱ    | U+FFFD            | "Use U+2131 instead of U+1D4A1" |
+| U+1D4A3             | ℋ    | U+FFFD            | "Use U+210B instead of U+1D4A3" |
+| U+1D4A4             | ℐ    | U+FFFD            | "Use U+2110 instead of U+1D4A4" |
+| U+1D4A7             | ℒ    | U+FFFD            | "Use U+2112 instead of U+1D4A7" |
+| U+1D4A8             | ℳ    | U+FFFD            | "Use U+2133 instead of U+1D4A8" |
+| U+1D4AD             | ℛ    | U+FFFD            | "Use U+211B instead of U+1D4AD" |
+| U+1D4BA             | ℯ    | U+FFFD            | "Use U+212F instead of U+1D4BA" |
+| U+1D4BC             | ℊ    | U+FFFD            | "Use U+210A instaed of U+1D4BC" |
+| U+1D4C4             | ℴ    | U+FFFD            | "Use U+2134 instead of U+1D4C4" |
+| U+1D506             | ℭ    | U+FFFD            | "Use U+212D instead of U+1D506" |
+| U+1D50B             | ℌ    | U+FFFD            | "Use U+210C instead of U+1D50B" |
+| U+1D50C             | ℑ    | U+FFFD            | "Use U+2111 instead of U+1D50C" |
+| U+1D515             | ℜ    | U+FFFD            | "Use U+211C instead of U+1D515" |
+| U+1D51D             | ℨ    | U+FFFD            | "Use U+2128 instead of U+1D51D" |
+| U+1D53A             | ℂ    | U+FFFD            | "Use U+2102 instead of U+1D53A" |
+| U+1D53F             | ℍ    | U+FFFD            | "Use U+210D instead of U+1D53F" |
+| U+1D545             | ℕ    | U+FFFD            | "Use U+2115 instead of U+1D545" |
+| U+1D547             | ℙ    | U+FFFD            | "Use U+2119 instead of U+1D547" |
+| U+1D548             | ℚ    | U+FFFD            | "Use U+211A instead of U+1D548" |
+| U+1D549             | ℝ    | U+FFFD            | "Use U+211D instead of U+1D549" |
+| U+1D551             | ℤ    | U+FFFD            | "Use U+2124 instead of U+1D551" |
 | \[U+1FFFE,U+1FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+2FFFE,U+2FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+3FFFE,U+3FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |

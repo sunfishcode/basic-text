@@ -123,6 +123,17 @@ U+2329 and U+232A have canonical equivalents with different appearances
 so their use is deprecated and it's not recommended to automatically replace
 them with their canonical equivalents.
 
+## Unassigned Mathematical Alphanumeric Symbols
+
+In the Mathematical Alphanumeric Symbols block, the codepoint U+1D455 would be
+the place for `ℎ`, however unicode already had an `ℎ` at U+210E, so U+1D455
+was left unassigned.
+
+Several other characters are treated similarly: U+1D455, U+1D49D, U+1D4A0,
+U+1D4A1, U+1D4A3, U+1D4A4, U+1D4A7, U+1D4A8, U+1D4AD, U+1D4BA, U+1D4BC,
+U+1D4C4, U+1D506, U+1D50B, U+1D50C, U+1D515, U+1D51D, U+1D53A, U+1D53F,
+U+1D545, U+1D547, U+1D548, U+1D549, and U+1D551.
+
 ## Not-recommended scalar values with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference

@@ -59,6 +59,13 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
             LS | PS => Some(' '),
             // Interlinear Annotations
             '\u{fff9}'..='\u{fffb}' |
+            // Unassigned alphanumeric mathematical symbols.
+            '\u{1d455}' | '\u{1d49d}' | '\u{1d4a0}' | '\u{1d4a1}' |
+            '\u{1d4a3}' | '\u{1d4a4}' | '\u{1d4a7}' | '\u{1d4a8}' |
+            '\u{1d4ad}' | '\u{1d4ba}' | '\u{1d4bc}' | '\u{1d4c4}' |
+            '\u{1d506}' | '\u{1d50b}' | '\u{1d50c}' | '\u{1d515}' |
+            '\u{1d51d}' | '\u{1d53a}' | '\u{1d53f}' | '\u{1d545}' |
+            '\u{1d547}' | '\u{1d548}' | '\u{1d549}' | '\u{1d551}' |
             // Object Replacement Character
             ORC |
             // Khmer characters erroneously invented by Unicode.

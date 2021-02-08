@@ -65,6 +65,31 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             | c @ '\u{ffffe}'..='\u{fffff}'
             | c @ '\u{10fffe}'..='\u{10ffff}'
             | c @ '\u{fdd0}'..='\u{fdef}' => self.noncharacter(c),
+            // Unassigned alphanumeric mathematical symbols.
+            c @ '\u{1d455}'
+            | c @ '\u{1d49d}'
+            | c @ '\u{1d4a0}'
+            | c @ '\u{1d4a1}'
+            | c @ '\u{1d4a3}'
+            | c @ '\u{1d4a4}'
+            | c @ '\u{1d4a7}'
+            | c @ '\u{1d4a8}'
+            | c @ '\u{1d4ad}'
+            | c @ '\u{1d4ba}'
+            | c @ '\u{1d4bc}'
+            | c @ '\u{1d4c4}'
+            | c @ '\u{1d506}'
+            | c @ '\u{1d50b}'
+            | c @ '\u{1d50c}'
+            | c @ '\u{1d515}'
+            | c @ '\u{1d51d}'
+            | c @ '\u{1d53a}'
+            | c @ '\u{1d53f}'
+            | c @ '\u{1d545}'
+            | c @ '\u{1d547}'
+            | c @ '\u{1d548}'
+            | c @ '\u{1d549}'
+            | c @ '\u{1d551}' => self.unassigned_math(c),
             ORC => self.orc(),
             BOM => self.bom(),
             c => c,
@@ -150,6 +175,18 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         *self.error.borrow_mut() = Some(io::Error::new(
             io::ErrorKind::Other,
             format!("Noncharacter written to text output stream: {:?}", c),
+        ));
+        SUB
+    }
+
+    #[cold]
+    fn unassigned_math(&mut self, c: char) -> char {
+        *self.error.borrow_mut() = Some(io::Error::new(
+            io::ErrorKind::Other,
+            format!(
+                "Unassigned mathematical alphanumeric symbol written to text output stream: {:?}",
+                c
+            ),
         ));
         SUB
     }
