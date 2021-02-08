@@ -20,5 +20,5 @@ rustup toolchain add nightly
 3. Fuzz away:
 
 ```
-cargo +nightly fuzz run text_reader
+cargo +nightly fuzz run text
 ```

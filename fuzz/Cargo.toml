@@ -10,8 +10,9 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.3.4"
 basic-text = { path = ".." }
-unicode-normalization = { git = "https://github.com/sunfishcode/unicode-normalization", branch = "flush-nfc-after-nl-and-cgj" }
 layered-io = "0.2.0"
+unicode-normalization = { git = "https://github.com/unicode-rs/unicode-normalization/" }
+utf8-io = { version = "0.1.0", features = ["layered-io"] }
 
 [[bin]]
 name = "text"

@@ -405,10 +405,14 @@ impl TextInput {
             }
         }
 
+        let mut queue_empty = false;
         loop {
             match internals.impl_().queue_next() {
                 Some(c) => nread += c.encode_utf8(&mut buf[nread..]).len(),
-                None => break,
+                None => {
+                    queue_empty = true;
+                    break;
+                }
             }
             if buf.len() - nread < MAX_UTF8_SIZE {
                 break;
@@ -425,7 +429,7 @@ impl TextInput {
 
         Ok((
             nread,
-            if internals.impl_().queue.is_empty() {
+            if queue_empty {
                 if status != Status::active() {
                     internals.impl_().expect_starter = true;
                 }
