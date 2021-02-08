@@ -1,4 +1,7 @@
-use crate::{TextReader, TextWriter, unicode::{BOM, WJ}};
+use crate::{
+    unicode::{BOM, WJ},
+    TextReader, TextWriter,
+};
 use layered_io::{LayeredReader, LayeredWriter};
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;

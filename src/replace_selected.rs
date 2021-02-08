@@ -2,7 +2,7 @@
 //! containing them can still be read, but applications don't have to
 //! handle them.
 
-use crate::unicode::{BOM, ORC, REPL, WJ, PS, LS};
+use crate::unicode::{BOM, LS, ORC, PS, REPL, WJ};
 
 /// An iterator over `char`s which replaces occurrences of
 /// characters that have replacement sequences.

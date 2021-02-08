@@ -174,33 +174,19 @@ fn basic_text_string_end() {
 #[test]
 fn basic_text_string_pre_nfc_table() {
     // `Ω`
-    assert_eq!(
-        TextString::from_text_lossy("\u{2126}")
-            .as_utf8(),
-        "\u{3a9}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{2126}").as_utf8(), "\u{3a9}");
     // `K`
-    assert_eq!(
-        TextString::from_text_lossy("\u{212a}")
-            .as_utf8(),
-        "\u{4b}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{212a}").as_utf8(), "\u{4b}");
     // `Å`
-    assert_eq!(
-        TextString::from_text_lossy("\u{212b}")
-            .as_utf8(),
-        "\u{c5}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{212b}").as_utf8(), "\u{c5}");
     // `〈`
     assert_eq!(
-        TextString::from_text_lossy("\u{2329}")
-            .as_utf8(),
+        TextString::from_text_lossy("\u{2329}").as_utf8(),
         "\u{fffd}"
     );
     // `〉`
     assert_eq!(
-        TextString::from_text_lossy("\u{232a}")
-            .as_utf8(),
+        TextString::from_text_lossy("\u{232a}").as_utf8(),
         "\u{fffd}"
     );
 }
