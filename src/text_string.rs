@@ -1,4 +1,4 @@
-use crate::{TextReader, TextWriter};
+use crate::{TextReader, TextWriter, unicode::{BOM, WJ}};
 use layered_io::{LayeredReader, LayeredWriter};
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
@@ -95,18 +95,25 @@ impl TextString {
 
     /// Converts a string to Basic Text, including invalid characters.
     #[inline]
-    pub fn from_text_lossy(v: &str) -> Cow<TextStr> {
+    pub fn from_text_lossy(mut v: &str) -> Cow<TextStr> {
         // TODO: If `v` is already valid, fast-path to `Cow::Borrowed(v)`.
         // TODO: Also, this currently redoes UTF-8 validation for `v`.
         let mut reader = TextReader::new(Utf8Reader::new(LayeredReader::new(v.as_bytes())));
         let mut text = String::new();
         reader.read_to_string(&mut text).unwrap();
 
+        // `TextReader` strips leading BOMs, but we don't want that behavior
+        // here. Translate a BOM to a WJ here.
+        if let Some(suffix) = v.strip_prefix(BOM) {
+            text.insert(0, WJ);
+            v = suffix;
+        }
+
         // `TextReader` ensures the stream ends in a newline, but we don't
         // want that behavior here. Strip a trailing newline if needed.
-        assert!(text.ends_with('\n'));
-        if !v.ends_with('\n') {
-            text.pop();
+        if !v.is_empty() && !v.ends_with(|c| matches!(c, '\n' | '\r')) {
+            let c = text.pop();
+            assert_eq!(c.unwrap(), '\n');
         }
 
         Cow::Owned(unsafe { Self::from_text_unchecked(text) })

@@ -65,10 +65,6 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             | c @ '\u{ffffe}'..='\u{fffff}'
             | c @ '\u{10fffe}'..='\u{10ffff}'
             | c @ '\u{fdd0}'..='\u{fdef}' => self.noncharacter(c),
-            // Private-Use Characters
-            c @ '\u{e000}'..='\u{f8ff}'
-            | c @ '\u{f0000}'..='\u{ffffd}'
-            | c @ '\u{100000}'..='\u{10fffd}' => self.private_use_character(c),
             ORC => self.orc(),
             BOM => self.bom(),
             c => c,
@@ -154,18 +150,6 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         *self.error.borrow_mut() = Some(io::Error::new(
             io::ErrorKind::Other,
             format!("Noncharacter written to text output stream: {:?}", c),
-        ));
-        SUB
-    }
-
-    #[cold]
-    fn private_use_character(&mut self, c: char) -> char {
-        *self.error.borrow_mut() = Some(io::Error::new(
-            io::ErrorKind::Other,
-            format!(
-                "Private use character written to text output stream: {:?}",
-                c
-            ),
         ));
         SUB
     }

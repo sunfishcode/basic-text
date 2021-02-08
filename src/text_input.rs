@@ -485,7 +485,7 @@ impl TextInput {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum State {
     // Default state. Boolean is true iff we just saw a '\n'.
     Ground(bool),

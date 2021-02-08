@@ -37,8 +37,8 @@ A buffered stream is in Basic Text form iff:
 | U+2126              | `Ω`  | U+3A9             | "Use U+3A9 instead of U+2126"             |
 | U+212A              | `K`  | U+4B              | "Use U+4B instead of U+212A"              |
 | U+212B              | `Å`  | U+C5              | "Use U+C5 instead of U+212B"              |
-| U+2329              | `〈` | U+3008            | "Unicode deprecated U+2329"               |
-| U+232A              | `〉` | U+3009            | "Unicode deprecated U+232A"               |
+| U+2329              | `〈` | U+FFFD            | "Unicode deprecated U+2329"               |
+| U+232A              | `〉` | U+FFFD            | "Unicode deprecated U+232A"               |
 | [CJK Compatibility Ideographs] | | [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 
 ### Main Table

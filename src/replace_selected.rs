@@ -2,7 +2,7 @@
 //! containing them can still be read, but applications don't have to
 //! handle them.
 
-use crate::unicode::{BOM, ORC, REPL, WJ};
+use crate::unicode::{BOM, ORC, REPL, WJ, PS, LS};
 
 /// An iterator over `char`s which replaces occurrences of
 /// characters that have replacement sequences.
@@ -56,6 +56,7 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
                 self.buffer = Some('\u{17b6}');
                 Some('\u{17a2}')
             }
+            LS | PS => Some(' '),
             // Interlinear Annotations
             '\u{fff9}'..='\u{fffb}' |
             // Object Replacement Character
@@ -84,11 +85,7 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
             '\u{efffe}' ..= '\u{effff}' |
             '\u{ffffe}' ..= '\u{fffff}' |
             '\u{10fffe}' ..= '\u{10ffff}' |
-            '\u{fdd0}'..='\u{fdef}' |
-            // Private-Use Characters
-            '\u{e000}'..= '\u{f8ff}' |
-            '\u{f0000}'..= '\u{ffffd}' |
-            '\u{100000}' ..= '\u{10fffd}' => Some(REPL),
+            '\u{fdd0}'..='\u{fdef}' => Some(REPL),
 
             c => Some(c),
         }
