@@ -1,5 +1,5 @@
-use layered_io::{LayeredReader, LayeredWriter, WriteLayered};
 use basic_text::{copy_text, TextReader, TextWriter};
+use layered_io::{LayeredReader, LayeredWriter, WriteLayered};
 use utf8_io::{Utf8Reader, Utf8Writer};
 
 fn main() -> anyhow::Result<()> {

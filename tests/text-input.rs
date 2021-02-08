@@ -1,9 +1,9 @@
 mod disallowed_scalar_values;
 
+use basic_text::TextReader;
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use layered_io::LayeredReader;
 use std::io::Read;
-use basic_text::TextReader;
 use utf8_io::Utf8Reader;
 
 fn to_text(input: &str) -> String {

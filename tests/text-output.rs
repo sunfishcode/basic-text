@@ -1,9 +1,9 @@
 mod disallowed_scalar_values;
 
+use basic_text::TextWriter;
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
 use layered_io::LayeredWriter;
 use std::io::{self, Write};
-use basic_text::TextWriter;
 use utf8_io::Utf8Writer;
 
 fn to_text(input: &str) -> io::Result<String> {

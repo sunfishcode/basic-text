@@ -9,7 +9,6 @@
 
 mod categorize;
 mod copy;
-mod rc_char_queue;
 mod read_text;
 mod replace_selected;
 mod text_duplexer;

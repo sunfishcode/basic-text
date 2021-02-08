@@ -1,5 +1,5 @@
 use std::io::Write;
-use utf8_io::{Utf8Reader, Utf8Writer, copy_str};
+use utf8_io::{copy_str, Utf8Reader, Utf8Writer};
 
 fn main() -> anyhow::Result<()> {
     let mut reader = Utf8Reader::new(std::io::stdin());

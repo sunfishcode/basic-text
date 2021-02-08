@@ -9,8 +9,7 @@ use crate::{
 use layered_io::default_is_write_vectored;
 #[cfg(write_all_vectored)]
 use layered_io::default_write_all_vectored;
-use layered_io::HalfDuplexLayered;
-use layered_io::{default_write_vectored, WriteLayered};
+use layered_io::{default_write_vectored, HalfDuplexLayered, WriteLayered};
 use std::{
     cell::RefCell,
     io::{self, Write},

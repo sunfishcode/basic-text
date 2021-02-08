@@ -1,17 +1,17 @@
 //! Text input for `TextReader` and the reader half of `TextDuplexer`.
 
 use crate::{
-    rc_char_queue::{RcCharQueue, RcCharQueueIter},
     replace_selected::ReplaceSelected,
     unicode::{
         is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
-        NORMALIZATION_BUFFER_LEN, NORMALIZATION_BUFFER_SIZE, REPL,
+        NORMALIZATION_BUFFER_SIZE, REPL,
     },
     TextDuplexer, TextReader, TextStr,
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
     cmp::max,
+    collections::{vec_deque, VecDeque},
     io::{self, copy, repeat, Cursor, Read},
     mem, str,
 };
@@ -71,10 +71,11 @@ pub(crate) struct TextInput {
     /// the output yet.
     /// TODO: This is awkward; what we really want here is a streaming stream-safe
     /// and NFC translator.
-    queue: RcCharQueue,
+    queue: VecDeque<char>,
 
     /// An iterator over the chars in `self.queue`.
-    queue_iter: Option<Recompositions<StreamSafe<ReplaceSelected<Replacements<RcCharQueueIter>>>>>,
+    queue_iter:
+        Recompositions<StreamSafe<ReplaceSelected<Replacements<vec_deque::IntoIter<char>>>>>,
 
     /// When we can't fit all the data from an underlying read in our buffer,
     /// we buffer it up. Remember the status value so we can replay that too.
@@ -95,11 +96,15 @@ impl TextInput {
     /// Construct a new instance of `TextInput`.
     #[inline]
     pub(crate) fn new() -> Self {
-        let queue = RcCharQueue::new();
+        let queue = VecDeque::new();
         Self {
             raw_string: String::new(),
             queue,
-            queue_iter: None,
+            queue_iter: ReplaceSelected::new(
+                VecDeque::<char>::new().into_iter().cjk_compat_variants(),
+            )
+            .stream_safe()
+            .nfc(),
             pending_status: Status::active(),
             expect_starter: true,
             at_start: true,
@@ -210,25 +215,18 @@ impl TextInput {
         internals.read_exact_using_status(unsafe { buf.as_bytes_mut() })
     }
 
-    fn queue_next(&mut self, sequence_end: bool) -> Option<char> {
-        if !sequence_end && !self.queue.has_reset() && self.queue.len() < NORMALIZATION_BUFFER_LEN {
-            return None;
-        }
-        if self.queue_iter.is_none() {
-            if self.queue.is_empty() {
-                return None;
-            }
-            self.queue_iter = Some(
-                ReplaceSelected::new(self.queue.iter().cjk_compat_variants())
+    fn queue_next(&mut self) -> Option<char> {
+        match self.queue_iter.next() {
+            Some(c) => Some(c),
+            None => {
+                let index = self.queue.iter().position(|c| matches!(*c, '\n' | CGJ))?;
+                let tmp = self.queue.drain(0..=index).collect::<VecDeque<char>>();
+                self.queue_iter = ReplaceSelected::new(tmp.into_iter().cjk_compat_variants())
                     .stream_safe()
-                    .nfc(),
-            );
+                    .nfc();
+                self.queue_iter.next()
+            }
         }
-        if let Some(c) = self.queue_iter.as_mut().unwrap().next() {
-            return Some(c);
-        }
-        self.queue_iter = None;
-        None
     }
 
     fn process_raw_string(&mut self) {
@@ -238,17 +236,17 @@ impl TextInput {
                 match (self.state, c) {
                     (State::Ground(_), BOM) if at_start => (),
                     (State::Ground(_), '\n') => {
-                        self.queue.push('\n');
+                        self.queue.push_back('\n');
                         self.expect_starter = false;
                         self.state = State::Ground(true)
                     }
                     (State::Ground(_), '\t') => {
-                        self.queue.push('\t');
+                        self.queue.push_back('\t');
                         self.expect_starter = false;
                         self.state = State::Ground(false)
                     }
                     (State::Ground(_), FF) | (State::Ground(_), NEL) => {
-                        self.queue.push(' ');
+                        self.queue.push_back(' ');
                         self.expect_starter = false;
                         self.state = State::Ground(false)
                     }
@@ -257,12 +255,12 @@ impl TextInput {
                     (State::Ground(_), c)
                         if c.is_control() || matches!(c, '\u{2329}' | '\u{232a}') =>
                     {
-                        self.queue.push(REPL);
+                        self.queue.push_back(REPL);
                         self.expect_starter = false;
                         self.state = State::Ground(false);
                     }
                     (State::Ground(_), CGJ) => {
-                        self.queue.push(CGJ);
+                        self.queue.push_back(CGJ);
                         self.expect_starter = false;
                         self.state = State::Ground(false)
                     }
@@ -274,17 +272,17 @@ impl TextInput {
                             }
                         }
                         assert!(c != CGJ);
-                        self.queue.push(c);
+                        self.queue.push_back(c);
                         self.state = State::Ground(false)
                     }
 
                     (State::Cr, '\n') => {
-                        self.queue.push('\n');
+                        self.queue.push_back('\n');
                         self.expect_starter = false;
                         self.state = State::Ground(true);
                     }
                     (State::Cr, _) => {
-                        self.queue.push('\n');
+                        self.queue.push_back('\n');
                         self.expect_starter = false;
                         self.state = State::Ground(true);
                         continue;
@@ -297,7 +295,7 @@ impl TextInput {
                         self.state = State::Ground(false)
                     }
                     (State::Esc, _) => {
-                        self.queue.push(REPL);
+                        self.queue.push_back(REPL);
                         self.expect_starter = false;
                         self.state = State::Ground(false);
                         continue;
@@ -347,7 +345,7 @@ impl TextInput {
         let mut nread = 0;
 
         loop {
-            match internals.impl_().queue_next(false) {
+            match internals.impl_().queue_next() {
                 Some(c) => nread += c.encode_utf8(&mut buf[nread..]).len(),
                 None => break,
             }
@@ -386,12 +384,12 @@ impl TextInput {
             match internals.impl_().state {
                 State::Ground(_) => {}
                 State::Cr => {
-                    internals.impl_().queue.push('\n');
+                    internals.impl_().queue.push_back('\n');
                     internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(true);
                 }
                 State::Esc => {
-                    internals.impl_().queue.push(REPL);
+                    internals.impl_().queue.push_back(REPL);
                     internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(false);
                 }
@@ -401,14 +399,14 @@ impl TextInput {
             }
 
             if status.is_end() && internals.impl_().state != State::Ground(true) {
-                internals.impl_().queue.push('\n');
+                internals.impl_().queue.push_back('\n');
                 internals.impl_().expect_starter = false;
                 internals.impl_().state = State::Ground(true);
             }
         }
 
         loop {
-            match internals.impl_().queue_next(status != Status::active()) {
+            match internals.impl_().queue_next() {
                 Some(c) => nread += c.encode_utf8(&mut buf[nread..]).len(),
                 None => break,
             }
@@ -427,7 +425,7 @@ impl TextInput {
 
         Ok((
             nread,
-            if internals.impl_().queue_iter.is_none() {
+            if internals.impl_().queue.is_empty() {
                 if status != Status::active() {
                     internals.impl_().expect_starter = true;
                 }
