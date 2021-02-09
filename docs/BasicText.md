@@ -163,7 +163,7 @@ The following boolean options may be enabled:
 | NEL Compatibility  | Boolean | `false` |
 | LSPS Compatibility | Boolean | `false` |
 
-### From Unicode string to Basic string, strict
+### From Unicode string to Basic Text string, strict
 
 To convert a [Unicode] string into a Basic Text string in a manner that
 discards information not usually considered meaningful and otherwise fails if
