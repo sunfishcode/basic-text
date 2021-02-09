@@ -61,7 +61,7 @@ never loses information but may fail:
 
 [Main Table]: #main-table
 
-### From Basic Text stream to Restricted Text string
+### From Basic Text stream to Restricted Text stream
 
 To convert a [Basic Text] stream into a Restricted Text stream in a manner than
 never loses information but may fail:
