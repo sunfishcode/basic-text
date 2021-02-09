@@ -1,4 +1,4 @@
-//! Text output for `TextWriter` and the writer half of `TextDuplexer`.
+//! Output for `TextWriter` and the writer half of `TextDuplexer`.
 
 use crate::{
     categorize::Categorize,

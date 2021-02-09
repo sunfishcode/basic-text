@@ -1,4 +1,4 @@
-//! Text input for `TextReader` and the reader half of `TextDuplexer`.
+//! Input for `TextReader` and the reader half of `TextDuplexer`.
 
 use crate::{
     replace_selected::ReplaceSelected,
