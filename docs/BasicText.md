@@ -147,9 +147,9 @@ The following boolean options may be enabled:
 
 ### From Basic Text string to Unicode string
 
-To convert a [Unicode] string into a Basic Text string in a manner that dicards
-information not usually considered meaningful and otherwise fails if the
-content is not valid Basic Text:
+To convert a [Unicode] string into a Basic Text string in a manner that
+discards information not usually considered meaningful and otherwise fails if
+the content is not valid Basic Text:
  - If the string starts with a [non-starter] or U+200D (ZWJ), error with
    "Basic Text string must begin with a starter other than ZWJ"
  - Perform the Error actions from the [Pre-NFC Table].
@@ -179,11 +179,11 @@ plain text:
 
 ### From Basic Text stream to Unicode stream
 
-To convert a [Unicode] stream into a Basic Text stream in a manner that dicards
-information not usually considered meaningful and otherwise fails if the
-content is not valid Basic Text:
- - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of the
-   stream.
+To convert a [Unicode] stream into a Basic Text stream in a manner that
+discards information not usually considered meaningful and otherwise fails if
+the content is not valid Basic Text:
+ - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of
+   the stream.
  - Perform [From Basic Text string to Unicode string].
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
