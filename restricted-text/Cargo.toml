@@ -1,0 +1,30 @@
+[package]
+name = "restricted-text"
+version = "0.0.0"
+description = "Restricted Text strings and I/O streams"
+authors = ["Dan Gohman <dev@sunfishcode.online>"]
+license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
+keywords = ["stream", "text"]
+categories = ["os", "text-processing"]
+repository = "https://github.com/sunfishcode/restricted-text"
+edition = "2018"
+readme = "README.md"
+
+[build-dependencies]
+rustc_version = "0.3.2"
+
+[dependencies]
+basic-text = { path = ".." }
+duplex = "0.1.0"
+layered-io = "0.2.0"
+unicode-normalization = "0.1.17"
+utf8-io = { version = "0.1.0", features = ["layered-io"] }
+
+[target.'cfg(windows)'.dependencies]
+unsafe-io = "0.3.0"
+
+[dev-dependencies]
+anyhow = "1.0.37"
+
+[badges]
+maintenance = { status = "actively-developed" }

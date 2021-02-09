@@ -28,7 +28,7 @@ called [Basic Text]:
    content is diagnosed as errors.
 
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
-   text stream using Basic Text.
+   stream using Basic Text.
 
 [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
 [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html

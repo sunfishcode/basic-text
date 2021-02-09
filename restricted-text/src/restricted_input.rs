@@ -1,12 +1,7 @@
-//! Input for `TextReader` and the reader half of `TextDuplexer`.
+//! Input for `RestrictedReader` and the reader half of `RestrictedDuplexer`.
 
 use crate::{
-    replace_selected::ReplaceSelected,
-    unicode::{
-        is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
-        NORMALIZATION_BUFFER_SIZE, REPL,
-    },
-    TextDuplexer, TextReader, TextStr,
+    RestrictedDuplexer, RestrictedReader, RestrictedStr,
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
@@ -15,18 +10,20 @@ use std::{
     io::{self, copy, repeat, Cursor, Read},
     mem, str,
 };
-use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
+use unicode_normalization::{Recompositions, UnicodeNormalization};
 use utf8_io::{ReadStrLayered, WriteStr};
+use basic_text::NORMALIZATION_BUFFER_SIZE;
+use basic_text::TextStr;
 
-pub(crate) trait TextReaderInternals<Inner: ReadStrLayered>: ReadStrLayered {
-    fn impl_(&mut self) -> &mut TextInput;
+pub(crate) trait RestrictedReaderInternals<Inner: ReadStrLayered>: ReadStrLayered {
+    fn impl_(&mut self) -> &mut RestrictedInput;
     fn inner(&self) -> &Inner;
     fn inner_mut(&mut self) -> &mut Inner;
     fn into_inner(self) -> Inner;
 }
 
-impl<Inner: ReadStrLayered> TextReaderInternals<Inner> for TextReader<Inner> {
-    fn impl_(&mut self) -> &mut TextInput {
+impl<Inner: ReadStrLayered> RestrictedReaderInternals<Inner> for RestrictedReader<Inner> {
+    fn impl_(&mut self) -> &mut RestrictedInput {
         &mut self.input
     }
 
@@ -43,10 +40,10 @@ impl<Inner: ReadStrLayered> TextReaderInternals<Inner> for TextReader<Inner> {
     }
 }
 
-impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + WriteLayered> TextReaderInternals<Inner>
-    for TextDuplexer<Inner>
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + WriteLayered> RestrictedReaderInternals<Inner>
+    for RestrictedDuplexer<Inner>
 {
-    fn impl_(&mut self) -> &mut TextInput {
+    fn impl_(&mut self) -> &mut RestrictedInput {
         &mut self.input
     }
 
@@ -63,52 +60,33 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr + WriteLayered> TextRe
     }
 }
 
-pub(crate) struct TextInput {
+pub(crate) struct RestrictedInput {
     /// Temporary storage for reading scalar values from the underlying stream.
     raw_string: String,
 
     /// A queue of scalar values which have been translated but not written to
     /// the output yet.
     /// TODO: This is awkward; what we really want here is a streaming stream-safe
-    /// and NFC translator.
+    /// and NFKC translator.
     queue: VecDeque<char>,
 
     /// An iterator over the chars in `self.queue`.
-    queue_iter:
-        Recompositions<StreamSafe<ReplaceSelected<Replacements<vec_deque::IntoIter<char>>>>>,
+    queue_iter: Recompositions<vec_deque::IntoIter<char>>,
 
     /// When we can't fit all the data from an underlying read in our buffer,
     /// we buffer it up. Remember the status value so we can replay that too.
     pending_status: Status,
-
-    /// At the beginning of a stream or after a push, expect a
-    /// normalization-form starter.
-    expect_starter: bool,
-
-    /// For emitting BOM at the start of a stream.
-    at_start: bool,
-
-    /// Control-code and escape-sequence state machine.
-    state: State,
 }
 
-impl TextInput {
-    /// Construct a new instance of `TextInput`.
+impl RestrictedInput {
+    /// Construct a new instance of `RestrictedInput`.
     #[inline]
     pub(crate) fn new() -> Self {
         let queue = VecDeque::new();
         Self {
             raw_string: String::new(),
             queue,
-            queue_iter: ReplaceSelected::new(
-                VecDeque::<char>::new().into_iter().cjk_compat_variants(),
-            )
-            .stream_safe()
-            .nfc(),
-            pending_status: Status::active(),
-            expect_starter: true,
-            at_start: true,
-            state: State::Ground(true),
+            queue_iter: VecDeque::<char>::new().into_iter().nfkc(),
         }
     }
 
@@ -117,7 +95,7 @@ impl TextInput {
     /// written.
     #[inline]
     pub(crate) fn read_str<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<usize> {
         // Safety: This is a UTF-8 stream so we can read directly into a `str`.
@@ -127,7 +105,7 @@ impl TextInput {
     /// Like `read_exact` but produces the result in a `str`.
     #[inline]
     pub(crate) fn read_exact_str<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<()> {
         // Safety: This is a UTF-8 stream so we can read directly into a `str`.
@@ -139,7 +117,7 @@ impl TextInput {
     /// written.
     #[inline]
     pub(crate) fn read_str_with_status<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<(usize, Status)> {
         // Safety: This is a UTF-8 stream so we can read directly into a `str`.
@@ -155,7 +133,7 @@ impl TextInput {
     /// written.
     #[inline]
     pub(crate) fn read_exact_str_using_status<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut str,
     ) -> io::Result<Status> {
         // Safety: This is a UTF-8 stream so we can read directly into a `str`.
@@ -167,7 +145,7 @@ impl TextInput {
     /// were written.
     #[inline]
     pub(crate) fn read_text<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut TextStr,
     ) -> io::Result<usize> {
         // Safety: This is a UTF-8 stream so we can read directly into a
@@ -178,7 +156,7 @@ impl TextInput {
     /// Like `read_exact` but produces the result in a `TextStr`.
     #[inline]
     pub(crate) fn read_exact_text<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut TextStr,
     ) -> io::Result<()> {
         // Safety: This is a Text stream so we can read directly into a
@@ -191,7 +169,7 @@ impl TextInput {
     /// were written.
     #[inline]
     pub(crate) fn read_text_with_status<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut TextStr,
     ) -> io::Result<(usize, Status)> {
         // Safety: This is a text stream so we can read directly into a `TextStr`.
@@ -208,7 +186,7 @@ impl TextInput {
     /// were written.
     #[inline]
     pub(crate) fn read_exact_text_using_status<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut TextStr,
     ) -> io::Result<Status> {
         // Safety: This is a text stream so we can read directly into a `str`.
@@ -219,11 +197,9 @@ impl TextInput {
         match self.queue_iter.next() {
             Some(c) => Some(c),
             None => {
-                let index = self.queue.iter().position(|c| matches!(*c, '\n' | CGJ))?;
+                let index = self.queue.iter().position(|c| matches!(*c, '\n'))?;
                 let tmp = self.queue.drain(0..=index).collect::<VecDeque<char>>();
-                self.queue_iter = ReplaceSelected::new(tmp.into_iter().cjk_compat_variants())
-                    .stream_safe()
-                    .nfc();
+                self.queue_iter = tmp.into_iter().nfkc();
                 self.queue_iter.next()
             }
         }
@@ -231,108 +207,13 @@ impl TextInput {
 
     fn process_raw_string(&mut self) {
         for c in self.raw_string.chars() {
-            let at_start = mem::replace(&mut self.at_start, false);
-            loop {
-                match (self.state, c) {
-                    (State::Ground(_), BOM) if at_start => (),
-                    (State::Ground(_), '\n') => {
-                        self.queue.push_back('\n');
-                        self.expect_starter = false;
-                        self.state = State::Ground(true)
-                    }
-                    (State::Ground(_), '\t') => {
-                        self.queue.push_back('\t');
-                        self.expect_starter = false;
-                        self.state = State::Ground(false)
-                    }
-                    (State::Ground(_), FF) | (State::Ground(_), NEL) => {
-                        self.queue.push_back(' ');
-                        self.expect_starter = false;
-                        self.state = State::Ground(false)
-                    }
-                    (State::Ground(_), '\r') => self.state = State::Cr,
-                    (State::Ground(_), ESC) => self.state = State::Esc,
-                    (State::Ground(_), c)
-                        if c.is_control() || matches!(c, '\u{2329}' | '\u{232a}') =>
-                    {
-                        self.queue.push_back(REPL);
-                        self.expect_starter = false;
-                        self.state = State::Ground(false);
-                    }
-                    (State::Ground(_), CGJ) => {
-                        self.queue.push_back(CGJ);
-                        self.expect_starter = false;
-                        self.state = State::Ground(false)
-                    }
-                    (State::Ground(_), mut c) => {
-                        if self.expect_starter {
-                            self.expect_starter = false;
-                            if !is_normalization_form_starter(c) {
-                                c = REPL;
-                            }
-                        }
-                        assert!(c != CGJ);
-                        self.queue.push_back(c);
-                        self.state = State::Ground(false)
-                    }
-
-                    (State::Cr, '\n') => {
-                        self.queue.push_back('\n');
-                        self.expect_starter = false;
-                        self.state = State::Ground(true);
-                    }
-                    (State::Cr, _) => {
-                        self.queue.push_back('\n');
-                        self.expect_starter = false;
-                        self.state = State::Ground(true);
-                        continue;
-                    }
-
-                    (State::Esc, '[') => self.state = State::CsiStart,
-                    (State::Esc, ']') => self.state = State::Osc,
-                    (State::Esc, ESC) => self.state = State::Esc,
-                    (State::Esc, c) if matches!(c, '@'..='~' | CAN) => {
-                        self.state = State::Ground(false)
-                    }
-                    (State::Esc, _) => {
-                        self.queue.push_back(REPL);
-                        self.expect_starter = false;
-                        self.state = State::Ground(false);
-                        continue;
-                    }
-
-                    (State::CsiStart, '[') => self.state = State::Linux,
-                    (State::CsiStart, c) | (State::Csi, c) if matches!(c, ' '..='?') => {
-                        self.state = State::Csi
-                    }
-                    (State::CsiStart, c) | (State::Csi, c) if matches!(c, '@'..='~') => {
-                        self.state = State::Ground(false)
-                    }
-                    (State::CsiStart, CAN) | (State::Csi, CAN) => self.state = State::Ground(false),
-                    (State::CsiStart, _) | (State::Csi, _) => {
-                        self.state = State::Ground(false);
-                        continue;
-                    }
-
-                    (State::Osc, BEL) | (State::Osc, CAN) => self.state = State::Ground(false),
-                    (State::Osc, ESC) => self.state = State::Esc,
-                    (State::Osc, _) => (),
-
-                    (State::Linux, c) if matches!(c, '\0'..=DEL) => {
-                        self.state = State::Ground(false)
-                    }
-                    (State::Linux, _) => {
-                        self.state = State::Ground(false);
-                        continue;
-                    }
-                }
-                break;
-            }
+            // TODO: Implement Restricted Text
+            self.queue.push_back(c);
         }
     }
 
     pub(crate) fn read_with_status<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut [u8],
     ) -> io::Result<(usize, Status)> {
         if buf.len() < NORMALIZATION_BUFFER_SIZE {
@@ -349,7 +230,7 @@ impl TextInput {
                 Some(c) => nread += c.encode_utf8(&mut buf[nread..]).len(),
                 None => break,
             }
-            if buf.len() - nread < MAX_UTF8_SIZE {
+            if nread == buf.len() {
                 return Ok((nread, Status::active()));
             }
         }
@@ -380,31 +261,6 @@ impl TextInput {
 
         internals.impl_().process_raw_string();
 
-        if status != Status::active() {
-            match internals.impl_().state {
-                State::Ground(_) => {}
-                State::Cr => {
-                    internals.impl_().queue.push_back('\n');
-                    internals.impl_().expect_starter = false;
-                    internals.impl_().state = State::Ground(true);
-                }
-                State::Esc => {
-                    internals.impl_().queue.push_back(REPL);
-                    internals.impl_().expect_starter = false;
-                    internals.impl_().state = State::Ground(false);
-                }
-                State::CsiStart | State::Csi | State::Osc | State::Linux => {
-                    internals.impl_().state = State::Ground(false);
-                }
-            }
-
-            if status.is_end() && internals.impl_().state != State::Ground(true) {
-                internals.impl_().queue.push_back('\n');
-                internals.impl_().expect_starter = false;
-                internals.impl_().state = State::Ground(true);
-            }
-        }
-
         let mut queue_empty = false;
         loop {
             match internals.impl_().queue_next() {
@@ -414,7 +270,7 @@ impl TextInput {
                     break;
                 }
             }
-            if buf.len() - nread < MAX_UTF8_SIZE {
+            if nread == buf.len() {
                 break;
             }
         }
@@ -443,7 +299,7 @@ impl TextInput {
 
     #[inline]
     pub(crate) fn minimum_buffer_size<Inner: ReadStrLayered>(
-        internals: &impl TextReaderInternals<Inner>,
+        internals: &impl RestrictedReaderInternals<Inner>,
     ) -> usize {
         max(
             NORMALIZATION_BUFFER_SIZE,
@@ -452,10 +308,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn abandon<Inner: ReadStrLayered>(internals: &mut impl TextReaderInternals<Inner>) {
-        // Don't enforce a trailing newline.
-        internals.impl_().state = State::Ground(true);
-
+    pub(crate) fn abandon<Inner: ReadStrLayered>(internals: &mut impl RestrictedReaderInternals<Inner>) {
         assert!(internals.impl_().queue.is_empty());
 
         internals.inner_mut().abandon()
@@ -463,7 +316,7 @@ impl TextInput {
 
     #[inline]
     pub(crate) fn suggested_buffer_size<Inner: ReadStrLayered>(
-        internals: &impl TextReaderInternals<Inner>,
+        internals: &impl RestrictedReaderInternals<Inner>,
     ) -> usize {
         max(
             Self::minimum_buffer_size(internals),
@@ -473,7 +326,7 @@ impl TextInput {
 
     #[inline]
     pub(crate) fn read<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut [u8],
     ) -> io::Result<usize> {
         default_read(internals, buf)
@@ -481,34 +334,10 @@ impl TextInput {
 
     #[inline]
     pub(crate) fn read_to_string<Inner: ReadStrLayered>(
-        internals: &mut impl TextReaderInternals<Inner>,
+        internals: &mut impl RestrictedReaderInternals<Inner>,
         buf: &mut String,
     ) -> io::Result<usize> {
         // Safety: This is a UTF-8 stream so we can read into a `String`.
         internals.read_to_end(unsafe { buf.as_mut_vec() })
     }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum State {
-    // Default state. Boolean is true iff we just saw a '\n'.
-    Ground(bool),
-
-    // After a '\r'.
-    Cr,
-
-    // After a '\x1b'.
-    Esc,
-
-    // Immediately after a "\x1b[".
-    CsiStart,
-
-    // Within a sequence started by "\x1b[".
-    Csi,
-
-    // Within a sequence started by "\x1b]".
-    Osc,
-
-    // After a "\x1b[[".
-    Linux,
 }

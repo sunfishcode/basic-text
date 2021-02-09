@@ -34,7 +34,7 @@ pub struct TextDuplexer<Inner: HalfDuplex + ReadStr + WriteStr> {
 impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + WriteLayered>
     TextDuplexer<Inner>
 {
-    /// Construct a new instance of `TextReader` wrapping `inner`.
+    /// Construct a new instance of `TextDuplexer` wrapping `inner`.
     #[inline]
     pub fn new(inner: Inner) -> Self {
         Self {
