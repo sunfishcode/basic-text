@@ -59,7 +59,12 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
             LS | PS => Some(' '),
             // Interlinear Annotations
             '\u{fff9}'..='\u{fffb}' |
-            // Unassigned alphanumeric mathematical symbols.
+            // Unassigned characters with replacements.
+            '\u{9e4}' | '\u{9e5}' | '\u{a64}' | '\u{a65}' |
+            '\u{ae4}' | '\u{ae5}' | '\u{b64}' | '\u{b65}' |
+            '\u{be4}' | '\u{be5}' | '\u{c64}' | '\u{c65}' |
+            '\u{ce4}' | '\u{ce5}' | '\u{d64}' | '\u{d65}' |
+            '\u{2072}' | '\u{2073}' |
             '\u{1d455}' | '\u{1d49d}' | '\u{1d4a0}' | '\u{1d4a1}' |
             '\u{1d4a3}' | '\u{1d4a4}' | '\u{1d4a7}' | '\u{1d4a8}' |
             '\u{1d4ad}' | '\u{1d4ba}' | '\u{1d4bc}' | '\u{1d4c4}' |

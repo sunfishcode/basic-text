@@ -173,6 +173,33 @@ fn basic_text_string_end() {
 /// separately below.
 #[test]
 fn basic_text_string_pre_nfc_table() {
+    // Unassigned characters with replacements.
+    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9e5}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{a64}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{a65}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ae4}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ae5}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{b64}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{b65}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{be4}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{be5}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{c64}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{c65}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ce4}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ce5}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{d64}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{d65}").as_utf8(), "\u{fffd}");
+    // Unassigned characters with replacements.
+    assert_eq!(
+        TextString::from_text_lossy("\u{2072}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{2073}").as_utf8(),
+        "\u{fffd}"
+    );
     // `Ω`
     assert_eq!(TextString::from_text_lossy("\u{2126}").as_utf8(), "\u{3a9}");
     // `K`
@@ -187,6 +214,103 @@ fn basic_text_string_pre_nfc_table() {
     // `〉`
     assert_eq!(
         TextString::from_text_lossy("\u{232a}").as_utf8(),
+        "\u{fffd}"
+    );
+    // Unassigned alphanumeric mathematical symbols.
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d455}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d49d}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4a0}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4a1}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4a3}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4a4}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4a7}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4a8}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4ad}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4ba}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4bc}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d4c4}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d506}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d50b}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d50c}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d515}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d51d}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d53a}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d53f}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d545}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d547}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d548}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d549}").as_utf8(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{1d551}").as_utf8(),
         "\u{fffd}"
     );
 }
@@ -546,102 +670,6 @@ fn basic_text_string_main_table() {
     );
     assert_eq!(
         TextString::from_text_lossy("\u{ffff}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d455}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d49d}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4a0}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4a1}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4a3}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4a4}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4a7}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4a8}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4ad}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4ba}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4bc}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d4c4}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d506}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d50b}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d50c}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d515}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d51d}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d53a}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d53f}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d545}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d547}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d548}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d549}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1d551}").as_utf8(),
         "\u{fffd}"
     );
     assert_eq!(

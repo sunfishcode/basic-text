@@ -65,8 +65,15 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             | c @ '\u{ffffe}'..='\u{fffff}'
             | c @ '\u{10fffe}'..='\u{10ffff}'
             | c @ '\u{fdd0}'..='\u{fdef}' => self.noncharacter(c),
+            // Unassigned characters with replacements.
+            c @ '\u{9e4}' | c @ '\u{9e5}' | c @ '\u{a64}' | c @ '\u{a65}'
+            | c @ '\u{ae4}' | c @ '\u{ae5}' | c @ '\u{b64}' | c @ '\u{b65}'
+            | c @ '\u{be4}' | c @ '\u{be5}' | c @ '\u{c64}' | c @ '\u{c65}'
+            | c @ '\u{ce4}' | c @ '\u{ce5}' | c @ '\u{d64}' | c @ '\u{d65}'
+            // Unassigned characters with replacements.
+            | c @ '\u{2072}' | c @ '\u{2073}'
             // Unassigned alphanumeric mathematical symbols.
-            c @ '\u{1d455}'
+            | c @ '\u{1d455}'
             | c @ '\u{1d49d}'
             | c @ '\u{1d4a0}'
             | c @ '\u{1d4a1}'
@@ -89,7 +96,7 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             | c @ '\u{1d547}'
             | c @ '\u{1d548}'
             | c @ '\u{1d549}'
-            | c @ '\u{1d551}' => self.unassigned_math(c),
+            | c @ '\u{1d551}' => self.unassigned_with_replacement(c),
             ORC => self.orc(),
             BOM => self.bom(),
             c => c,
@@ -115,23 +122,44 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
 
     #[cold]
     fn deprecated(&mut self, c: char) -> char {
+        let replacement = match c {
+            '\u{149}' => Some("\u{2bc}\u{6e}"),
+            '\u{673}' => Some("\u{627}\u{65f}"),
+            '\u{f77}' => Some("\u{fb2}\u{f81}"),
+            '\u{f79}' => Some("\u{fb3}\u{f81}"),
+            '\u{17a3}' => Some("\u{17a2}"),
+            '\u{17a4}' => Some("\u{17a2}\u{17b6}"),
+            _ => None,
+        };
         *self.error.borrow_mut() = Some(io::Error::new(
             io::ErrorKind::Other,
-            format!(
-                "Deprecated character written to text output stream: {:?}",
-                c
-            ),
+            match replacement {
+                Some(replacement) => format!(
+                    "Deprecated character written to text output stream: {:?}; use {:?} instead",
+                    c, replacement
+                ),
+                None => format!(
+                    "Deprecated character written to text output stream: {:?}",
+                    c
+                ),
+            },
         ));
         SUB
     }
 
     #[cold]
     fn obsolete_compatibility(&mut self, c: char) -> char {
+        let replacement = match c {
+            '\u{2126}' => "\u{3a9}",
+            '\u{212a}' => "\u{4b}",
+            '\u{212b}' => "\u{c5}",
+            _ => panic!(),
+        };
         *self.error.borrow_mut() = Some(io::Error::new(
             io::ErrorKind::Other,
             format!(
-                "Obsolete compatibility written to text output stream: {:?}",
-                c
+                "Obsolete compatibility written to text output stream: {:?}; use {:?} instead",
+                c, replacement
             ),
         ));
         SUB
@@ -180,12 +208,57 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
     }
 
     #[cold]
-    fn unassigned_math(&mut self, c: char) -> char {
+    fn unassigned_with_replacement(&mut self, c: char) -> char {
+        let replacement = match c {
+            '\u{9e4}' => "\u{964}",
+            '\u{9e5}' => "\u{965}",
+            '\u{a64}' => "\u{964}",
+            '\u{a65}' => "\u{965}",
+            '\u{ae4}' => "\u{964}",
+            '\u{ae5}' => "\u{965}",
+            '\u{b64}' => "\u{964}",
+            '\u{b65}' => "\u{965}",
+            '\u{be4}' => "\u{964}",
+            '\u{be5}' => "\u{965}",
+            '\u{c64}' => "\u{964}",
+            '\u{c65}' => "\u{965}",
+            '\u{ce4}' => "\u{964}",
+            '\u{ce5}' => "\u{965}",
+            '\u{d64}' => "\u{964}",
+            '\u{d65}' => "\u{965}",
+            '\u{2072}' => "\u{b2}",
+            '\u{2073}' => "\u{b3}",
+            '\u{1d455}' => "\u{210e}",
+            '\u{1d49d}' => "\u{212c}",
+            '\u{1d4a0}' => "\u{2130}",
+            '\u{1d4a1}' => "\u{2131}",
+            '\u{1d4a3}' => "\u{210b}",
+            '\u{1d4a4}' => "\u{2110}",
+            '\u{1d4a7}' => "\u{2112}",
+            '\u{1d4a8}' => "\u{2133}",
+            '\u{1d4ad}' => "\u{211b}",
+            '\u{1d4ba}' => "\u{212f}",
+            '\u{1d4bc}' => "\u{210a}",
+            '\u{1d4c4}' => "\u{2134}",
+            '\u{1d506}' => "\u{212d}",
+            '\u{1d50b}' => "\u{210c}",
+            '\u{1d50c}' => "\u{2111}",
+            '\u{1d515}' => "\u{211c}",
+            '\u{1d51d}' => "\u{2128}",
+            '\u{1d53a}' => "\u{2102}",
+            '\u{1d53f}' => "\u{210d}",
+            '\u{1d545}' => "\u{2115}",
+            '\u{1d547}' => "\u{2119}",
+            '\u{1d548}' => "\u{211a}",
+            '\u{1d549}' => "\u{211d}",
+            '\u{1d551}' => "\u{2124}",
+            _ => panic!("ff [{:?}", c),
+        };
         *self.error.borrow_mut() = Some(io::Error::new(
             io::ErrorKind::Other,
             format!(
-                "Unassigned mathematical alphanumeric symbol written to text output stream: {:?}",
-                c
+                "Unassigned character written to text output stream: {:?}; use {:?} instead",
+                c, replacement
             ),
         ));
         SUB

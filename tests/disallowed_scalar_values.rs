@@ -1,4 +1,4 @@
-pub const DISALLOWED_SCALAR_VALUES: [char; 291] = [
+pub const DISALLOWED_SCALAR_VALUES: [char; 309] = [
     // All C0, U+007F, and C1 control codes other than U+000A (newline),
     // U+0009 (horizontal tab), U+000D (carriage return), U+000C (form feed),
     // U+0007 (alert), U+001B (escape) and U+0085 (NEL). Many of these are
@@ -63,6 +63,23 @@ pub const DISALLOWED_SCALAR_VALUES: [char; 291] = [
     '\u{9d}',
     '\u{9e}',
     '\u{9f}',
+    // Unassigned characters with replacements.
+    '\u{9e4}',
+    '\u{9e5}',
+    '\u{a64}',
+    '\u{a65}',
+    '\u{ae4}',
+    '\u{ae5}',
+    '\u{b64}',
+    '\u{b65}',
+    '\u{be4}',
+    '\u{be5}',
+    '\u{c64}',
+    '\u{c65}',
+    '\u{ce4}',
+    '\u{ce5}',
+    '\u{d64}',
+    '\u{d65}',
     // Khmer characters erroneously invented by Unicode.
     '\u{17b4}',
     '\u{17b5}',
@@ -74,6 +91,9 @@ pub const DISALLOWED_SCALAR_VALUES: [char; 291] = [
     '\u{206d}',
     '\u{206e}',
     '\u{206f}',
+    // Unassigned characters with replacements.
+    '\u{2072}',
+    '\u{2073}',
     // Interlinear Annotations
     '\u{fff9}',
     '\u{fffa}',
