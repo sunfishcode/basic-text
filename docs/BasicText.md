@@ -145,7 +145,7 @@ The following boolean options may be enabled:
 | NEL Compatibility  | Boolean | `false` |
 | LSPS Compatibility | Boolean | `false` |
 
-### From Basic Text string to Unicode string
+### From Unicode string to Basic string, strict
 
 To convert a [Unicode] string into a Basic Text string in a manner that
 discards information not usually considered meaningful and otherwise fails if
@@ -177,21 +177,21 @@ plain text:
  - Perform [From Unicode string to Basic Text string].
  - If the stream is non-empty and doesn't end with U+A, append a U+A.
 
-### From Basic Text stream to Unicode stream
+### From Unicode stream to Basic Text stream, strict
 
 To convert a [Unicode] stream into a Basic Text stream in a manner that
 discards information not usually considered meaningful and otherwise fails if
 the content is not valid Basic Text:
  - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of
    the stream.
- - Perform [From Basic Text string to Unicode string].
+ - Perform [From Unicode string to BasicText string, strict].
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
 
 [Pre-NFC Table]: #pre-nfc-table
 [Main Table]: #main-table
 [From Unicode string to Basic Text string]: #from-unicode-string-to-basic-text-string
-[From Basic Text string to Unicode string]: #from-basic-text-string-to-unicode-string
+[From Unicode string to Basic Text string, strict]: #from-unicode-string-to-basic-text-string-strict
 [*BOM Compatibility*]: #options
 
 #### Options
