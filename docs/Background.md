@@ -136,6 +136,10 @@ U+1D4A7, U+1D4A8, U+1D4AD, U+1D4BA, U+1D4BC, U+1D4C4, U+1D506, U+1D50B,
 U+1D50C, U+1D515, U+1D51D, U+1D53A, U+1D53F, U+1D545, U+1D547, U+1D548,
 U+1D549, and U+1D551.
 
+Unicode considers these codepoints unassigned, so they could potentially be
+assigned new meanings in the future. Consequently, in Basic Text they convert
+to U+FFFD rather than their designated replacements.
+
 ## Not-recommended scalar values with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference
