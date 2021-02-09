@@ -484,8 +484,8 @@ fn test_linux() {
 
 #[test]
 fn test_unassigned() {
-    // FIXME: test_error("\u{1d455}".as_bytes());
-    // FIXME: test_error("\u{1d455}\n".as_bytes());
+    test_error("\u{1d455}".as_bytes());
+    test_error("\u{1d455}\n".as_bytes());
 }
 
 // TODO: Test Stream-Safe
