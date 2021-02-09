@@ -202,7 +202,7 @@ discards information not usually considered meaningful and otherwise fails if
 the content is not valid Basic Text:
  - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of
    the stream.
- - Perform [From Unicode string to BasicText string, strict].
+ - Perform [From Unicode string to Basic Text string, strict].
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
 
