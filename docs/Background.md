@@ -26,11 +26,11 @@ By default, lossy text conversion translates NEL, LS, and PS into U+20 which,
 which for those rare formats which recognize these scalars at all, is
 compatible with how they're typically treated. As options, lossy text
 conversion can also translate NEL, or LS and PS, into newlines, for example to
-support the text conventions used in [XML 1.1] and [Javascript source code],
+support the text conventions used in [XML 1.1] and [JavaScript source code],
 respectively.
 
 [XML 1.1]: https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-line-ends
-[Javascript]: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
+[JavaScript]: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
 
 By default, strict text conversion rejects CRLF and other line terminator
 sequences other than U+A. As an option, strict text conversion can translate
