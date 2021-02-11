@@ -6,6 +6,10 @@ fulfill common notions of "plain text".
 Basic Text permits homoglyphs and other visual ambiguities; see
 [Restricted Text] for an alternative which provides some mitigations.
 
+For rationale and background information, see [Background].
+
+[Background]: Background.md
+
 ## Definitions
 
 A string is in Basic Text form iff:

@@ -1,5 +1,8 @@
 # Background
 
+This document explains the decisions behind the Basic Text format and provides
+links to related standards, documentation, and other resources.
+
 ## NFC, Normalization
 
 [Basic Text] normalizes to NFC. See [this page](NFC.md) for details.
