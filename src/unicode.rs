@@ -16,9 +16,11 @@ const MAX_NONSTARTERS: usize = 30;
 // TODO: Investigate whether we can avoid considering composed starters and stoppers.
 pub(crate) const NORMALIZATION_BUFFER_LEN: usize = 2 + MAX_NONSTARTERS + 2;
 
-/// The minimum size of a buffer needed to perform NFC normalization,
-/// and thus the minimum size needed to pass to
-/// [`TextReader::read`](crate::TextReader::read).
+/// The minimum size of a buffer needed to perform NFC normalization, and thus
+/// the minimum size needed to pass to [`TextReader`]'s [`read`].
+///
+/// [`TextReader`]: crate::TextReader
+/// [`read`]: std::io::Read::read
 pub const NORMALIZATION_BUFFER_SIZE: usize = MAX_UTF8_SIZE * NORMALIZATION_BUFFER_LEN;
 
 /// ASCII FF, known as '\f' in some contexts.
