@@ -33,8 +33,8 @@ choice for the [Restricted Text] format.
 
 ## Specific concerns
 
-The following are some notes from researching situations where NFC has been
-thought to be semantically lossy.
+The following are some notes about various situations where NFC has been
+considered to be semantically lossy.
 
 ### CJK Compatibility Ideographs
 
@@ -147,11 +147,11 @@ As discussed in the above sections, almost all of the places where information
 about such distinctions seem to be lost either have satisfactory solutions,
 or are caused by bugs or missing features in fonts or Unicode implementations.
 
-There is also a difference in priorities; this plain text format is all about
-building the foundations of a platform for the future, while the W3C is
-concerned about helping users use the Web today, so this format is more
-inclined to accept problems if they are believed to merely be limitations
-of today's environments that can be fixed.
+There is also a difference in priorities; [Basic Text] is all about building
+the foundations of a platform for the future, while the W3C is concerned about
+helping users use the Web today, so this format is more inclined to accept
+problems if they are believed to merely be limitations of today's environments
+that can be fixed.
 
 [Restricted Text]: RestrictedText.md
 [Basic Text]: BasicText.md
