@@ -1097,20 +1097,13 @@ fn normalize_string() {
     let ring = "\u{030a}";
     let unnormal = "A\u{30a}";
     let unnormal_nl = "A\u{30a}\n";
-    eprintln!("A");
     let composed = TextStr::from_text("\u{c5}").unwrap();
-    eprintln!("B");
     let composed_nl = TextStr::from_text("\u{c5}\n").unwrap();
-    eprintln!("C");
 
     assert!(TextStr::from_text(unnormal).is_err());
-    eprintln!("D");
     assert!(TextStr::from_text(ring).is_err());
-    eprintln!("E");
     assert_eq!(composed, &TextString::from_text_lossy(unnormal));
-    eprintln!("F");
     assert_eq!(composed_nl, &TextString::from_text_lossy(unnormal_nl));
-    eprintln!("G");
 }
 
 #[test]
