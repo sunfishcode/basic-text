@@ -148,10 +148,10 @@ about such distinctions seem to be lost either have satisfactory solutions,
 or are caused by bugs or missing features in fonts or Unicode implementations.
 
 There is also a difference in priorities; [Basic Text] is all about building
-the foundations of a platform for the future, while the W3C is concerned about
-helping users use the Web today, so this format is more inclined to accept
-problems if they are believed to merely be limitations of today's environments
-that can be fixed.
+the foundations of a platform for the future, while the W3C's recommendation
+is about helping users use the Web today. Consequently, Basic Text is more
+inclined to accept problems if they are believed to merely be limitations of
+today's environments that can be fixed.
 
 [Restricted Text]: RestrictedText.md
 [Basic Text]: BasicText.md
