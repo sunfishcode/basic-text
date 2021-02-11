@@ -28,3 +28,6 @@ anyhow = "1.0.37"
 
 [badges]
 maintenance = { status = "actively-developed" }
+
+[workspace]
+members = ["restricted-text"]
