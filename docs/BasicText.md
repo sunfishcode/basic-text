@@ -1,7 +1,7 @@
 # Basic Text
 
 The *Basic Text* format is a subset of the [Unicode] format and meant to
-formalize common informal notions of "plain text".
+fulfill common notions of "plain text".
 
 Basic Text permits homoglyphs and other visual ambiguities; see
 [Restricted Text] for an alternative which provides some mitigations.

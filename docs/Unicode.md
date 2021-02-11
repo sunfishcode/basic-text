@@ -3,7 +3,7 @@
 Here, the *Unicode* format is just a sequence of [Unicode Scalar Values].
 
 Unicode permits control codes and other non-textual content; see [Basic Text]
-for an alternative which focused on textual content.
+for a subset focused on textual content.
 
 ## Definitions
 
