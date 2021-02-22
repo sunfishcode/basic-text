@@ -18,10 +18,8 @@ basic-text = { path = "..", version = "0.0.0" }
 duplex = "0.1.0"
 layered-io = "0.2.0"
 unicode-normalization = "0.1.17"
-utf8-io = { version = "0.1.0", features = ["layered-io"] }
-
-[target.'cfg(windows)'.dependencies]
-unsafe-io = "0.3.0"
+unsafe-io = "0.5.0"
+utf8-io = { version = "0.2.0", features = ["layered-io"] }
 
 [dev-dependencies]
 anyhow = "1.0.37"

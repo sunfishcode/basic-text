@@ -1,9 +1,5 @@
 use crate::{text_input::TextInput, ReadText, ReadTextLayered, TextStr};
 use layered_io::{default_read_to_end, Bufferable, ReadLayered, Status};
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, RawFd};
 use std::{
     fmt,
     io::{self, Read},
@@ -11,8 +7,11 @@ use std::{
 };
 #[cfg(feature = "terminal-io")]
 use terminal_io::{ReadTerminal, Terminal};
+#[cfg(not(windows))]
+use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
-use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::OwnsRaw;
 #[cfg(test)]
 use utf8_io::Utf8Reader;
 use utf8_io::{ReadStr, ReadStrLayered};
@@ -159,6 +158,9 @@ impl<Inner: ReadStrLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for TextRe
         self.inner.as_raw_handle_or_socket()
     }
 }
+
+// Safety: `TextReader` implements `OwnsRaw` if `Inner` does.
+unsafe impl<Inner: ReadStrLayered + OwnsRaw> OwnsRaw for TextReader<Inner> {}
 
 impl<Inner: ReadStrLayered + fmt::Debug> fmt::Debug for TextReader<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

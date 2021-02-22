@@ -1,16 +1,15 @@
 use crate::{restricted_output::RestrictedOutput, RestrictedStr, WriteRestricted};
 use layered_io::{Bufferable, WriteLayered};
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, RawFd};
+#[cfg(not(windows))]
+use unsafe_io::os::posish::{AsRawFd, RawFd};
 use std::{
     fmt,
     io::{self, Write},
     str,
 };
 #[cfg(windows)]
-use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::OwnsRaw;
 use utf8_io::WriteStr;
 #[cfg(test)]
 use utf8_io::Utf8Writer;
@@ -167,6 +166,9 @@ impl<Inner: WriteStr + WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket
         self.inner.as_raw_handle_or_socket()
     }
 }
+
+// Safety: `RestrictedWriter` implements `OwnsRaw` if `Inner` does.
+unsafe impl<Inner: OwnsRaw> OwnsRaw for RestrictedWriter<Inner> {}
 
 impl<Inner: fmt::Debug> fmt::Debug for RestrictedWriter<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

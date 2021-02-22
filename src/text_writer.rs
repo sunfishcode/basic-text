@@ -1,9 +1,5 @@
 use crate::{text_output::TextOutput, TextStr, WriteText};
 use layered_io::{Bufferable, WriteLayered};
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, RawFd};
 use std::{
     fmt,
     io::{self, Write},
@@ -11,8 +7,11 @@ use std::{
 };
 #[cfg(feature = "terminal-io")]
 use terminal_io::{Terminal, TerminalColorSupport, WriteTerminal};
+#[cfg(not(windows))]
+use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
-use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::OwnsRaw;
 use utf8_io::WriteStr;
 
 /// A `WriteLayered` implementation which translates to an output
@@ -195,6 +194,9 @@ impl<Inner: WriteStr + WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket
         self.inner.as_raw_handle_or_socket()
     }
 }
+
+// Safety: `TextWriter` implements `OwnsRaw` if `Inner` does.
+unsafe impl<Inner: OwnsRaw> OwnsRaw for TextWriter<Inner> {}
 
 impl<Inner: fmt::Debug> fmt::Debug for TextWriter<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

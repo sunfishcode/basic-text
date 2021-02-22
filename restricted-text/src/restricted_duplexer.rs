@@ -3,10 +3,8 @@ use duplex::{Duplex, HalfDuplex};
 use layered_io::{
     default_read_to_end, Bufferable, HalfDuplexLayered, ReadLayered, Status, WriteLayered,
 };
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, RawFd};
+#[cfg(not(windows))]
+use unsafe_io::os::posish::{AsRawFd, RawFd};
 use std::{
     cmp::max,
     fmt,
@@ -14,7 +12,8 @@ use std::{
     str,
 };
 #[cfg(windows)]
-use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::OwnsRaw;
 use utf8_io::{ReadStr, ReadStrLayered, WriteStr};
 use basic_text::{ReadText, ReadTextLayered, WriteText, TextStr};
 
@@ -226,6 +225,9 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawH
         self.inner.as_raw_handle_or_socket()
     }
 }
+
+// Safety: `RestrictedDuplexer` implements `OwnsRaw` if `Inner` does.
+unsafe impl<Inner: OwnsRaw> OwnsRaw for RestrictedDuplexer<Inner> {}
 
 impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug
     for RestrictedDuplexer<Inner>

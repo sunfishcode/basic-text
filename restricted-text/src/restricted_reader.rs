@@ -1,9 +1,7 @@
 use crate::{restricted_input::RestrictedInput, ReadRestricted, ReadRestrictedLayered, RestrictedStr};
 use layered_io::{default_read_to_end, Bufferable, ReadLayered, Status};
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, RawFd};
+#[cfg(not(windows))]
+use unsafe_io::os::posish::{AsRawFd, RawFd};
 use std::{
     fmt,
     io::{self, Read},
@@ -12,13 +10,14 @@ use std::{
 #[cfg(feature = "terminal-io")]
 use terminal_io::{ReadTerminal, Terminal};
 #[cfg(windows)]
-use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
 #[cfg(test)]
 use utf8_io::Utf8Reader;
 use utf8_io::{ReadStr, ReadStrLayered};
 #[cfg(test)]
 use basic_text::{TextReader};
 use basic_text::{TextStr, ReadTextLayered, ReadText};
+use unsafe_io::OwnsRaw;
 
 /// A [`Read`] implementation which translates from an input `Read`
 /// implementation producing an arbitrary byte sequence into a valid Restricted Text
@@ -186,6 +185,9 @@ impl<Inner: ReadStrLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for Restri
         self.inner.as_raw_handle_or_socket()
     }
 }
+
+// Safety: `RestrictedReader` implements `OwnsRaw` if `Inner` does.
+unsafe impl<Inner: ReadStrLayered + OwnsRaw> OwnsRaw for RestrictedReader<Inner> {}
 
 impl<Inner: ReadStrLayered + fmt::Debug> fmt::Debug for RestrictedReader<Inner> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

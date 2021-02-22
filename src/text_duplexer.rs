@@ -3,10 +3,6 @@ use duplex::{Duplex, HalfDuplex};
 use layered_io::{
     default_read_to_end, Bufferable, HalfDuplexLayered, ReadLayered, Status, WriteLayered,
 };
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, RawFd};
 use std::{
     cmp::max,
     fmt,
@@ -15,8 +11,11 @@ use std::{
 };
 #[cfg(feature = "terminal-io")]
 use terminal_io::{DuplexTerminal, ReadTerminal, Terminal, TerminalColorSupport, WriteTerminal};
+#[cfg(not(windows))]
+use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
-use unsafe_io::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
+use unsafe_io::OwnsRaw;
 use utf8_io::{ReadStr, ReadStrLayered, WriteStr};
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`
@@ -325,6 +324,12 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawH
     fn as_raw_handle_or_socket(&self) -> RawHandleOrSocket {
         self.inner.as_raw_handle_or_socket()
     }
+}
+
+// Safety: `TextDuplexer` implements `OwnsRaw` if `Inner` does.
+unsafe impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + OwnsRaw> OwnsRaw
+    for TextDuplexer<Inner>
+{
 }
 
 impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug
