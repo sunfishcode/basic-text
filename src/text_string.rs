@@ -29,10 +29,12 @@ use utf8_io::{Utf8Reader, Utf8Writer, WriteStr};
 
 /// A Basic Text encoded, growable string.
 #[derive(PartialEq, Eq, Hash, Debug)]
+#[repr(transparent)]
 pub struct TextString(String);
 
 /// `TextStr` is to `TextString` as `str` is to `String`.
 #[derive(PartialEq, Eq, Hash, Debug)]
+#[repr(transparent)]
 pub struct TextStr(str);
 
 /// `TextError` is to `TextString` as `Utf8Error` is to `String`.

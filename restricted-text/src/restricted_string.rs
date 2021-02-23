@@ -29,10 +29,12 @@ use basic_text::{TextStr, TextString, TextReader, TextWriter};
 
 /// A Restricted Text encoded, growable string.
 #[derive(PartialEq, Eq, Hash, Debug)]
+#[repr(transparent)]
 pub struct RestrictedString(TextString);
 
 /// `RestrictedStr` is to `RestrictedString` as `TextStr` is to `TextString`.
 #[derive(PartialEq, Eq, Hash, Debug)]
+#[repr(transparent)]
 pub struct RestrictedStr(TextStr);
 
 /// `RestrictedError` is to `RestrictedString` as `TextError` is to `TextString`.
