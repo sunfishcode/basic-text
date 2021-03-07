@@ -12,23 +12,29 @@
   </p>
 </div>
 
-*This is an early experiment! Both the code and the Basic Text format are actively evolving!*
+This repository defines a text format called [Basic Text], a subset of Unicode
+being developed to focus on *text*: it excludes unprintable control characters,
+characters which depend on out-of-band information to interpret,
+non-characters, and more, while aiming to preserve everything of use to plain
+text and formats built on top of plain text.
 
-`basic-text` defines several utilities for working with a subset of Unicode
-called [Basic Text]:
+It also includes a Rust crate which aims to implement the Basic Text format,
+providing several utilities:
 
- - [`TextString`] and [`TextStr`] are similar to [`String`] and [`str`] using
-   Basic Text. Basic Text excludes things like unprintable control characters,
-   escape sequences, and non-canonical sequences, but preserves any practical
-   Unicode textual content.
+ - [`TextString`] and [`TextStr`] are similar to the standard library's [`String`]
+   and [`str`], but use the Basic Text string format.
 
  - [`TextReader`] and [`TextWriter`] are input and output streams which use the
-   Basic Text format, and which ensure a consistent line-ending convention.
-   On input, non-text content is lossily converted, and on output, non-text
-   content is diagnosed as errors.
+   Basic Text stream format. On input, content is converted in a way which is
+   lossy with respect to the original bytestream. Output uses the "strict"
+   conversion method, in which invalid content is diagnosed with errors.
 
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
    stream using Basic Text.
+
+The code here is usable, but fairly new and has not yet been optimized much. It
+implements most of the Basic Text spec, though see the `TODO`s in the tests
+directory for remaining missing pieces.
 
 [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
 [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
