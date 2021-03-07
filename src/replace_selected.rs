@@ -56,6 +56,10 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
                 self.buffer = Some('\u{17b6}');
                 Some('\u{17a2}')
             }
+            '\u{2df5}' => {
+                self.buffer = Some('\u{2dee}');
+                Some('\u{2ded}')
+            }
             LS | PS => Some(' '),
             // Interlinear Annotations
             '\u{fff9}'..='\u{fffb}' |

@@ -173,6 +173,10 @@ Khmer scalar values U+17B4 and U+17B5
 "should be considered errors in the encoding". Also,
 "the use of U+17D8 Khmer sign beyyal is discouraged".
 
+For the Cyrillic value U+2DF5, Unicode [prefers] the sequence U+2DED U+2DEE.
+
+[prefers]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G10.28571
+
 ### "Forbidden Characters"
 
 There were a few errors in the Unicode normalization algorithm in before

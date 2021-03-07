@@ -1,4 +1,4 @@
-pub const DISALLOWED_SCALAR_VALUES: [char; 309] = [
+pub const DISALLOWED_SCALAR_VALUES: [char; 310] = [
     // All C0, U+007F, and C1 control codes other than U+000A (newline),
     // U+0009 (horizontal tab), U+000D (carriage return), U+000C (form feed),
     // U+0007 (alert), U+001B (escape) and U+0085 (NEL). Many of these are
@@ -94,6 +94,8 @@ pub const DISALLOWED_SCALAR_VALUES: [char; 309] = [
     // Unassigned characters with replacements.
     '\u{2072}',
     '\u{2073}',
+    // Discouraged characters
+    '\u{2df5}',
     // Interlinear Annotations
     '\u{fff9}',
     '\u{fffa}',

@@ -50,6 +50,8 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             c @ '\u{206a}'..='\u{206f}' => self.deprecated_format_character(c),
             // Tag Characters
             c @ '\u{e0000}'..='\u{e007f}' => self.tag_character(c),
+            // Discouraged Characters
+            c @ '\u{2df5}' => self.discouraged_character(c),
             // Noncharacters
             c @ '\u{fffe}'..='\u{ffff}'
             | c @ '\u{1fffe}'..='\u{1ffff}'
@@ -198,6 +200,15 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Tag character written to text output stream: {:?}", c),
+        ));
+        SUB
+    }
+
+    #[cold]
+    fn discouraged_character(&mut self, c: char) -> char {
+        self.record_error(io::Error::new(
+            io::ErrorKind::Other,
+            format!("Discouraged character written to text output stream: {:?}", c),
         ));
         SUB
     }
