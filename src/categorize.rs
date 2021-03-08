@@ -20,8 +20,9 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         Self { iter, error }
     }
 
-    fn record_error(&mut self, error: io::Error) {
+    fn record_error(&mut self, error: io::Error) -> char {
         *self.error.borrow_mut() = Some(error);
+        SUB
     }
 }
 
@@ -124,8 +125,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Control code written to text output stream: {:?}", c),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -151,8 +151,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
                     c
                 ),
             },
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -169,8 +168,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
                 "Obsolete compatibility written to text output stream: {:?}; use {:?} instead",
                 c, replacement
             ),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -181,8 +179,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
                 "Erroneous Khmer character written to text output stream: {:?}",
                 c
             ),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -193,8 +190,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
                 "Deprecated format character written to text output stream: {:?}",
                 c
             ),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -202,8 +198,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Tag character written to text output stream: {:?}", c),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -211,8 +206,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Discouraged character written to text output stream: {:?}", c),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -228,8 +222,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Noncharacter written to text output stream: {:?}", c),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -285,8 +278,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
                 "Unassigned character written to text output stream: {:?}; use {:?} instead",
                 c, replacement
             ),
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -294,8 +286,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             "Object replacement character written to text output stream",
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -303,8 +294,7 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             "Byte-order mark written to text output stream",
-        ));
-        SUB
+        ))
     }
 
     #[cold]
@@ -312,7 +302,6 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             "Interlinear annotation written to text output stream",
-        ));
-        SUB
+        ))
     }
 }
