@@ -6,7 +6,7 @@ authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
 keywords = ["stream", "text"]
 categories = ["os", "text-processing"]
-repository = "https://github.com/sunfishcode/restricted-text"
+repository = "https://github.com/sunfishcode/basic-text"
 edition = "2018"
 readme = "README.md"
 

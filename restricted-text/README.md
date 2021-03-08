@@ -6,7 +6,7 @@
   </p>
 
   <p>
-    <a href="https://github.com/sunfishcode/restricted-text/actions?query=workflow%3ACI"><img src="https://github.com/sunfishcode/restricted-text/workflows/CI/badge.svg" alt="Github Actions CI Status" /></a>
+    <a href="https://github.com/sunfishcode/basic-text/actions?query=workflow%3ACI"><img src="https://github.com/sunfishcode/restricted-text/workflows/CI/badge.svg" alt="Github Actions CI Status" /></a>
     <a href="https://crates.io/crates/restricted-text"><img src="https://img.shields.io/crates/v/restricted-text.svg" alt="crates.io page" /></a>
     <a href="https://docs.rs/restricted-text"><img src="https://docs.rs/restricted-text/badge.svg" alt="docs.rs docs" /></a>
   </p>
@@ -29,12 +29,12 @@ called [Restricted Text]:
  - [`RestrictedDuplexer`] is a [`Duplex`] for reading and writing on an
    interactive stream using Restricted Text.
 
-[`RestrictedString`]: https://docs.rs/basic-text/latest/basic_text/struct.RestrictedString.html
-[`RestrictedStr`]: https://docs.rs/basic-text/latest/basic_text/struct.RestrictedStr.html
-[`RestrictedReader`]: https://docs.rs/basic-text/latest/basic_text/struct.RestrictedReader.html
-[`RestrictedWriter`]: https://docs.rs/basic-text/latest/basic_text/struct.RestrictedWriter.html
-[`RestrictedDuplexer`]: https://docs.rs/basic-text/latest/basic_text/struct.RestrictedDuplexer.html
-[`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
-[`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
+[`RestrictedString`]: https://docs.rs/restricted-text/latest/restricted_text/struct.RestrictedString.html
+[`RestrictedStr`]: https://docs.rs/restricted-text/latest/restricted_text/struct.RestrictedStr.html
+[`RestrictedReader`]: https://docs.rs/restricted-text/latest/restricted_text/struct.RestrictedReader.html
+[`RestrictedWriter`]: https://docs.rs/restricted-text/latest/restricted_text/struct.RestrictedWriter.html
+[`RestrictedDuplexer`]: https://docs.rs/restricted-text/latest/restricted_text/struct.RestrictedDuplexer.html
+[`TextString`]: https://docs.rs/restricted-text/latest/restricted_text/struct.TextString.html
+[`TextStr`]: https://docs.rs/restricted-text/latest/restricted_text/struct.TextStr.html
 [`Duplex`]: https://docs.rs/duplex/latest/duplex/trait.Duplex.html
-[Restricted Text]: https://github.com/sunfishcode/basic-text/blob/main/docs/RestrictedText.md
+[Restricted Text]: https://github.com/sunfishcode/restricted-text/blob/main/docs/RestrictedText.md
