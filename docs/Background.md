@@ -347,3 +347,18 @@ and FCC. We aren't using these here, mainly because we're using NFC (and
 NFKC) and FCD and FCC aren't fully compatible with NFC.
 
 [Unicode Technical Note #5]: https://www.unicode.org/notes/tn5/
+
+### Relationship to Markup
+
+[Unicode in XML and other Markup Languages] describes the relationship between
+Unicode and markup languages. It includes recommendatations about
+[Characters not Suitable for use With Markup]. Many of these recommendataions
+are incoproated into [Basic Text], however some are specific to the needs of
+markup languages, and Basic Text intends to be useful for plain text as well.
+
+For example, Basic Text includes the Bidi control characters even though
+[they are duplicated by markdup features].
+
+[Unicode in XML and other Markup Languages]: http://www.unicode.org/reports/tr20/tr20-9.html#Object
+[Characters not Suitable for use With Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Suitable
+[they are duplicated by markdup features]: http://www.unicode.org/reports/tr20/tr20-9.html#Bidi
