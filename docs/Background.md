@@ -9,7 +9,7 @@ links to related standards, documentation, and other resources.
 
 Basic Text's initial goal is to collect ideas on all the things in Unicode that
 aren't needed in practical Unicode text. Start by being conservative in what to
-accept, and being liberal in exposing assumptions™.
+accept, and being liberal in exposing assumptions 😎.
 
 Many of the decisions about what should be included or excluded are made not
 from a place of deep expertise on all relevant human languages, but from a
