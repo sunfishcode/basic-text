@@ -12,12 +12,14 @@ what you accept, and be liberal in uncovering implicit assumptions.
 As the format gains real-world exposure, we may discover places where it's
 too strict and relax it as needed.
 
-## NFC, Normalization
+## Rationale
+
+### NFC, Normalization
 
 [Basic Text] normalizes to NFC, using a special algorithm to minimize loss
-of intent. See [this page](NFC.md) for an explanation.
+of intent. See [this page](NFC.md) for motivation and rationale.
 
-## Newlines
+### Newlines
 
 In [Basic Text] content, U+A, and nothing else, is a *line terminator*,
 sometimes also called a *newline*.
@@ -42,8 +44,9 @@ conversion can also translate NEL, or LS and PS, into newlines, for example to
 support the text conventions used in [XML 1.1] and [JavaScript source code],
 respectively.
 
+[POSIX]: http://get.posixcertified.ieee.org/
 [XML 1.1]: https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-line-ends
-[JavaScript]: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
+[JavaScript source code]: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
 
 By default, strict text conversion rejects CRLF and other line terminator
 sequences other than U+A. As an option, strict text conversion can translate
@@ -71,7 +74,7 @@ strict conversion requires a line terminator at the end if needed.
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
 
-## Form Feed
+### Form Feed
 
 Pagination control is primarily a feature of higher-level protocols, and not
 part of most informal notions of "plain text". U+C does have [some uses] in
@@ -92,32 +95,32 @@ about its meaning is resolved.
 
 [some uses]: https://en.wikipedia.org/wiki/Page_break#Semantic_use
 
-## Tab
+### Tab
 
 It might be tempting to disallow tab on the basis of it being a control
 code primarily concerned with how text is aligned on the screen, which is
 typically considered a feature of higher-level protocols. However, Tab's effects
 are much more mild than other control codes, and in practice it has several uses,
-some of which [require] it, so we allow it.
+some of which [require it], so we allow it.
 
 We can refer to it as just "Tab" though, rather than "Horizontal Tab", since
 [Basic Text] excludes Vertical Tab.
 
-[depends on]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
+[require it]: https://www.gnu.org/software/make/manual/html_node/Recipe-Syntax.html
 
-## Backspace, Delete, Vertical Tab
+### Backspace, Delete, Vertical Tab
 
 These do appear in some other "plain text" concepts, however they're rare in
 practice. Here, plain text is meant to mean text that doesn't include control
 codes for cursor positioning. Cursor positioning controls are widely used with
 terminals, but that's a different use case than what [Basic Text] is targeting.
 
-## Alert
+### Alert
 
 Ringing the terminal bell is well outside the scope for plain text,
 and theoretically could even be used for side-channel communication.
 
-## Escape
+### Escape
 
 Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
@@ -127,7 +130,7 @@ not just the U+1B, but also the sequences which commonly make up escape sequence
 such as CSI and OSC, so that entire sequences are cleanly ignored, as is common
 with unrecognized escape sequences.
 
-## Deprecated scalar values
+### Deprecated scalar values
 
 U+149, U+673, U+F77, U+F79, U+17A3, and U+17A4 are officially deprecated,
 "their use is strongly discouraged", and they have recommended replacements.
@@ -136,7 +139,7 @@ U+2329 and U+232A have canonical equivalents with different appearances
 so their use is deprecated and it's not recommended to automatically replace
 them with their canonical equivalents.
 
-## Unassigned Mathematical Alphanumeric Symbols
+### Unassigned Mathematical Alphanumeric Symbols
 
 In the Mathematical Alphanumeric Symbols block, the codepoint U+1D455 would be
 the place for `ℎ`, however unicode already had an `ℎ` at U+210E, so U+1D455
@@ -153,7 +156,7 @@ Unicode considers these codepoints unassigned, so they could potentially be
 assigned new meanings in the future. Consequently, in Basic Text they convert
 to U+FFFD rather than their designated replacements.
 
-## Not-recommended scalar values with singleton canonical decompositions
+### Not-recommended scalar values with singleton canonical decompositions
 
 Unicode [recommends] the "regular letter" forms be used in preference
 to the dedicated unit characters for U+2126 OHM SIGN, U+212A KELVIN SIGN,
@@ -164,13 +167,13 @@ differently from the regular letter forms will be promptly corrected.
 
 [recommends]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G25.14143
 
-## Characters Whose Use Is Discouraged
+### Characters Whose Use Is Discouraged
 
 Khmer scalar values U+17B4 and U+17B5
 "should be considered errors in the encoding". Also,
 "the use of U+17D8 Khmer sign beyyal is discouraged".
 
-## "Forbidden Characters"
+### "Forbidden Characters"
 
 There were a few errors in the Unicode normalization algorithm in before
 Unicode 4.1. The affected scalar values and sequences are identified as
@@ -180,7 +183,7 @@ gases), they're not restricted here.
 
 [Forbidden Characters]: https://unicode.org/reports/tr15/#Forbidding_Characters
 
-## "Ghost Characters"
+### "Ghost Characters"
 
 [Ghost characters] are characters which don't correspond to any existing
 written characters, and seem to have been created by accident. It's tempting
@@ -189,7 +192,7 @@ possible that they'll acquire meanings, so we don't restrict them here.
 
 [Ghost characters]: https://www.dampfkraft.com/ghost-characters.html
 
-## Hangul Compatibility Jamo
+### Hangul Compatibility Jamo
 
 The Hangul Compatibility Jamo block in Unicode is one of the blocks added
 to Unicode for compatibility with other standards, however it also turns
@@ -198,7 +201,7 @@ don't restrict them here.
 
 [displaying isolated Jamo]: http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html
 
-## Noncharacters
+### Noncharacters
 
 [Noncharacters] are like [Private-Use Characters], except they are not intended
 for interchange. These characters are not widely used, and when they are used,
@@ -215,7 +218,7 @@ for private use should use the plain [Unicode] format rather than the
 [Noncharacters]: http://www.unicode.org/faq/private_use.html#noncharacters
 [Private-Use Characters]: http://www.unicode.org/faq/private_use.html#pua1
 
-## Variation sequences
+### Variation sequences
 
 Basic Text does not restrict the [Variation sequences], because Unicode may
 add new variation sequences over time. Restricted Text excludes the
@@ -223,7 +226,9 @@ variation sequences entirely.
 
 [variation sequences]: http://unicode.org/faq/vs.html#3
 
-## Relationship to IETF RFC 8264 "PRECIS"
+## Relationships to other standards and conventions
+
+### Relationship to IETF RFC 8264 "PRECIS"
 
 [PRECIS] is mostly focused on identifiers and has several restrictions that
 are inappropriate for streams such as disallowing whitespace, but it also
@@ -235,7 +240,7 @@ PRECIS doesn't permit tabs; we include them for the reasons mentioned above.
 [PRECIS]: https://tools.ietf.org/html/rfc8264
 [Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
 
-## Relationship to POSIX Text Files and Printable Files
+### Relationship to POSIX Text Files and Printable Files
 
 A [*text file* in POSIX]:
  - consists of zero or more [*lines* in POSIX], which all end in newlines
@@ -260,10 +265,11 @@ commands aren't part of plain text content.
 [*lines* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 [*whitespace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_442
 [*backspace* in POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_38
+[Unicode]: Unicode.md
 [Basic Text]: BasicText.md
 [Restricted Text]: RestrictedText.md
 
-## Relationship to Wikipedia's "plain text"
+### Relationship to Wikipedia's "plain text"
 
 The plain text format here is intended to align with the use cases described in
 the [Wikipedia article on plain text]. The character encoding is known, all
@@ -272,7 +278,7 @@ display.
 
 [Wikipedia article on plain text]: https://en.wikipedia.org/wiki/Plain_text
 
-## Relationship to Unicode's "plain text"
+### Relationship to Unicode's "plain text"
 
 The plain text format here is a more specific version of the
 [Unicode definition of "plain text"]. Unicode says
@@ -290,7 +296,7 @@ with just enough information to permit the text to be rendered legibly.
 
 [Unicode definition of "plain text"]: https://www.unicode.org/versions/Unicode13.0.0/ch02.pdf#G642
 
-## Relationship to "What makes a Unicode code point safe?"
+### Relationship to "What makes a Unicode code point safe?"
 
 The blog post ["What makes a Unicode code point safe?"] has a list of safety
 criteria with much in common with the plain text format here. Both exclude
@@ -307,7 +313,7 @@ all, whitespace and formatting characters.
 
 ["What makes a Unicode code point safe?"]: https://qntm.org/safe
 
-## Relationship to "Canonical Equivalence in Applications"
+### Relationship to "Canonical Equivalence in Applications"
 
 [Unicode Technical Note #5] describes various considerations related to
 normalization, including two alternate normalization forms, called FCD
