@@ -292,6 +292,17 @@ See also [Musical Controls in Markup].
 
 [Musical Controls in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Musical
 
+### Tag Characters
+
+U+E0001 is deprecated in Unicode. See [Language Tagging in Markup] for more
+information.
+
+The rest of the characters in U+E0000–U+E007F were once deprecated, but no
+longer are. One new use for them is regional indicator modifiers for national
+flags. So Basic Text includes them.
+
+[Language Tagging in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Language
+
 ## Relationships to other standards and conventions
 
 ### Relationship to IETF RFC 8264 "PRECIS"
