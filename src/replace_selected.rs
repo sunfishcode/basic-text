@@ -61,9 +61,14 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
                 self.buffer = Some('\u{17b6}');
                 Some('\u{17a2}')
             }
+            // Discouraged characters
             '\u{2df5}' => {
                 self.buffer = Some('\u{2dee}');
                 Some('\u{2ded}')
+            }
+            '\u{111c4}' => {
+                self.buffer = Some('\u{11180}');
+                Some('\u{1118f}')
             }
             LS | PS => Some(' '),
             // Latin Ligatures

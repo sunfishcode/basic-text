@@ -52,7 +52,7 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             // Tag Characters
             c @ '\u{e0000}'..='\u{e007f}' => self.tag_character(c),
             // Discouraged Characters
-            c @ '\u{2df5}' => self.discouraged_character(c),
+            c @ '\u{2df5}' | c @ '\u{111c4}' => self.discouraged_character(c),
             // Latin Ligatures
             c @ '\u{fb00}' ..= '\u{fb06}' => self.latin_ligature(c),
             // Noncharacters

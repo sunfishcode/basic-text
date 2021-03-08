@@ -133,6 +133,7 @@ A buffered stream is in Basic Text form iff:
 | U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
 | \[U+FFFE,U+FFFF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+1FFFE,U+1FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| U+111C4             | `𑇄`  | U+1118F U+11180   | "Use U+1118F U+11180 instead of U+111C4"  |
 | \[U+2FFFE,U+2FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+3FFFE,U+3FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+4FFFE,U+4FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |

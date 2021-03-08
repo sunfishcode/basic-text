@@ -542,6 +542,10 @@ fn basic_text_string_main_table() {
         "\u{2ded}\u{2dee}"
     );
     assert_eq!(
+        TextString::from_text_lossy("\u{111c4}").as_utf8(),
+        "\u{1118f}\u{11180}"
+    );
+    assert_eq!(
         TextString::from_text_lossy("\u{fdd0}").as_utf8(),
         "\u{fffd}"
     );
