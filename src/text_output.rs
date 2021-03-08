@@ -264,9 +264,9 @@ impl TextOutput {
         let buffer = replace(&mut internals.impl_().buffer, String::new());
         match internals.write_str(&buffer) {
             Ok(()) => (),
-            Err(e) => {
+            Err(err) => {
                 Self::reset_state(internals);
-                return Err(e);
+                return Err(err);
             }
         }
         internals.impl_().buffer = buffer;
