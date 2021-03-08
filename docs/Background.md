@@ -137,7 +137,10 @@ U+149, U+673, U+F77, U+F79, U+17A3, and U+17A4 are officially deprecated,
 
 U+2329 and U+232A have canonical equivalents with different appearances
 so their use is deprecated and it's not recommended to automatically replace
-them with their canonical equivalents.
+them with their canonical equivalents. There is a [suggested replacement], so
+the table suggests that, but does not perform the substitution automatically.
+
+[suggested replacement]: https://www.unicode.org/review/pr-122.html
 
 ### Unassigned Mathematical Alphanumeric Symbols
 

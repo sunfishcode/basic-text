@@ -63,8 +63,8 @@ A buffered stream is in Basic Text form iff:
 | U+2126              | `Ω`  | U+3A9             | "Use U+3A9 instead of U+2126"   |
 | U+212A              | `K`  | U+4B              | "Use U+4B instead of U+212A"    |
 | U+212B              | `Å`  | U+C5              | "Use U+C5 instead of U+212B"    |
-| U+2329              | `〈` | U+FFFD            | "Unicode deprecated U+2329"     |
-| U+232A              | `〉` | U+FFFD            | "Unicode deprecated U+232A"     |
+| U+2329              | `⟨`  | U+FFFD            | "Use U+27E8 instead of U+2329"  |
+| U+232A              | `⟩`  | U+FFFD            | "Use U+27E9 instead of U+232A"  |
 | U+1D455             | `ℎ`  | U+FFFD            | "Use U+210E instead of U+1D455" |
 | U+1D49D             | `ℬ`  | U+FFFD            | "Use U+212C instead of U+1D49D" |
 | U+1D4A0             | `ℰ`  | U+FFFD            | "Use U+2130 instead of U+1D4A0" |
