@@ -66,7 +66,7 @@ fuzz_target!(|bytes: &[u8]| {
             {
                 result.unwrap();
             } else {
-                result.map(|_| ()).unwrap_err();
+                result.unwrap_err();
             }
         }
         Err(_) => {
