@@ -211,12 +211,15 @@ they aren't text, we exclude them here to avoid the confusion.
 Also, some implementations are unable to handle U+FFFE because in UTF-16 it
 can interfere with endianness detection.
 
+See also [Noncharacters in Markup].
+
 Along with U+0, U+FFFC, and U+FFF9–U+FFFB, applications wishing to use these
 for private use should use the plain [Unicode] format rather than the
 [Basic Text] format.
 
 [Noncharacters]: http://www.unicode.org/faq/private_use.html#noncharacters
 [Private-Use Characters]: http://www.unicode.org/faq/private_use.html#pua1
+[Noncharacters in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Noncharacters
 
 ### Variation sequences
 
