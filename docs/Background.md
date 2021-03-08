@@ -1,6 +1,6 @@
 # Background
 
-This document explains the decisions behind the Basic Text format and provides
+This document explains the decisions behind the [Basic Text] format and provides
 links to related standards, documentation, and other resources.
 
 ## Overall approach to Basic Text
@@ -47,9 +47,10 @@ of intent. See [this page](NFC.md) for motivation and rationale.
 In [Basic Text] content, U+A, and nothing else, is a *line terminator*,
 sometimes also called a *newline*.
 
-Why not use the CRLF convention? That's what [IETF RFCs] use, and after
-ASCII-1986 / ECMA-6:1985 at least, that's what ASCII itself uses.
- - U+A is what IEEE [POSIX] and ISO C and C++ use in program data.
+Why not use the CRLF convention? CRLF is what [IETF RFCs] use, as well as ASCII
+itself (after ASCII-1986 / ECMA-6:1985 at least). Basic Text uses U+A because:
+ - U+A is what IEEE [POSIX], ISO C and C++, and many other programs use in
+   program data.
  - The newline convention is only one scalar, so it's simpler than CRLF and
    avoids corner-case concerns of what to do when CR and LF are split apart.
  - The newline convention is also only one byte in UTF-8, so it can be
@@ -298,7 +299,8 @@ iself.
 
 Unicode says that U+20A4 is interchangeable with U+A3, however it doesn't
 depracate or discourage its use. U+20A4 also displays differently from U+A3,
-having two horizontal lines in the middle rather than one.
+having two horizontal lines in the middle rather than one. Consequently,
+Basic Text permits the Lira Sign.
 
 ### Musical Controls
 
