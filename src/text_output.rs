@@ -431,6 +431,15 @@ impl TextOutput {
     pub(crate) fn flush<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
+        match internals.impl_().state {
+            State::Ground(_) => (),
+            State::Esc | State::Csi => {
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "output text stream flushed while an escape sequence was in progress",
+                ))
+            }
+        }
         internals.impl_().expect_starter = true;
         internals.inner_mut().flush()
     }

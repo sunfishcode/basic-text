@@ -2,7 +2,7 @@ use crate::{
     unicode::{BOM, WJ},
     TextReader, TextWriter,
 };
-use layered_io::{LayeredReader, LayeredWriter};
+use layered_io::{Bufferable, LayeredReader, LayeredWriter};
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
 #[cfg(pattern)]
@@ -17,7 +17,7 @@ use std::{
     ffi::OsStr,
     fmt::{self, Debug, Display, Formatter},
     hash::Hash,
-    io::{self, Read},
+    io::{self, Read, Write},
     net::{SocketAddr, ToSocketAddrs},
     ops::{Add, AddAssign, Deref, DerefMut},
     path::Path,
@@ -40,9 +40,7 @@ pub struct TextStr(str);
 /// `TextError` is to `TextString` as `Utf8Error` is to `String`.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub struct TextError {
-    // TODO: `valid_up_to`?
-// But `write_str` (and `write_all`) don't currently report how many bytes
-// they wrote before an error.
+    valid_up_to: usize,
 }
 
 /// `FromTextError` is to `TextString` as `FromUtf8Error` is to `String`.
@@ -76,10 +74,19 @@ impl TextString {
     pub fn from_text(s: String) -> Result<Self, FromTextError> {
         let bytes: Vec<u8> = Vec::new();
         let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(bytes)));
-        writer.write_str(&s).map_err(|_err| FromTextError {
-            bytes: s.into_bytes(),
-            error: TextError {},
-        })?;
+
+        match writer.write_str(&s).and_then(|()| writer.flush()) {
+            Ok(()) => (),
+            Err(_err) => {
+                writer.abandon();
+                let valid_up_to = compute_valid_string_up_to(&s);
+                return Err(FromTextError {
+                    bytes: s.into_bytes(),
+                    error: TextError { valid_up_to },
+                });
+            }
+        }
+
         Ok(unsafe {
             Self::from_text_vec_unchecked(
                 writer
@@ -311,6 +318,114 @@ impl TextString {
     }
 }
 
+#[cold]
+fn compute_valid_str_up_to(s: &str) -> usize {
+    // Binary search in `s` for the place where the error starts. We do
+    // this after the fact rather than tracking the positions of everything
+    // as we go, because tracking the positions through multiple iterators
+    // is complex.
+    let mut begin = 0;
+    let mut end = s.len();
+    while begin != end {
+        let mut mid = begin + (end - begin) / 2;
+        while !s.is_char_boundary(mid) {
+            mid -= 1;
+        }
+        if mid == begin {
+            mid = begin + (end - begin) / 2 + 1;
+            while !s.is_char_boundary(mid) {
+                mid += 1;
+            }
+            if mid == end {
+                break;
+            }
+        }
+        let substr = &s[..mid];
+        match TextString::from_text(substr.to_string()) {
+            Ok(text_string) if text_string.as_utf8() == substr => begin = mid,
+            _ => end = mid,
+        }
+    }
+    begin
+}
+
+#[cold]
+fn compute_valid_string_up_to(s: &String) -> usize {
+    // Binary search in `s` for the place where the error starts. We do
+    // this after the fact rather than tracking the positions of everything
+    // as we go, because tracking the positions through multiple iterators
+    // is complex.
+    let mut begin = 0;
+    let mut end = s.len();
+    while begin != end {
+        let bytes = Vec::new();
+        let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(bytes)));
+        let mut mid = begin + (end - begin) / 2;
+        while !s.is_char_boundary(mid) {
+            mid -= 1;
+        }
+        if mid == begin {
+            mid = begin + (end - begin) / 2 + 1;
+            while !s.is_char_boundary(mid) {
+                mid += 1;
+            }
+            if mid == end {
+                break;
+            }
+        }
+        match writer.write_str(&s[..mid]).and_then(|()| writer.flush()) {
+            Ok(()) => begin = mid,
+            Err(_err) => end = mid,
+        }
+        writer.abandon();
+    }
+    begin
+}
+
+impl AsRef<[u8]> for TextString {
+    #[inline]
+    fn as_ref(&self) -> &[u8] {
+        self.as_bytes()
+    }
+}
+
+impl AsRef<OsStr> for TextString {
+    #[inline]
+    fn as_ref(&self) -> &OsStr {
+        let s: &str = self.as_ref();
+        s.as_ref()
+    }
+}
+
+impl AsRef<Path> for TextString {
+    #[inline]
+    fn as_ref(&self) -> &Path {
+        let s: &str = self.as_ref();
+        s.as_ref()
+    }
+}
+
+impl AsRef<str> for TextString {
+    #[inline]
+    fn as_ref(&self) -> &str {
+        self.as_utf8()
+    }
+}
+
+impl AsRef<TextStr> for TextString {
+    #[inline]
+    fn as_ref(&self) -> &TextStr {
+        self
+    }
+}
+
+impl Clone for TextString {
+    #[inline]
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+
 impl Default for TextString {
     #[inline]
     fn default() -> Self {
@@ -434,13 +549,14 @@ impl TextStr {
     #[inline]
     pub fn from_text(s: &str) -> Result<&Self, TextError> {
         // TODO: Do this without constructing temporaries.
-        if TextString::from_text(s.to_string())
-            .map_err(|e| e.text_error())?
-            .as_utf8()
-            != s
-        {
-            return Err(TextError {});
+        let text_string = TextString::from_text(s.to_string()).map_err(|e| e.text_error())?;
+
+        // If any bytes got rewritten (eg. by normalization), fail.
+        if text_string.as_utf8() != s {
+            let valid_up_to = compute_valid_str_up_to(&s);
+            return Err(TextError { valid_up_to });
         }
+
         Ok(unsafe { Self::from_text_unchecked(s) })
     }
 
@@ -454,13 +570,14 @@ impl TextStr {
     #[inline]
     pub fn from_text_mut(s: &mut str) -> Result<&mut Self, TextError> {
         // TODO: Do this without constructing temporaries.
-        if TextString::from_text((*s).to_string())
-            .map_err(|e| e.text_error())?
-            .as_utf8()
-            != s
-        {
-            return Err(TextError {});
+        let text_string = TextString::from_text(s.to_string()).map_err(|e| e.text_error())?;
+
+        // If any bytes got rewritten (eg. by normalization), fail.
+        if text_string.as_utf8() != s {
+            let valid_up_to = compute_valid_str_up_to(&s);
+            return Err(TextError { valid_up_to });
         }
+
         Ok(unsafe { Self::from_text_unchecked_mut(s) })
     }
 
@@ -979,12 +1096,18 @@ impl ToSocketAddrs for TextStr {
 }
 
 impl TextError {
-    // TODO: valid_up_to etc.?
+    // Returns the index in the given string up to which valid Basic Text was
+    // verified.
+    pub fn valid_up_to(&self) -> usize {
+        self.valid_up_to
+    }
 }
 
 impl From<Utf8Error> for TextError {
-    fn from(_err: Utf8Error) -> Self {
-        Self {}
+    fn from(err: Utf8Error) -> Self {
+        Self {
+            valid_up_to: err.valid_up_to(),
+        }
     }
 }
 
@@ -1055,6 +1178,27 @@ impl From<Box<TextStr>> for TextString {
     }
 }
 
+impl From<&'_ TextString> for TextString {
+    #[inline]
+    fn from(s: &TextString) -> Self {
+        s.clone()
+    }
+}
+
+impl From<&'_ mut TextStr> for TextString {
+    #[inline]
+    fn from(s: &mut TextStr) -> Self {
+        s.to_owned()
+    }
+}
+
+impl From<&'_ TextStr> for TextString {
+    #[inline]
+    fn from(s: &TextStr) -> Self {
+        s.to_owned()
+    }
+}
+
 impl From<Cow<'_, TextStr>> for Box<TextStr> {
     #[inline]
     fn from(cow: Cow<'_, TextStr>) -> Self {
@@ -1094,6 +1238,56 @@ impl From<&TextStr> for Box<TextStr> {
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a> arbitrary::Arbitrary<'a> for &'a TextStr {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let size = u.arbitrary_len::<u8>()?;
+        match TextStr::from_text_bytes(&u.peek_bytes(size).unwrap()) {
+            Ok(s) => {
+                u.bytes(size).unwrap();
+                Ok(s)
+            }
+            Err(e) => {
+                let i = e.valid_up_to();
+                let valid = u.bytes(i).unwrap();
+                let s = unsafe {
+                    debug_assert!(TextStr::from_text_bytes(valid).is_ok());
+                    TextStr::from_text_bytes_unchecked(valid)
+                };
+                Ok(s)
+            }
+        }
+    }
+
+    fn arbitrary_take_rest(u: arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let bytes = u.take_rest();
+        TextStr::from_text_bytes(bytes)
+            .map_err(|_| arbitrary::Error::IncorrectFormat)
+            .map(Into::into)
+    }
+
+    #[inline]
+    fn size_hint(depth: usize) -> (usize, Option<usize>) {
+        arbitrary::size_hint::and(<usize as arbitrary::Arbitrary>::size_hint(depth), (0, None))
+    }
+}
+
+#[cfg(feature = "arbitrary")]
+impl<'a> arbitrary::Arbitrary<'a> for TextString {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        <&TextStr as arbitrary::Arbitrary>::arbitrary(u).map(Into::into)
+    }
+
+    fn arbitrary_take_rest(u: arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        <&TextStr as arbitrary::Arbitrary>::arbitrary_take_rest(u).map(Into::into)
+    }
+
+    #[inline]
+    fn size_hint(depth: usize) -> (usize, Option<usize>) {
+        <&TextStr as arbitrary::Arbitrary>::size_hint(depth)
+    }
+}
+
 #[test]
 fn normalize_string() {
     let ring = "\u{030a}";
@@ -1102,8 +1296,8 @@ fn normalize_string() {
     let composed = TextStr::from_text("\u{c5}").unwrap();
     let composed_nl = TextStr::from_text("\u{c5}\n").unwrap();
 
-    assert!(TextStr::from_text(unnormal).is_err());
-    assert!(TextStr::from_text(ring).is_err());
+    assert_eq!(TextStr::from_text(unnormal).unwrap_err().valid_up_to(), 1);
+    assert_eq!(TextStr::from_text(ring).unwrap_err().valid_up_to(), 0);
     assert_eq!(composed, &TextString::from_text_lossy(unnormal));
     assert_eq!(composed_nl, &TextString::from_text_lossy(unnormal_nl));
 }
@@ -1111,14 +1305,35 @@ fn normalize_string() {
 #[test]
 fn validate_string() {
     assert!(TextStr::from_text_bytes(b"").is_ok());
-    assert!(TextStr::from_text_bytes(b"\xff").is_err());
+    assert_eq!(
+        TextStr::from_text_bytes(b"\xff").unwrap_err().valid_up_to(),
+        0
+    );
 }
 
 #[test]
 fn split_escape() {
-    TextStr::from_text_bytes(b"\x1b[!p").unwrap_err();
-    TextStr::from_text_bytes(b"\x1b[p").unwrap_err();
-    TextStr::from_text_bytes(b"\x1b[!").unwrap_err();
-    TextStr::from_text_bytes(b"\x1b[").unwrap_err();
-    TextStr::from_text_bytes(b"\x1b").unwrap_err();
+    //assert_eq!(TextStr::from_text_bytes(b"\x1b[!p").unwrap_err().valid_up_to(), 0);
+    assert_eq!(
+        TextStr::from_text_bytes(b"\x1b[p")
+            .unwrap_err()
+            .valid_up_to(),
+        0
+    );
+    assert_eq!(
+        TextStr::from_text_bytes(b"\x1b[!")
+            .unwrap_err()
+            .valid_up_to(),
+        0
+    );
+    assert_eq!(
+        TextStr::from_text_bytes(b"\x1b[")
+            .unwrap_err()
+            .valid_up_to(),
+        0
+    );
+    assert_eq!(
+        TextStr::from_text_bytes(b"\x1b").unwrap_err().valid_up_to(),
+        0
+    );
 }

@@ -211,14 +211,46 @@ fn translate_via_layered_writer(bytes: &[u8]) -> io::Result<String> {
     let mut writer = TextWriter::new(utf8_io::Utf8Writer::new(layered_io::LayeredWriter::new(
         Vec::<u8>::new(),
     )));
-    writer.write_all(bytes)?;
-    let inner = writer.close_into_inner()?.close_into_inner()?;
-    Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
+    match writer.write_all(bytes) {
+        Ok(()) => (),
+        Err(err) => {
+            writer.abandon();
+            return Err(err);
+        }
+    }
+    let inner = writer
+        .close_into_inner()?
+        .close_into_inner()?
+        .close_into_inner()?;
+    Ok(String::from_utf8(inner).unwrap())
 }
 
 #[cfg(test)]
-fn test(bytes: &[u8], s: &str) {
-    assert_eq!(translate_via_layered_writer(bytes).unwrap(), s);
+fn translate_str_via_layered_writer(s: &str) -> io::Result<String> {
+    let mut writer = TextWriter::new(utf8_io::Utf8Writer::new(layered_io::LayeredWriter::new(
+        Vec::<u8>::new(),
+    )));
+    match writer.write_str(s) {
+        Ok(()) => (),
+        Err(err) => {
+            writer.abandon();
+            return Err(err);
+        }
+    }
+    let inner = writer
+        .close_into_inner()?
+        .close_into_inner()?
+        .close_into_inner()?;
+    Ok(String::from_utf8(inner).unwrap())
+}
+
+#[cfg(test)]
+fn test(s: &str, expected: &str) {
+    assert_eq!(
+        translate_via_layered_writer(s.as_bytes()).unwrap(),
+        expected
+    );
+    assert_eq!(translate_str_via_layered_writer(s).unwrap(), expected);
 }
 
 #[cfg(test)]
@@ -228,7 +260,7 @@ fn test_error(bytes: &[u8]) {
 
 #[test]
 fn test_empty_string() {
-    test(b"", "");
+    test("", "");
 }
 
 #[test]
@@ -238,8 +270,8 @@ fn test_no_newline() {
 
 #[test]
 fn test_nl() {
-    test(b"\n", "\n");
-    test(b"\nhello\nworld\n", "\nhello\nworld\n");
+    test("\n", "\n");
+    test("\nhello\nworld\n", "\nhello\nworld\n");
 }
 
 #[test]
@@ -434,8 +466,8 @@ fn test_c1() {
 fn test_nfc() {
     test_error("\u{212b}".as_bytes());
     test_error("\u{212b}\n".as_bytes());
-    test("\u{c5}\n".as_bytes(), "\u{c5}\n");
-    test("\u{41}\u{30a}\n".as_bytes(), "\u{c5}\n");
+    test("\u{c5}\n", "\u{c5}\n");
+    test("\u{41}\u{30a}\n", "\u{c5}\n");
 }
 
 #[test]
