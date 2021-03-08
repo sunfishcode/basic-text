@@ -33,7 +33,7 @@ A buffered stream is in Basic Text form iff:
 
 [Tables]: #tables
 [non-starter]: https://unicode.org/reports/tr15/#Description_Norm
-[Bidirectional formatting characters]:  http://www.unicode.org/reports/tr9/
+[Bidirectional formatting character]:  http://www.unicode.org/reports/tr9/
 [Unicode Bidirectional Algorithm `max_depth`]: http://www.unicode.org/reports/tr9/#BD2
 
 ## Tables
