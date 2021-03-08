@@ -271,6 +271,27 @@ iself.
 
 [Unicode FAQ on Ligatures]: https://unicode.org/faq/ligature_digraph.html
 
+### Lira Sign
+
+Unicode says that U+20A4 is interchangeable with U+A3, however it doesn't
+depracate or discourage its use. U+20A4 also displays differently from U+A3,
+having two horizontal lines in the middle rather than one.
+
+### Musical Controls
+
+The Musical Controls U+1D173–U+1D17A are non-printing control characters,
+however they can usually be safely ignored by producers that don't support
+them.
+
+The musical symbols and controls in Unicode are not sufficient to express
+most forms of music, however higher-level formats built on top of Unicode do
+use these symbols, in combination with their own specialized markup features,
+so Basic Text includes them.
+
+See also [Musical Controls in Markup].
+
+[Musical Controls in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Musical
+
 ## Relationships to other standards and conventions
 
 ### Relationship to IETF RFC 8264 "PRECIS"
