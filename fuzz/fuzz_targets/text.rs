@@ -53,17 +53,20 @@ fuzz_target!(|bytes: &[u8]| {
     let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::<u8>::new())));
     match str::from_utf8(bytes) {
         Ok(utf8) => {
-            let result = writer
-                .write_all(bytes)
-                .and_then(|()| writer.close_into_inner()?.close_into_inner()?.close_into_inner());
-            if !s.contains('\x1b') &&
-                utf8
-                .chars()
-                .cjk_compat_variants()
-                .stream_safe()
-                .nfc()
-                .collect::<String>()
-                == s
+            let result = writer.write_all(bytes).and_then(|()| {
+                writer
+                    .close_into_inner()?
+                    .close_into_inner()?
+                    .close_into_inner()
+            });
+            if !s.contains('\x1b')
+                && utf8
+                    .chars()
+                    .cjk_compat_variants()
+                    .stream_safe()
+                    .nfc()
+                    .collect::<String>()
+                    == s
             {
                 assert_eq!(String::from_utf8(result.unwrap()).unwrap(), s);
             } else {

@@ -205,7 +205,10 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
     fn discouraged_character(&mut self, c: char) -> char {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
-            format!("Discouraged character written to text output stream: {:?}", c),
+            format!(
+                "Discouraged character written to text output stream: {:?}",
+                c
+            ),
         ))
     }
 
