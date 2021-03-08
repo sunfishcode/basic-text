@@ -140,7 +140,10 @@ so their use is deprecated and it's not recommended to automatically replace
 them with their canonical equivalents. There is a [suggested replacement], so
 the table suggests that, but does not perform the substitution automatically.
 
+[Other Deprecated Characters in Markup] has additional information.
+
 [suggested replacement]: https://www.unicode.org/review/pr-122.html
+[Other Deprecated Characters in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#OtherDeprecated
 
 ### Unassigned Mathematical Alphanumeric Symbols
 
