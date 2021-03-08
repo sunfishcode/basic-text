@@ -355,6 +355,34 @@ NFKC) and FCD and FCC aren't fully compatible with NFC.
 
 [Unicode Technical Note #5]: https://www.unicode.org/notes/tn5/
 
+### Relationship to FTFY
+
+[FTFY] implements several related features.
+
+Not addressed in Basic Text or Restricted Text:
+ - Mojibake
+ - HTML entities
+ - Curly quotation marks
+
+Addressed in Restricted Text and not Basic Text:
+ - Half-width and full-width characters (via NFKC)
+
+Addressed in Basic Text and Restricted Text:
+ - Escape sequences
+ - Control codes
+ - Ligatures
+ - Normalization
+ - Line breaks
+ - Lone Surrogates
+ - Byte-Order Marks
+
+Basic Text discards information useful for recovering the original intent from
+Mojibake. In the future, we may want to add an option to the conversion from
+Unicode to Basic Text which uses C1 control codes and lone surrogates to guess
+the intende meaning of an improperly transcoded text.
+
+[FTFY]: https://ftfy.readthedocs.io/en/latest/
+
 ### Relationship to Markup
 
 [Unicode in XML and other Markup Languages] describes the relationship between
