@@ -7,25 +7,18 @@ links to related standards, documentation, and other resources.
 
 ### Approach
 
-Basic Text's initial goal is to collect ideas on all the things in Unicode that
-aren't needed in practical Unicode text. Start by being conservative in what to
-accept, and being liberal in exposing assumptions 😎.
-
-Many of the decisions about what should be included or excluded are made not
-from a place of deep expertise on all relevant human languages, but from a
+Many of the decisions about what should be excluded from Basic Text in its
+current form have been made not from a place of deep expertise, but from a
 place of gathering ideas from a variety of sources, and then consulting Unicode
 standards and documentation, other standards, popular Unicode implementations,
 and Web searches, and ultimately making some guesses. If the explanations in
 the rest of this document convey confidence in the decisions, it's only because
-they're intended to be drafts of the kinds of things a future spec might say.
+they're intended to be drafts of the kinds of things a more mature design
+document might say.
 
 Input from people with actual expertise would be greatly appreciated! As would
 corrections, bug reports, or even just example bodies of text that would be
 interesting to test on.
-
-The next goal is to correct the incorrect guesses, build up the reference
-implementation, and grow to be generally useful. An eventual goal is to
-standardize something, or contribute to a standard in some way.
 
 ### No Stability (Yet)
 
