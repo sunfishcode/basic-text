@@ -229,6 +229,29 @@ variation sequences entirely.
 
 [variation sequences]: http://unicode.org/faq/vs.html#3
 
+### Characters requiring out-of-band information
+
+Some characters require additional data not described by Unicode to properly
+display.
+
+U+FFFC (OBJECT REPLACEMENT CHARACTER) has no way to indicate which object it
+references. See also [Object Replacement Character in Markup].
+
+U+FFF9–U+FFFB, the Interlinear Annotation Characters, refer to external
+information, and ignoring them may change the meaning of a text. See also
+[Interlinear Annotation Characters in Markup].
+
+[Object Replacement Character in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Object
+[Interlinear Annotation Characters in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Interlinear
+
+### C1 controls
+
+See [Newlines] for more information about U+85.
+
+The rest of the C1 controls are non-printing control codes rather than text.
+
+[Newlines]: #newlines
+
 ## Relationships to other standards and conventions
 
 ### Relationship to IETF RFC 8264 "PRECIS"
