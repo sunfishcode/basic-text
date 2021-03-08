@@ -218,6 +218,35 @@ fn basic_text_string_pre_nfc_table() {
         TextString::from_text_lossy("\u{232a}").as_utf8(),
         "\u{fffd}"
     );
+    // Latin Ligatures
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb00}").as_utf8(),
+        "ff"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb01}").as_utf8(),
+        "fi"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb02}").as_utf8(),
+        "fl"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb03}").as_utf8(),
+        "ffi"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb04}").as_utf8(),
+        "ffl"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb05}").as_utf8(),
+        "ſt"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fb06}").as_utf8(),
+        "st"
+    );
     // Unassigned alphanumeric mathematical symbols.
     assert_eq!(
         TextString::from_text_lossy("\u{1d455}").as_utf8(),

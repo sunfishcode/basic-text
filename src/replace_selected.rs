@@ -9,9 +9,10 @@ use crate::unicode::{BOM, LS, ORC, PS, REPL, WJ};
 pub(crate) struct ReplaceSelected<Inner: Iterator<Item = char>> {
     inner: Inner,
 
-    /// At this time, the longest replacement sequences is 2 USVs,
-    /// so we need at most one in the buffer.
+    /// At this time, the longest replacement sequence is 3 USVs,
+    /// so we need at most two in the buffer.
     buffer: Option<char>,
+    second_buffer: Option<char>,
 }
 
 impl<Inner: Iterator<Item = char>> ReplaceSelected<Inner> {
@@ -20,6 +21,7 @@ impl<Inner: Iterator<Item = char>> ReplaceSelected<Inner> {
         Self {
             inner,
             buffer: None,
+            second_buffer: None,
         }
     }
 }
@@ -30,6 +32,9 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(c) = self.buffer.take() {
+            return Some(c);
+        }
+        if let Some(c) = self.second_buffer.take() {
             return Some(c);
         }
 
@@ -61,6 +66,37 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
                 Some('\u{2ded}')
             }
             LS | PS => Some(' '),
+            // Latin Ligatures
+            '\u{fb00}' => {
+                self.buffer = Some('f');
+                Some('f')
+            }
+            '\u{fb01}' => {
+                self.buffer = Some('i');
+                Some('f')
+            }
+            '\u{fb02}' => {
+                self.buffer = Some('l');
+                Some('f')
+            }
+            '\u{fb03}' => {
+                self.buffer = Some('f');
+                self.second_buffer = Some('i');
+                Some('f')
+            }
+            '\u{fb04}' => {
+                self.buffer = Some('f');
+                self.second_buffer = Some('l');
+                Some('f')
+            }
+            '\u{fb05}' => {
+                self.buffer = Some('t');
+                Some('ſ')
+            }
+            '\u{fb06}' => {
+                self.buffer = Some('t');
+                Some('s')
+            }
             // Interlinear Annotations
             '\u{fff9}'..='\u{fffb}' |
             // Unassigned characters with replacements.

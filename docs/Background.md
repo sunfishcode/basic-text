@@ -262,6 +262,15 @@ The rest of the C1 controls are non-printing control codes rather than text.
 
 [Newlines]: #newlines
 
+### Latin Ligatures
+
+The Latin Ligatures were added to Unicode for round-trip compatibility with
+other character sets. As explained in the [Unicode FAQ on Ligatures], ligatures
+should be handled by a display system, rather than being encoded in the text
+iself.
+
+[Unicode FAQ on Ligatures]: https://unicode.org/faq/ligature_digraph.html
+
 ## Relationships to other standards and conventions
 
 ### Relationship to IETF RFC 8264 "PRECIS"

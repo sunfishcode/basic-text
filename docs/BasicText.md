@@ -65,6 +65,13 @@ A buffered stream is in Basic Text form iff:
 | U+212B              | `Å`  | U+C5              | "Use U+C5 instead of U+212B"    |
 | U+2329              | `⟨`  | U+FFFD            | "Use U+27E8 instead of U+2329"  |
 | U+232A              | `⟩`  | U+FFFD            | "Use U+27E9 instead of U+232A"  |
+| U+FB00              | `ff` | U+66 U+66         | "Use U+66 U+66 instead of U+FB00 |
+| U+FB01              | `fi` | U+66 U+69         | "Use U+66 U+69 instead of U+FB01 |
+| U+FB02              | `fl` | U+66 U+6C         | "Use U+66 U+6C instead of U+FB02 |
+| U+FB03              | `ffi`| U+66 U+66 U+66    | "Use U+66 U+66 U+69 instead of U+FB03 |
+| U+FB04              | `ffl`| U+66 U+66 U+6C    | "Use U+66 U+66 U+6C instead of U+FB04 |
+| U+FB05              | `ſt` | U+17F U+74        | "Use U+17F U+74 instead of U+FB05 |
+| U+FB06              | `st` | U+73 U+74         | "Use U+73 U+74 instead of U+FB06 |
 | U+1D455             | `ℎ`  | U+FFFD            | "Use U+210E instead of U+1D455" |
 | U+1D49D             | `ℬ`  | U+FFFD            | "Use U+212C instead of U+1D49D" |
 | U+1D4A0             | `ℰ`  | U+FFFD            | "Use U+2130 instead of U+1D4A0" |

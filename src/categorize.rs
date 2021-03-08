@@ -52,6 +52,8 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             c @ '\u{e0000}'..='\u{e007f}' => self.tag_character(c),
             // Discouraged Characters
             c @ '\u{2df5}' => self.discouraged_character(c),
+            // Latin Ligatures
+            c @ '\u{fb00}' ..= '\u{fb06}' => self.latin_ligature(c),
             // Noncharacters
             c @ '\u{fffe}'..='\u{ffff}'
             | c @ '\u{1fffe}'..='\u{1ffff}'
@@ -211,6 +213,14 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
             format!("Discouraged character written to text output stream: {:?}", c),
         ));
         SUB
+    }
+
+    #[cold]
+    fn latin_ligature(&mut self, c: char) -> char {
+        self.record_error(io::Error::new(
+            io::ErrorKind::Other,
+            format!("Latin ligature written to text output stream: {:?}", c),
+        ))
     }
 
     #[cold]
