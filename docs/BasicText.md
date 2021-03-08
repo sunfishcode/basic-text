@@ -87,7 +87,7 @@ A buffered stream is in Basic Text form iff:
 | U+1D545             | `ℕ`  | U+FFFD            | "Use U+2115 instead of U+1D545" |
 | U+1D547             | `ℙ`  | U+FFFD            | "Use U+2119 instead of U+1D547" |
 | U+1D548             | `ℚ`  | U+FFFD            | "Use U+211A instead of U+1D548" |
-g U+1D549             | `ℝ`  | U+FFFD            | "Use U+211D instead of U+1D549" |
+| U+1D549             | `ℝ`  | U+FFFD            | "Use U+211D instead of U+1D549" |
 | U+1D551             | `ℤ`  | U+FFFD            | "Use U+2124 instead of U+1D551" |
 | [CJK Compatibility Ideographs] | | [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 
