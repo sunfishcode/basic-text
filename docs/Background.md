@@ -32,6 +32,11 @@ standardize something, or contribute to a standard in some way.
 At this time, there is no stability guarantee, for either forwards or backwards
 compatibility. But we may consider such things in the future.
 
+## Rationale
+
+The following sections provide information about the decisions that Basic Text
+makes, and links to related standards and documentation.
+
 ### NFC, Normalization
 
 [Basic Text] normalizes to NFC, using a special algorithm to minimize loss
