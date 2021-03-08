@@ -1,6 +1,6 @@
 # Is including NFC the right thing to do?
 
-At this time, it does seem to be. The following are some notes.
+It's a good question. The following are some notes.
 
 ## What are the advantages of normalizing?
 
@@ -155,3 +155,11 @@ today's environments that can be fixed.
 
 [Restricted Text]: RestrictedText.md
 [Basic Text]: BasicText.md
+
+## What about the performance impact of NFC normalization?
+
+The performance impact has not yet been evaluated.
+
+One observation is that for text which is already intended to be in
+normalized form, it should be relatively cheap to simplify verify that, and
+this should ideally be a very common case.
