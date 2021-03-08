@@ -291,7 +291,7 @@ iself.
 ### Lira Sign
 
 Unicode says that U+20A4 is interchangeable with U+A3, however it doesn't
-depracate or discourage its use. U+20A4 also displays differently from U+A3,
+deprecate or discourage its use. U+20A4 also displays differently from U+A3,
 having two horizontal lines in the middle rather than one. Consequently,
 Basic Text permits the Lira Sign.
 
@@ -441,21 +441,21 @@ Addressed in Basic Text and Restricted Text:
 Basic Text discards information useful for recovering the original intent from
 Mojibake. In the future, we may want to add an option to the conversion from
 Unicode to Basic Text which uses C1 control codes and lone surrogates to guess
-the intende meaning of an improperly transcoded text.
+the intended meaning of an improperly transcoded text.
 
 [FTFY]: https://ftfy.readthedocs.io/en/latest/
 
 ### Relationship to Markup
 
 [Unicode in XML and other Markup Languages] describes the relationship between
-Unicode and markup languages. It includes recommendatations about
-[Characters not Suitable for use With Markup]. Many of these recommendataions
-are incoproated into [Basic Text], however some are specific to the needs of
+Unicode and markup languages. It includes recommendations about
+[Characters not Suitable for use With Markup]. Many of these recommendations
+are incorporated into [Basic Text], however some are specific to the needs of
 markup languages, and Basic Text intends to be useful for plain text as well.
 
 For example, Basic Text includes the Bidi control characters even though
-[they are duplicated by markdup features].
+[they are duplicated by markup features].
 
 [Unicode in XML and other Markup Languages]: http://www.unicode.org/reports/tr20/tr20-9.html#Object
 [Characters not Suitable for use With Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Suitable
-[they are duplicated by markdup features]: http://www.unicode.org/reports/tr20/tr20-9.html#Bidi
+[they are duplicated by markup features]: http://www.unicode.org/reports/tr20/tr20-9.html#Bidi
