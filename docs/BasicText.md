@@ -230,9 +230,6 @@ The following options may be enabled:
 
 ## TODO
 
-TODO: `canonical_combining_class` doesn't know about the astral compositions
-like U+11099 U+110BA => U+1109A. Restrict non-starters of that form too?
-
 TODO: Validate [variation sequences]?
 
 [NFC]: https://unicode.org/reports/tr15/#Norm_Forms

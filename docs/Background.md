@@ -3,9 +3,19 @@
 This document explains the decisions behind the Basic Text format and provides
 links to related standards, documentation, and other resources.
 
+## Overall approach to Basic Text
+
+Basic Text's initial goal is to disallow as much as it can be without
+compromising the meaning of any practical Unicode text. Be conservative in
+what you accept, and be liberal in uncovering implicit assumptions.
+
+As the format gains real-world exposure, we may discover places where it's
+too strict and relax it as needed.
+
 ## NFC, Normalization
 
-[Basic Text] normalizes to NFC. See [this page](NFC.md) for details.
+[Basic Text] normalizes to NFC, using a special algorithm to minimize loss
+of intent. See [this page](NFC.md) for an explanation.
 
 ## Newlines
 
@@ -222,7 +232,7 @@ PRECIS doesn't permit tabs; we include them for the reasons mentioned above.
 A [*text file* in POSIX]:
  - consists of zero or more [*lines* in POSIX], which all end in newlines
  - excludes NUL
- - lines are at most `LINE_MAX` bytes long including the newline (TODO).
+ - lines are at most `LINE_MAX` bytes long including the newline.
 
 [Basic Text] excludes NUL (it's a C0 control), and requires content to consist
 of lines which all end in newlines.
@@ -253,10 +263,6 @@ characters are either printable or have behavior relevant to simple text
 display.
 
 [Wikipedia article on plain text]: https://en.wikipedia.org/wiki/Plain_text
-
-## Relationship to Wikipedia's "text file"
-
-TODO: https://en.wikipedia.org/wiki/Text_file
 
 ## Relationship to Unicode's "plain text"
 
@@ -301,9 +307,3 @@ and FCC. We aren't using these here, mainly because we're using NFC (and
 NFKC) and FCD and FCC aren't fully compatible with NFC.
 
 [Unicode Technical Note #5]: https://www.unicode.org/notes/tn5/
-
-## TODO
-
-May be interesting to discuss:
- - https://tools.ietf.org/html/rfc678
- - https://tools.ietf.org/html/rfc7994

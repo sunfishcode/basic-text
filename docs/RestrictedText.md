@@ -4,7 +4,9 @@ The *Restricted Text* format is a subset of the [Basic Text] format. It
 incorporates several restrictions which reduce the expressiveness of the format
 in order to reduce visual ambiguity.
 
-TODO: This isn't implemented yet.
+*This format is entirely hypothetical at this time*. It's formed from a
+loose collection of ideas from a variety of sources, and is not yet ready for
+any practical purpose.
 
 This format does not define conversion from Basic Text or other less
 restrictive formats, as that may cause meaning to be silently lost. Instead,

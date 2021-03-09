@@ -356,5 +356,21 @@ fn test_linux() {
     test(b"\x1b[[Ahello\x1b[[Aworld\x1b[[A", "helloworld\n");
 }
 
+#[test]
+fn test_unassigned() {
+    test("\u{1d455}".as_bytes(), "\u{fffd}\n");
+    test("\u{1d455}\n".as_bytes(), "\u{fffd}\n");
+}
+
+#[test]
+fn test_dddha() {
+    test("\u{11099}\u{110ba}".as_bytes(), "\u{1109a}\n");
+    test("\u{1109a}".as_bytes(), "\u{1109a}\n");
+    test("\u{110ba}".as_bytes(), "\u{fffd}\n");
+    test("\u{110ba}\n".as_bytes(), "\u{fffd}\n");
+    test("\u{11099}\u{110ba}\n".as_bytes(), "\u{1109a}\n");
+    test("\u{1109a}\n".as_bytes(), "\u{1109a}\n");
+}
+
 // TODO: Test Stream-Safe
 // TODO: test for nonstarter after push

@@ -522,5 +522,15 @@ fn test_unassigned() {
     test_error("\u{1d455}\n".as_bytes());
 }
 
+#[test]
+fn test_dddha() {
+    test_error("\u{11099}\u{110ba}".as_bytes());
+    test_error("\u{1109a}".as_bytes());
+    test_error("\u{110ba}".as_bytes());
+    test_error("\u{110ba}\n".as_bytes());
+    test("\u{11099}\u{110ba}\n", "\u{1109a}\n");
+    test("\u{1109a}\n", "\u{1109a}\n");
+}
+
 // TODO: Test Stream-Safe
 // TODO: test for nonstarter after push

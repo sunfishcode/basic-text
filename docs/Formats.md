@@ -21,7 +21,6 @@ This repository describes and implements three formats.
      symbols.
    - Invalid scalar values and sequences are rejected, even on input, since it
      isn't always possible to preserve intent automatically.
-   - TODO: This isn't implemented yet.
 
 The [background information] contains rationale and source information.
 
