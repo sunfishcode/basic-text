@@ -215,6 +215,14 @@ for private use should use the plain [Unicode] format rather than the
 [Noncharacters]: http://www.unicode.org/faq/private_use.html#noncharacters
 [Private-Use Characters]: http://www.unicode.org/faq/private_use.html#pua1
 
+## Variation sequences
+
+Basic Text does not restrict the [Variation sequences], because Unicode may
+add new variation sequences over time. Restricted Text excludes the
+variation sequences entirely.
+
+[variation sequences]: http://unicode.org/faq/vs.html#3
+
 ## Relationship to IETF RFC 8264 "PRECIS"
 
 [PRECIS] is mostly focused on identifiers and has several restrictions that

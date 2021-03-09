@@ -228,10 +228,6 @@ The following options may be enabled:
 | ------------------ | ------- | ------- |
 | BOM Compatibility  | Boolean | `false` |
 
-## TODO
-
-TODO: Validate [variation sequences]?
-
 [NFC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Stream-Safe]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
 [Stream-Safe Text Process (UAX15-D4)]: https://unicode.org/reports/tr15/#UAX15-D4
@@ -240,4 +236,3 @@ TODO: Validate [variation sequences]?
 [Restricted Text]: RestrictedText.md
 [Unicode]: Unicode.md
 [CJK Compatibility Ideographs]: http://www.unicode.org/versions/latest/ch23.pdf#G19053
-[variation sequences]: http://unicode.org/faq/vs.html#3
