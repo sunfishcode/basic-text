@@ -18,7 +18,9 @@ A string is in Basic Text form iff:
    `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`, and
  - it doesn't end with a scalar value with a `Grapheme_Cluster_Break` of `ZWJ`
    or `Prepend`, and
- - it does not contain any of the sequences listed in the [Tables].
+ - it doesn't attempt [Bidirectional formatting character] nesting less than 0
+   or greater than the [Unicode Bidirectional Algorithm `max_depth`], and
+ - it doesn't contain any of the sequences listed in the [Tables].
 
 A stream is in Basic Text form iff:
  - it consists entirely of a string in Basic Text form, and
@@ -31,6 +33,8 @@ A buffered stream is in Basic Text form iff:
 
 [Tables]: #tables
 [non-starter]: https://unicode.org/reports/tr15/#Description_Norm
+[Bidirectional formatting characters]:  http://www.unicode.org/reports/tr9/
+[Unicode Bidirectional Algorithm `max_depth`]: http://www.unicode.org/reports/tr9/#BD2
 
 ## Tables
 
@@ -229,8 +233,6 @@ The following options may be enabled:
 TODO: `canonical_combining_class` doesn't know about the astral compositions
 like U+11099 U+110BA => U+1109A. Restrict non-starters of that form too?
 
-TODO: Validate/normalize [BiDi Controls]?
-
 TODO: Validate [variation sequences]?
 
 [NFC]: https://unicode.org/reports/tr15/#Norm_Forms
@@ -241,5 +243,4 @@ TODO: Validate [variation sequences]?
 [Restricted Text]: RestrictedText.md
 [Unicode]: Unicode.md
 [CJK Compatibility Ideographs]: http://www.unicode.org/versions/latest/ch23.pdf#G19053
-[BiDi Controls]: https://unicode.org/reports/tr9/
 [variation sequences]: http://unicode.org/faq/vs.html#3

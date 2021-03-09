@@ -1,5 +1,7 @@
 use basic_text::TextString;
 
+// TODO: Bidi nesting depth >= 0 and <= 125
+
 /// Various miscellaenous testcases.
 #[test]
 fn basic_text_string_basics() {
