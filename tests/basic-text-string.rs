@@ -39,10 +39,10 @@ fn basic_text_string_basics() {
         "\u{2011}\u{ad}"
     );
     assert_eq!(
-        TextString::from_text("\u{34f}\u{200c}\u{200d}\u{2060}".to_owned())
+        TextString::from_text("A\u{34f}\u{200c}\u{200d}\u{2060}".to_owned())
             .unwrap()
             .as_utf8(),
-        "\u{34f}\u{200c}\u{200d}\u{2060}"
+        "A\u{34f}\u{200c}\u{200d}\u{2060}"
     );
     assert_eq!(
         TextString::from_text("\u{200e}\u{202a}\u{202d}\u{2066}".to_owned())
@@ -77,7 +77,7 @@ fn basic_text_string_basics() {
 }
 
 /// Test that text strings are in Stream-Safe NFC form.
-#[ignore] // not yet implemented
+#[ignore] // not yet implemented; TODO: implement this
 #[test]
 fn basic_text_string_ssnfc() {
     // Stream-Safe
@@ -104,7 +104,6 @@ fn basic_text_string_ssnfc() {
 
 /// Test that text strings don't start with a non-starter, or a scalar value
 /// with a `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`.
-#[ignore] // string/stream start behavior is not fully implemented
 #[test]
 fn basic_text_string_start() {
     // non-starter
@@ -117,6 +116,10 @@ fn basic_text_string_start() {
         "hello\u{327}world"
     );
     // Grapheme_Cluster_Break = ZWJ.
+    assert_eq!(
+        TextString::from_text_lossy("\u{34f}\u{200c}\u{200d}\u{2060}").as_utf8(),
+        "\u{fffd}\u{200c}\u{200d}\u{2060}"
+    );
     assert_eq!(
         TextString::from_text_lossy("\u{200d}hello").as_utf8(),
         "\u{fffd}hello"
@@ -147,13 +150,12 @@ fn basic_text_string_start() {
 
 /// Test that text strings don't end with a scalar value with a
 /// `Grapheme_Cluster_Break` of `ZWJ` or `Prepend`.
-#[ignore] // string/stream end behavior is not fully implemented
 #[test]
 fn basic_text_string_end() {
     // Grapheme_Cluster_Break = ZWJ.
     assert_eq!(
         TextString::from_text_lossy("hello\u{200d}").as_utf8(),
-        "hello\u{fffd}"
+        "hello\u{200d}\u{fffd}"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{200d}world").as_utf8(),
@@ -162,7 +164,7 @@ fn basic_text_string_end() {
     // Grapheme_Cluster_Break = Prepend.
     assert_eq!(
         TextString::from_text_lossy("hello\u{110bd}").as_utf8(),
-        "hello\u{fffd}"
+        "hello\u{110bd}\u{fffd}"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{110bd}world").as_utf8(),
@@ -327,7 +329,6 @@ fn basic_text_string_pre_nfc_table() {
 
 /// Test that text strings do not contain any of the sequences listed in the
 /// Main Table.
-#[ignore] // trailing newline behavior is not fully handled yet
 #[test]
 fn basic_text_string_main_table() {
     // CRLF
@@ -384,21 +385,21 @@ fn basic_text_string_main_table() {
     assert_eq!(TextString::from_text_lossy("\u{1b}A").as_utf8(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}\u{18}").as_utf8(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}\u{1b}A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}A\n").as_utf8(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}A\n").as_utf8(), "\n");
     assert_eq!(
         TextString::from_text_lossy("\u{1b}\t").as_utf8(),
         "\u{fffd}\t"
     );
     assert_eq!(
         TextString::from_text_lossy("\u{1b}\n").as_utf8(),
-        "\u{fffd}"
+        "\u{fffd}\n"
     );
     assert_eq!(TextString::from_text_lossy("\u{1b}[[").as_utf8(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[A").as_utf8(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\0").as_utf8(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7f}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[\n").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[A\n").as_utf8(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\n").as_utf8(), "\n");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[A\n").as_utf8(), "\n");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{18}").as_utf8(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7}").as_utf8(), "");
     assert_eq!(
@@ -408,7 +409,7 @@ fn basic_text_string_main_table() {
     assert_eq!(TextString::from_text_lossy("\u{1b}").as_utf8(), "\u{fffd}");
     assert_eq!(
         TextString::from_text_lossy("\u{1b}\n").as_utf8(),
-        "\u{fffd}"
+        "\u{fffd}\n"
     );
 
     // DEL
@@ -458,13 +459,15 @@ fn basic_text_string_main_table() {
         TextString::from_text_lossy("\u{673}").as_utf8(),
         "\u{627}\u{65f}"
     );
+    assert_eq!(TextString::from_text_lossy("\u{f77}").as_utf8(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("\u{f77}").as_utf8(),
-        "\u{fb2}\u{f71}\u{f80}"
+        TextString::from_text_lossy("A\u{f77}").as_utf8(),
+        "A\u{fb2}\u{f71}\u{f80}"
     );
+    assert_eq!(TextString::from_text_lossy("\u{f79}").as_utf8(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("\u{f79}").as_utf8(),
-        "\u{fb3}\u{f71}\u{f80}"
+        TextString::from_text_lossy("A\u{f79}").as_utf8(),
+        "A\u{fb3}\u{f71}\u{f80}"
     );
     assert_eq!(
         TextString::from_text_lossy("\u{17a3}").as_utf8(),
@@ -518,7 +521,11 @@ fn basic_text_string_main_table() {
     );
     assert_eq!(
         TextString::from_text_lossy("\u{2df5}").as_utf8(),
-        "\u{2ded}\u{2dee}"
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("A\u{2df5}").as_utf8(),
+        "A\u{2ded}\u{2dee}"
     );
     assert_eq!(
         TextString::from_text_lossy("\u{111c4}").as_utf8(),

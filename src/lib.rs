@@ -16,6 +16,7 @@ mod text_input;
 mod text_output;
 mod text_reader;
 mod text_string;
+mod text_utils;
 mod text_writer;
 mod unicode;
 mod write_text;

@@ -59,18 +59,19 @@ fuzz_target!(|bytes: &[u8]| {
                     .close_into_inner()?
                     .close_into_inner()
             });
-            if !s.contains('\x1b')
-                && utf8
+            if !bytes.contains(&b'\x1b') {
+                if utf8
                     .chars()
                     .cjk_compat_variants()
                     .stream_safe()
                     .nfc()
                     .collect::<String>()
                     == s
-            {
-                assert_eq!(String::from_utf8(result.unwrap()).unwrap(), s);
-            } else {
-                result.unwrap_err();
+                {
+                    assert_eq!(String::from_utf8(result.unwrap()).unwrap(), s);
+                } else {
+                    result.unwrap_err();
+                }
             }
         }
         Err(_) => {

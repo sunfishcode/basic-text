@@ -137,11 +137,13 @@ fn test_text_input_rules() {
     // Replace U+0673 with U+0627 U+065F.
     assert_eq!(to_text("\u{673}"), "\u{627}\u{65f}\n");
 
-    // Replace U+0F77 with U+0FB2 U+0F81.
-    assert_eq!(to_text("\u{f77}"), "\u{fb2}\u{f71}\u{f80}\n");
+    // Replace U+0F77 with U+0FB2 U+0F81. Prefix with "A" since U+F77 is Extend
+    // and would otherwise be replaced by U+FFFD.
+    assert_eq!(to_text("A\u{f77}"), "A\u{fb2}\u{f71}\u{f80}\n");
 
-    // Replace U+0F79 with U+0FB3 U+0F81.
-    assert_eq!(to_text("\u{f79}"), "\u{fb3}\u{f71}\u{f80}\n");
+    // Replace U+0F79 with U+0FB3 U+0F81. Prefix with "A" since U+F79 is Extend
+    // and would otherwise be replaced by U+FFFD.
+    assert_eq!(to_text("A\u{f79}"), "A\u{fb3}\u{f71}\u{f80}\n");
 
     // Replace U+17A3 with U+17A2.
     assert_eq!(to_text("\u{17a3}"), "\u{17a2}\n");

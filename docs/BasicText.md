@@ -14,8 +14,9 @@ For rationale and background information, see [Background].
 
 A string is in Basic Text form iff:
  - it is a [Unicode] string in [Stream-Safe] [NFC] form, and
- - it doesn't start with a [non-starter], or a scalar value with a
-   `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`, and
+ - it doesn't start with a [non-starter], and
+ - it doesn't start with a scalar value with a `Grapheme_Cluster_Break` of
+   `ZWJ`, `SpacingMark` or `Extend`, and
  - it doesn't end with a scalar value with a `Grapheme_Cluster_Break` of `ZWJ`
    or `Prepend`, and
  - it doesn't attempt [Bidirectional formatting character] nesting less than 0
@@ -28,8 +29,8 @@ A stream is in Basic Text form iff:
 
 A buffered stream is in Basic Text form iff:
  - the stream is in Basic Text form, and
- - a flush of the buffer fails if the data up to that point is not a
-   string in Basic Text form.
+ - substrings of the string separated by buffer flushes are all in Basic Text
+   form.
 
 [Tables]: #tables
 [non-starter]: https://unicode.org/reports/tr15/#Description_Norm
@@ -158,8 +159,11 @@ A buffered stream is in Basic Text form iff:
 To convert a [Unicode] string into a Basic Text string in a manner that always
 succeeds, discarding information not usually considered meaningful or valid in
 plain text:
- - If the string starts with a [non-starter] or U+200D (ZWJ), replace it with
-   U+FFFD.
+ - If the first scalar in the string is a [non-starter] or has a
+   `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`, replace it
+   with U+FFFD.
+ - If the last scalar in the string has a `Grapheme_Cluster_Break` of `ZWJ`
+   or `Prepend`, append a U+FFFD.
  - Perform the Replacement actions from the [Pre-NFC Table].
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
@@ -185,8 +189,12 @@ The following boolean options may be enabled:
 To convert a [Unicode] string into a Basic Text string in a manner that
 discards information not usually considered meaningful and otherwise fails if
 the content is not valid Basic Text:
- - If the string starts with a [non-starter] or U+200D (ZWJ), error with
-   "Basic Text string must begin with a starter other than ZWJ"
+ - If the first scalar in the string is a [non-starter] or has a
+   `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`, error with
+   "Basic Text string must begin with a starter other than ZWJ, SpacingMark, or
+   Extend".
+ - If the last scalar in the string has a `Grapheme_Cluster_Break` of `ZWJ`
+   or `Prepend`, error with "Basic Text string must not end in ZWJ or Prepend".
  - Perform the Error actions from the [Pre-NFC Table].
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
@@ -236,6 +244,33 @@ The following options may be enabled:
 | Name               | Type    | Default |
 | ------------------ | ------- | ------- |
 | BOM Compatibility  | Boolean | `false` |
+
+### From Unicode buffered stream to Basic Text buffered stream
+
+To convert a [Unicode] buffered stream into a Basic Text buffered stream in a
+manner than always succeeds, discarding information not usually considered
+meaningful or valid in plain text:
+ - Perform [From Unicode stream to Basic Text stream].
+ - At each buffer flush:
+   - If the most recent scalar value is a has a `Grapheme_Cluster_Break` of
+     `ZWJ` or `Extend`, append a U+FFFD before performing the flush.
+   - If the next scalar value after the flush is a [non-starter] or has a
+     `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`,
+     replace it with U+FFFD.
+
+### From Unicode buffered stream to Basic Text buffered stream, strict
+
+To convert a [Unicode] buffered stream into a Basic Text buffered stream in a
+manner that discards information not usually considered meaningful and
+otherwise fails if the content is not valid Basic Text:
+ - Perform [From Unicode stream, strict to Basic Text stream, strict].
+ - At each buffer flush:
+   - If the most recent scalar value is a has a `Grapheme_Cluster_Break` of
+     `ZWJ` or `Extend`, error wth "Basic Text string must begin with a starter
+     other than ZWJ, SpacingMark, or Extend" before performing the flush.
+   - If the next scalar value after the flush is a [non-starter] or has a
+     `Grapheme_Cluster_Break` of `ZWJ`, `SpacingMark` or `Extend`,
+     error with "Basic Text string must not end in ZWJ or Prepend".
 
 [NFC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Stream-Safe]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format

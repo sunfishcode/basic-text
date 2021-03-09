@@ -2,9 +2,9 @@
 
 use crate::{
     replace_selected::ReplaceSelected,
+    text_utils::{is_end_ok, is_start_ok},
     unicode::{
-        is_normalization_form_starter, BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL,
-        NORMALIZATION_BUFFER_SIZE, REPL,
+        BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, REPL,
     },
     TextDuplexer, TextReader, TextStr,
 };
@@ -259,19 +259,13 @@ impl TextInput {
                         self.expect_starter = false;
                         self.state = State::Ground(false);
                     }
-                    (State::Ground(_), CGJ) => {
-                        self.queue.push_back(CGJ);
-                        self.expect_starter = false;
-                        self.state = State::Ground(false);
-                    }
                     (State::Ground(_), mut c) => {
                         if self.expect_starter {
                             self.expect_starter = false;
-                            if !is_normalization_form_starter(c) {
+                            if !is_start_ok(c) {
                                 c = REPL;
                             }
                         }
-                        assert!(c != CGJ);
                         self.queue.push_back(c);
                         self.state = State::Ground(false);
                     }
@@ -398,10 +392,20 @@ impl TextInput {
                 }
             }
 
-            if status.is_end() && internals.impl_().state != State::Ground(true) {
-                internals.impl_().queue.push_back('\n');
-                internals.impl_().expect_starter = false;
-                internals.impl_().state = State::Ground(true);
+            // If the stream ends in a non-ending char, append a REPL.
+            if let Some(last) = internals.impl_().queue.back() {
+                if !is_end_ok(*last) {
+                    internals.impl_().queue.push_back(REPL);
+                }
+            }
+
+            if status.is_end() {
+                // If the stream doesn't end in a newline, append one.
+                if internals.impl_().state != State::Ground(true) {
+                    internals.impl_().queue.push_back('\n');
+                    internals.impl_().expect_starter = false;
+                    internals.impl_().state = State::Ground(true);
+                }
             }
         }
 

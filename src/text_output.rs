@@ -2,7 +2,8 @@
 
 use crate::{
     categorize::Categorize,
-    unicode::{is_normalization_form_starter, BOM, ESC, MAX_UTF8_SIZE, SUB},
+    text_utils::{is_end_ok, is_start_ok},
+    unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
     TextDuplexer, TextStr, TextWriter,
 };
 #[cfg(can_vector)]
@@ -105,7 +106,7 @@ impl TextOutput {
             crlf_compatibility: false,
             expect_starter: true,
             ansi_color: false,
-            state: State::Ground(true),
+            state: State::Ground(Ground::Newline),
             escape_sequence: String::new(),
         }
     }
@@ -139,8 +140,8 @@ impl TextOutput {
         internals.write_all(&bom_bytes[..bom_len])?;
 
         // The BOM is not part of the logical content, so leave the stream in
-        // Ground(true) mode, meaning we don't require a newline if nothing
-        // else is written to the stream.
+        // Ground(Ground::Newline) mode, meaning we don't require a newline if
+        // nothing else is written to the stream.
 
         Ok(result)
     }
@@ -195,7 +196,7 @@ impl TextOutput {
                 first = false;
             } else {
                 let impl_ = internals.impl_();
-                impl_.state = State::Ground(true);
+                impl_.state = State::Ground(Ground::Newline);
                 impl_.buffer.push_str("\r\n");
             }
 
@@ -214,7 +215,12 @@ impl TextOutput {
         let s = s.as_ref(); // TODO: Avoid doing this.
 
         impl_.buffer.push_str(s);
-        impl_.state = State::Ground(s.is_empty() || s.ends_with('\n'));
+        let ground = match s.chars().next_back() {
+            None | Some('\n') => Ground::Newline,
+            Some(c) if !is_end_ok(c) => Ground::ZwjOrPrepend,
+            _ => Ground::Other,
+        };
+        impl_.state = State::Ground(ground);
 
         // Write to the underlying stream.
         Self::write_buffer(internals)
@@ -233,12 +239,17 @@ impl TextOutput {
             if first {
                 first = false;
             } else {
-                impl_.state = State::Ground(true);
+                impl_.state = State::Ground(Ground::Newline);
                 impl_.buffer.push_str("\r\n");
             }
 
             impl_.buffer.push_str(slice);
-            impl_.state = State::Ground(slice.ends_with('\n'));
+            let ground = match slice.chars().next_back() {
+                None | Some('\n') => Ground::Newline,
+                Some(c) if !is_end_ok(c) => Ground::ZwjOrPrepend,
+                _ => Ground::Other,
+            };
+            impl_.state = State::Ground(ground);
         }
 
         // Write to the underlying stream.
@@ -251,7 +262,7 @@ impl TextOutput {
         if internals.impl_().expect_starter {
             internals.impl_().expect_starter = false;
             if let Some(c) = internals.impl_().buffer.chars().next() {
-                if !is_normalization_form_starter(c) {
+                if !is_start_ok(c) {
                     Self::reset_state(internals);
                     return Err(io::Error::new(
                         io::ErrorKind::Other,
@@ -303,11 +314,11 @@ impl TextOutput {
                 (State::Csi, 'm') => {
                     impl_.escape_sequence.push('m');
                     impl_.buffer.push_str(&impl_.escape_sequence);
-                    impl_.state = State::Ground(false);
+                    impl_.state = State::Ground(Ground::Other);
                 }
 
                 (State::Ground(_), '\n') => {
-                    impl_.state = State::Ground(true);
+                    impl_.state = State::Ground(Ground::Newline);
                     impl_.buffer.push(c);
                 }
 
@@ -325,7 +336,12 @@ impl TextOutput {
 
                 // Common case: in ground state and reading a normal char.
                 (State::Ground(_), c) => {
-                    impl_.state = State::Ground(false);
+                    let ground = if !is_end_ok(c) {
+                        Ground::ZwjOrPrepend
+                    } else {
+                        Ground::Other
+                    };
+                    impl_.state = State::Ground(ground);
                     impl_.buffer.push(c);
                 }
 
@@ -346,8 +362,15 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         match internals.impl_().state {
-            State::Ground(true) => Ok(()),
-            State::Ground(false) => {
+            State::Ground(Ground::Newline) => Ok(()),
+            State::Ground(Ground::ZwjOrPrepend) => {
+                Self::reset_state(internals);
+                Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "output text stream closed after a ZWJ or Prepend",
+                ))
+            }
+            State::Ground(Ground::Other) => {
                 Self::reset_state(internals);
                 Err(io::Error::new(
                     io::ErrorKind::Other,
@@ -432,6 +455,13 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
     ) -> io::Result<()> {
         match internals.impl_().state {
+            State::Ground(Ground::ZwjOrPrepend) => {
+                Self::reset_state(internals);
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "output text stream flushed after a ZWJ or Prepend",
+                ));
+            }
             State::Ground(_) => (),
             State::Esc | State::Csi => {
                 return Err(io::Error::new(
@@ -475,7 +505,7 @@ impl TextOutput {
         nl: bool,
     ) {
         if nl {
-            internals.impl_().state = State::Ground(true);
+            internals.impl_().state = State::Ground(Ground::Newline);
         }
     }
 
@@ -483,13 +513,13 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
     ) {
         // Don't enforce a trailing newline.
-        internals.impl_().state = State::Ground(true);
+        internals.impl_().state = State::Ground(Ground::Newline);
     }
 }
 
 impl Drop for TextOutput {
     fn drop(&mut self) {
-        if let State::Ground(true) = self.state {
+        if let State::Ground(Ground::Newline) = self.state {
             // oll korrect
         } else {
             panic!("output text stream not ended with newline");
@@ -497,9 +527,18 @@ impl Drop for TextOutput {
     }
 }
 
+enum Ground {
+    // We just saw a '\n'.
+    Newline,
+    // We just as a ZWJ or a Prepend.
+    ZwjOrPrepend,
+    // Otherwise.
+    Other,
+}
+
 enum State {
-    // Default state. Boolean is true iff we just saw a '\n'.
-    Ground(bool),
+    // Default state.
+    Ground(Ground),
 
     // After a '\x1b'.
     Esc,
