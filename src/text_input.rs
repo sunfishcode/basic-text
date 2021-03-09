@@ -238,17 +238,17 @@ impl TextInput {
                     (State::Ground(_), '\n') => {
                         self.queue.push_back('\n');
                         self.expect_starter = false;
-                        self.state = State::Ground(true)
+                        self.state = State::Ground(true);
                     }
                     (State::Ground(_), '\t') => {
                         self.queue.push_back('\t');
                         self.expect_starter = false;
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
                     (State::Ground(_), FF) | (State::Ground(_), NEL) => {
                         self.queue.push_back(' ');
                         self.expect_starter = false;
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
                     (State::Ground(_), '\r') => self.state = State::Cr,
                     (State::Ground(_), ESC) => self.state = State::Esc,
@@ -262,7 +262,7 @@ impl TextInput {
                     (State::Ground(_), CGJ) => {
                         self.queue.push_back(CGJ);
                         self.expect_starter = false;
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
                     (State::Ground(_), mut c) => {
                         if self.expect_starter {
@@ -273,7 +273,7 @@ impl TextInput {
                         }
                         assert!(c != CGJ);
                         self.queue.push_back(c);
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
 
                     (State::Cr, '\n') => {
@@ -292,7 +292,7 @@ impl TextInput {
                     (State::Esc, ']') => self.state = State::Osc,
                     (State::Esc, ESC) => self.state = State::Esc,
                     (State::Esc, c) if matches!(c, '@'..='~' | CAN) => {
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
                     (State::Esc, _) => {
                         self.queue.push_back(REPL);
@@ -303,10 +303,10 @@ impl TextInput {
 
                     (State::CsiStart, '[') => self.state = State::Linux,
                     (State::CsiStart, c) | (State::Csi, c) if matches!(c, ' '..='?') => {
-                        self.state = State::Csi
+                        self.state = State::Csi;
                     }
                     (State::CsiStart, c) | (State::Csi, c) if matches!(c, '@'..='~') => {
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
                     (State::CsiStart, CAN) | (State::Csi, CAN) => self.state = State::Ground(false),
                     (State::CsiStart, _) | (State::Csi, _) => {
@@ -319,7 +319,7 @@ impl TextInput {
                     (State::Osc, _) => (),
 
                     (State::Linux, c) if matches!(c, '\0'..=DEL) => {
-                        self.state = State::Ground(false)
+                        self.state = State::Ground(false);
                     }
                     (State::Linux, _) => {
                         self.state = State::Ground(false);
@@ -458,7 +458,7 @@ impl TextInput {
 
         assert!(internals.impl_().queue.is_empty());
 
-        internals.inner_mut().abandon()
+        internals.inner_mut().abandon();
     }
 
     #[inline]

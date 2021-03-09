@@ -308,7 +308,7 @@ impl TextOutput {
 
                 (State::Ground(_), '\n') => {
                     impl_.state = State::Ground(true);
-                    impl_.buffer.push(c)
+                    impl_.buffer.push(c);
                 }
 
                 (State::Ground(_), SUB) => {
@@ -326,7 +326,7 @@ impl TextOutput {
                 // Common case: in ground state and reading a normal char.
                 (State::Ground(_), c) => {
                     impl_.state = State::Ground(false);
-                    impl_.buffer.push(c)
+                    impl_.buffer.push(c);
                 }
 
                 // Escape sequence not recognized.

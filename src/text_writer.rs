@@ -139,7 +139,7 @@ impl<Inner: WriteStr + WriteLayered> WriteText for TextWriter<Inner> {
 impl<Inner: WriteStr + WriteLayered> Bufferable for TextWriter<Inner> {
     #[inline]
     fn abandon(&mut self) {
-        TextOutput::abandon(self)
+        TextOutput::abandon(self);
     }
 
     #[inline]

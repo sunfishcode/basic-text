@@ -456,7 +456,8 @@ impl RestrictedStr {
     /// are valid Restricted Text.
     #[inline]
     pub unsafe fn from_text_unchecked(s: &str) -> &Self {
-        &*(s as *const str as *const Self)
+        let ptr: *const str = s;
+        &*ptr.cast::<const Self>()
     }
 
     /// Converts a slice of bytes to a text string slice without checking that
@@ -484,7 +485,8 @@ impl RestrictedStr {
     /// `&RestrictedStr`s are valid Restricted Text.
     #[inline]
     pub unsafe fn from_text_unchecked_mut(s: &mut str) -> &mut Self {
-        &mut *(s as *mut str as *mut Self)
+        let ptr: *mut str = s;
+        &mut *s.cast::<mut Self>()
     }
 
     /// Converts a boxed slice of bytes to a boxed text string slice without
@@ -498,7 +500,8 @@ impl RestrictedStr {
     /// are valid Restricted Text.
     #[inline]
     pub unsafe fn from_boxed_text_bytes_unchecked(v: Box<[u8]>) -> Box<Self> {
-        Box::from_raw(Box::into_raw(v) as *mut Self)
+        let ptr = Box::into_raw(v);
+        Box::from_raw(ptr.cast::<mut Self>())
     }
 
     /// Converts a boxed string slice to a boxed text string slice without
@@ -512,7 +515,8 @@ impl RestrictedStr {
     /// are valid Restricted Text.
     #[inline]
     pub unsafe fn from_boxed_text_unchecked(v: Box<str>) -> Box<Self> {
-        Box::from_raw(Box::into_raw(v) as *mut Self)
+        let ptr = Box::into_raw(v);
+        Box::from_raw(ptr.cast::<mut Self>())
     }
 
     /// Returns the length of `self`.
@@ -1004,14 +1008,16 @@ impl Error for FromRestrictedError {}
 impl From<Box<RestrictedStr>> for Box<[u8]> {
     #[inline]
     fn from(s: Box<RestrictedStr>) -> Self {
-        unsafe { Self::from_raw(Box::into_raw(s) as *mut [u8]) }
+        let ptr = Box::into_raw(s);
+        unsafe { Self::from_raw(ptr.cast<mut [u8]>()) }
     }
 }
 
 impl From<Box<RestrictedStr>> for Box<str> {
     #[inline]
     fn from(s: Box<RestrictedStr>) -> Self {
-        unsafe { Self::from_raw(Box::into_raw(s) as *mut str) }
+        let ptr = Box::into_raw(s);
+        unsafe { Self::from_raw(ptr.cast::<mut str>()) }
     }
 }
 

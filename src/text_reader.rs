@@ -69,7 +69,7 @@ impl<Inner: ReadStrLayered> ReadLayered for TextReader<Inner> {
 impl<Inner: ReadStrLayered> Bufferable for TextReader<Inner> {
     #[inline]
     fn abandon(&mut self) {
-        TextInput::abandon(self)
+        TextInput::abandon(self);
     }
 
     #[inline]

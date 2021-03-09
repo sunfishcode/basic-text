@@ -53,12 +53,14 @@ pub struct FromTextError {
 impl TextString {
     /// Creates a new empty `TextString`.
     #[inline]
+    #[must_use]
     pub const fn new() -> Self {
         Self(String::new())
     }
 
     /// Creates a new empty `TextString` with a particular capacity.
     #[inline]
+    #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
         Self(String::with_capacity(capacity))
     }
@@ -100,6 +102,7 @@ impl TextString {
 
     /// Converts a slice of bytes to Basic Text, including invalid characters.
     #[inline]
+    #[must_use]
     pub fn from_text_bytes_lossy(v: &[u8]) -> Cow<TextStr> {
         // TODO: optimize away the temporary String here
         Cow::Owned(Self::from_text_lossy(&String::from_utf8_lossy(v)).into_owned())
@@ -107,6 +110,7 @@ impl TextString {
 
     /// Converts a string to Basic Text, including invalid characters.
     #[inline]
+    #[must_use]
     pub fn from_text_lossy(mut v: &str) -> Cow<TextStr> {
         // TODO: If `v` is already valid, fast-path to `Cow::Borrowed(v)`.
         // TODO: Also, this currently redoes UTF-8 validation for `v`.
@@ -143,6 +147,7 @@ impl TextString {
     /// behavior results, as the rest of this crate assumes that `&TextStr`s
     /// are valid Basic Text.
     #[inline]
+    #[must_use]
     pub unsafe fn from_text_vec_unchecked(vec: Vec<u8>) -> Self {
         Self::from_text_unchecked(String::from_utf8_unchecked(vec))
     }
@@ -157,42 +162,49 @@ impl TextString {
     /// behavior results, as the rest of this crate assumes that `&TextStr`s
     /// are valid Basic Text.
     #[inline]
+    #[must_use]
     pub const unsafe fn from_text_unchecked(s: String) -> Self {
         Self(s)
     }
 
     /// Converts a `TextString` into a `String`.
     #[inline]
+    #[must_use]
     pub fn into_utf8(self) -> String {
         self.0
     }
 
     /// Converts a String into a byte vector.
     #[inline]
+    #[must_use]
     pub fn into_bytes(self) -> Vec<u8> {
         self.0.into_bytes()
     }
 
     /// Extracts a UTF-8 string slice containing the entire `TextString`.
     #[inline]
+    #[must_use]
     pub fn as_utf8(&self) -> &str {
         &self.0
     }
 
     /// Extracts a Basic Text string slice containing the entire `TextString`.
     #[inline]
+    #[must_use]
     pub fn as_str(&self) -> &TextStr {
         self
     }
 
     /// Converts a `TextString` into a mutable UTF-8 string slice.
     #[inline]
+    #[must_use]
     pub fn as_mut_utf8(&mut self) -> &mut str {
         &mut self.0
     }
 
     /// Converts a `TextString` into a mutable Basic Text string slice.
     #[inline]
+    #[must_use]
     pub fn as_mut_str(&mut self) -> &mut TextStr {
         self
     }
@@ -209,6 +221,7 @@ impl TextString {
 
     /// Returns this `TextString`'s capacity, in bytes.
     #[inline]
+    #[must_use]
     pub fn capacity(&self) -> usize {
         self.0.capacity()
     }
@@ -217,14 +230,14 @@ impl TextString {
     /// bytes larger than its length.
     #[inline]
     pub fn reserve(&mut self, additional: usize) {
-        self.0.reserve(additional)
+        self.0.reserve(additional);
     }
 
     /// Ensures that this `TextString`'s capacity is `additional` bytes larger
     /// than its length.
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
-        self.0.reserve_exact(additional)
+        self.0.reserve_exact(additional);
     }
 
     /// Tries to reserve capacity for at least `additional` more elements to
@@ -246,14 +259,14 @@ impl TextString {
     /// Shrinks the capacity of this `TextString` to match its length.
     #[inline]
     pub fn shrink_to_fit(&mut self) {
-        self.0.shrink_to_fit()
+        self.0.shrink_to_fit();
     }
 
     /// Shrinks the capacity of this `String` with a lower bound.
     #[cfg(shrink_to)]
     #[inline]
     pub fn shrink_to(&mut self, min_capacity: usize) {
-        self.0.shrink_to(min_capacity)
+        self.0.shrink_to(min_capacity);
     }
 
     // TODO: push? But think about how to maintain NFC and other guarantees
@@ -299,7 +312,7 @@ impl TextString {
     /// Truncates this `String`, removing all contents.
     #[inline]
     pub fn clear(&mut self) {
-        self.0.clear()
+        self.0.clear();
     }
 
     // TODO: drain, replace_range?
@@ -341,7 +354,7 @@ fn compute_valid_str_up_to(s: &str) -> usize {
             }
         }
         let substr = &s[..mid];
-        match TextString::from_text(substr.to_string()) {
+        match TextString::from_text(substr.to_owned()) {
             Ok(text_string) if text_string.as_utf8() == substr => begin = mid,
             _ => end = mid,
         }
@@ -483,7 +496,7 @@ impl Add<&TextStr> for TextString {
 impl AddAssign<&TextStr> for TextString {
     #[inline]
     fn add_assign(&mut self, other: &TextStr) {
-        self.push_str(other)
+        self.push_str(other);
     }
 }
 
@@ -549,11 +562,11 @@ impl TextStr {
     #[inline]
     pub fn from_text(s: &str) -> Result<&Self, TextError> {
         // TODO: Do this without constructing temporaries.
-        let text_string = TextString::from_text(s.to_string()).map_err(|e| e.text_error())?;
+        let text_string = TextString::from_text(s.to_owned()).map_err(|e| e.text_error())?;
 
         // If any bytes got rewritten (eg. by normalization), fail.
         if text_string.as_utf8() != s {
-            let valid_up_to = compute_valid_str_up_to(&s);
+            let valid_up_to = compute_valid_str_up_to(s);
             return Err(TextError { valid_up_to });
         }
 
@@ -570,11 +583,11 @@ impl TextStr {
     #[inline]
     pub fn from_text_mut(s: &mut str) -> Result<&mut Self, TextError> {
         // TODO: Do this without constructing temporaries.
-        let text_string = TextString::from_text(s.to_string()).map_err(|e| e.text_error())?;
+        let text_string = TextString::from_text(s.to_owned()).map_err(|e| e.text_error())?;
 
         // If any bytes got rewritten (eg. by normalization), fail.
         if text_string.as_utf8() != s {
-            let valid_up_to = compute_valid_str_up_to(&s);
+            let valid_up_to = compute_valid_str_up_to(s);
             return Err(TextError { valid_up_to });
         }
 
@@ -606,7 +619,8 @@ impl TextStr {
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_text_unchecked(s: &str) -> &Self {
-        &*(s as *const str as *const Self)
+        let ptr: *const str = s;
+        &*(ptr as *const Self)
     }
 
     /// Converts a slice of bytes to a text string slice without checking that
@@ -634,7 +648,8 @@ impl TextStr {
     /// `&TextStr`s are valid Basic Text.
     #[inline]
     pub unsafe fn from_text_unchecked_mut(s: &mut str) -> &mut Self {
-        &mut *(s as *mut str as *mut Self)
+        let ptr: *mut str = s;
+        &mut *(ptr as *mut Self)
     }
 
     /// Converts a boxed slice of bytes to a boxed text string slice without
@@ -648,7 +663,8 @@ impl TextStr {
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_boxed_text_bytes_unchecked(v: Box<[u8]>) -> Box<Self> {
-        Box::from_raw(Box::into_raw(v) as *mut Self)
+        let ptr = Box::into_raw(v);
+        Box::from_raw(ptr as *mut Self)
     }
 
     /// Converts a boxed string slice to a boxed text string slice without
@@ -662,7 +678,8 @@ impl TextStr {
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_boxed_text_unchecked(v: Box<str>) -> Box<Self> {
-        Box::from_raw(Box::into_raw(v) as *mut Self)
+        let ptr = Box::into_raw(v);
+        Box::from_raw(ptr as *mut Self)
     }
 
     /// Returns the length of `self`.
@@ -1160,14 +1177,16 @@ impl Error for FromTextError {}
 impl From<Box<TextStr>> for Box<[u8]> {
     #[inline]
     fn from(s: Box<TextStr>) -> Self {
-        unsafe { Self::from_raw(Box::into_raw(s) as *mut [u8]) }
+        let ptr = Box::into_raw(s);
+        unsafe { Self::from_raw(ptr as *mut [u8]) }
     }
 }
 
 impl From<Box<TextStr>> for Box<str> {
     #[inline]
     fn from(s: Box<TextStr>) -> Self {
-        unsafe { Self::from_raw(Box::into_raw(s) as *mut str) }
+        let ptr = Box::into_raw(s);
+        unsafe { Self::from_raw(ptr as *mut str) }
     }
 }
 
