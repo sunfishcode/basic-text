@@ -55,6 +55,8 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             c @ '\u{2df5}' | c @ '\u{111c4}' => self.discouraged_character(c),
             // Latin Ligatures
             c @ '\u{fb00}' ..= '\u{fb06}' => self.latin_ligature(c),
+            // Markup Characters
+            c @ '\u{2028}' | c @ '\u{2029}' => self.markup_character(c),
             // Noncharacters
             c @ '\u{fffe}'..='\u{ffff}'
             | c @ '\u{1fffe}'..='\u{1ffff}'
@@ -198,6 +200,14 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Tag character written to text output stream: {:?}", c),
+        ))
+    }
+
+    #[cold]
+    fn markup_character(&mut self, c: char) -> char {
+        self.record_error(io::Error::new(
+            io::ErrorKind::Other,
+            format!("Markup character written to text output stream: {:?}", c),
         ))
     }
 

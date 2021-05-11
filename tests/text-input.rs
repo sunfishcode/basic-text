@@ -151,6 +151,10 @@ fn test_text_input_rules() {
     // Replace U+17A4 with U+17A2 U+17B6.
     assert_eq!(to_text("\u{17a4}"), "\u{17a2}\u{17b6}\n");
 
+    // Replace U+2028 and U+2029 with U+20.
+    assert_eq!(to_text("\u{2028}"), " \n");
+    assert_eq!(to_text("\u{2029}"), " \n");
+
     // At the end of the stream, if any scalar values were transmitted and the
     // last scalar value is not U+000A, after replacements, a U+000A is
     // appended.

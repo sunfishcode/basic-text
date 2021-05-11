@@ -95,6 +95,7 @@ fn test_text_output_rules() {
     for c in &[
         '\u{7}', '\u{c}', '\u{1b}', '\u{feff}', '\u{149}', '\u{0673}', '\u{0F77}', '\u{0F79}',
         '\u{17a3}', '\u{17a4}', '\u{2329}', '\u{232a}', '\u{2126}', '\u{212a}', '\u{212b}',
+        '\u{2028}', '\u{2029}',
     ] {
         assert_eq!(
             to_text(&format!("{}\n", c)).unwrap_err().kind(),
