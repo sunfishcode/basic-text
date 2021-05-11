@@ -32,15 +32,65 @@ use utf8_io::{Utf8Reader, Utf8Writer, WriteStr};
 ///
 /// This is an owning string similar to [`String`], but ensures the contents
 /// are Basic Text rather than just UTF-8. It's accompanied by a borrowing
-/// [`TextStr`], which plays an analogous role [`str`].
+/// [`TextStr`], which plays an analogous role to [`prim@str`].
+///
+/// # Examples
+///
+/// You can create a `TextString` from a literal text string with `TextString::from`:
+///
+/// ```rust
+/// use basic_text::{text, TextString};
+///
+/// let hello = TextString::from(text!("Hello, world!"));
+/// ```
+///
+/// You can append a `&TextStr` with the `push_text` method:
+///
+/// ```rust
+/// use basic_text::{text, TextString};
+///
+/// let mut hello = TextString::from(text!("Hello, "));
+///
+/// hello.push_text(text!("world!"));
+/// ```
+///
+/// If you have a `String` containing a Basic Text string, you can create a
+/// `TextString` from it with the `from_text` method:
+///
+/// ```rust
+/// use basic_text::{text, TextString};
+///
+/// // a `String`
+/// let sparkle_heart = "💖".to_owned();
+///
+/// // We know this string is valid, so we'll use `unwrap()`.
+/// let sparkle_heart = TextString::from_text(sparkle_heart).unwrap();
+///
+/// assert_eq!(text!("💖"), &sparkle_heart);
+/// ```
+///
+/// If you have a vector of Basic Text bytes, you can create a `String` from it
+/// with the `from_text_vec` method:
+///
+/// ```rust
+/// use basic_text::{text, TextString};
+///
+/// // some bytes, in a vector
+/// let sparkle_heart = vec![240, 159, 146, 150];
+///
+/// // We know these bytes are valid, so we'll use `unwrap()`.
+/// let sparkle_heart = TextString::from_text_vec(sparkle_heart).unwrap();
+///
+/// assert_eq!(text!("💖"), &sparkle_heart);
+/// ```
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
 pub struct TextString(String);
 
 /// Text slices.
 ///
-/// `TextStr` is to `TextString` as [`str`] is to `String`. It is usually used
-/// for borrowing, in the form of `&TextStr`.
+/// `TextStr` is to `TextString` as [`prim@str`] is to `String`. It is usually
+/// used for borrowing, in the form of `&TextStr`.
 ///
 /// # Examples
 ///
@@ -235,11 +285,11 @@ impl TextString {
 
     /// Appends a given string slice onto the end of this `TextString`.
     ///
-    /// But wait, NFC isn't closed under concatenation! This is true, but
+    /// But wait, isn't NFC closed under concatenation? This is true, but
     /// Basic Text has additional restrictions, including that strings start
-    /// with non-combining codepoints, so it is closed under concatenation.
+    /// with non-combining codepoints, so it *is* closed under concatenation.
     #[inline]
-    pub fn push_str(&mut self, s: &TextStr) {
+    pub fn push_text(&mut self, s: &TextStr) {
         self.0.push_str(&s.0);
     }
 
@@ -349,7 +399,7 @@ impl TextString {
 
     /// Converts this `TextString` into a `Box<TextStr>`.
     #[inline]
-    pub fn into_boxed_str(self) -> Box<TextStr> {
+    pub fn into_boxed_text(self) -> Box<TextStr> {
         let slice = self.into_boxed_utf8();
         unsafe { TextStr::from_boxed_text_unchecked(slice) }
     }
@@ -480,7 +530,7 @@ impl Add<&TextStr> for TextString {
 
     #[inline]
     fn add(mut self, other: &TextStr) -> Self::Output {
-        self.push_str(other);
+        self.push_text(other);
         self
     }
 }
@@ -488,7 +538,28 @@ impl Add<&TextStr> for TextString {
 impl AddAssign<&TextStr> for TextString {
     #[inline]
     fn add_assign(&mut self, other: &TextStr) {
-        self.push_str(other);
+        self.push_text(other);
+    }
+}
+
+impl PartialEq<TextStr> for str {
+    #[inline]
+    fn eq(&self, other: &TextStr) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<&'a TextStr> for String {
+    #[inline]
+    fn eq(&self, other: &&'a TextStr) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<&'a str> for TextString {
+    #[inline]
+    fn eq(&self, other: &&'a str) -> bool {
+        self.0.eq(other)
     }
 }
 
@@ -506,6 +577,20 @@ impl<'a> PartialEq<Cow<'a, TextStr>> for TextString {
     }
 }
 
+impl<'a> PartialEq<Cow<'a, str>> for TextString {
+    #[inline]
+    fn eq(&self, other: &Cow<'a, str>) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl<'a, 'b> PartialEq<Cow<'a, str>> for &'b TextStr {
+    #[inline]
+    fn eq(&self, other: &Cow<'a, str>) -> bool {
+        self.0.eq(other)
+    }
+}
+
 impl<'a> PartialEq<TextString> for Cow<'a, TextStr> {
     #[inline]
     fn eq(&self, other: &TextString) -> bool {
@@ -513,21 +598,56 @@ impl<'a> PartialEq<TextString> for Cow<'a, TextStr> {
     }
 }
 
-impl<'a> PartialEq<str> for TextString {
+impl<'a> PartialEq<TextString> for Cow<'a, str> {
+    #[inline]
+    fn eq(&self, other: &TextString) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<TextStr> for Cow<'a, TextStr> {
+    #[inline]
+    fn eq(&self, other: &TextStr) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
+impl<'a, 'b> PartialEq<&'b TextStr> for Cow<'a, str> {
+    #[inline]
+    fn eq(&self, other: &&TextStr) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl<'a, 'b> PartialEq<&'b TextStr> for Cow<'a, TextStr> {
+    #[inline]
+    fn eq(&self, other: &&TextStr) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
+impl PartialEq<str> for TextString {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<String> for TextString {
+impl PartialEq<String> for TextString {
     #[inline]
     fn eq(&self, other: &String) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<TextString> for String {
+impl<'a> PartialEq<TextStr> for Cow<'a, str> {
+    #[inline]
+    fn eq(&self, other: &TextStr) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl PartialEq<TextString> for String {
     #[inline]
     fn eq(&self, other: &TextString) -> bool {
         self.eq(&other.0)
@@ -538,6 +658,41 @@ impl<'a> PartialEq<TextString> for &'a str {
     #[inline]
     fn eq(&self, other: &TextString) -> bool {
         self.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<TextString> for &'a TextStr {
+    #[inline]
+    fn eq(&self, other: &TextString) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl<'a> PartialEq<String> for &'a TextStr {
+    #[inline]
+    fn eq(&self, other: &String) -> bool {
+        self.eq(&other)
+    }
+}
+
+impl PartialEq<TextString> for str {
+    #[inline]
+    fn eq(&self, other: &TextString) -> bool {
+        self.eq(&other.0)
+    }
+}
+
+impl PartialEq<TextStr> for TextString {
+    #[inline]
+    fn eq(&self, other: &TextStr) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl PartialEq<TextString> for TextStr {
+    #[inline]
+    fn eq(&self, other: &TextString) -> bool {
+        self.0.eq(&other.0)
     }
 }
 
@@ -938,13 +1093,13 @@ impl TextStr {
     /// allocating.
     #[inline]
     pub fn into_boxed_bytes(self: Box<Self>) -> Box<[u8]> {
-        self.into_boxed_str().into_boxed_bytes()
+        self.into_boxed_text().into_boxed_bytes()
     }
 
     /// Converts a `Box<TextStr>` into a `Box<str>` without copying or
     /// allocating.
     #[inline]
-    pub fn into_boxed_str(self: Box<Self>) -> Box<str> {
+    pub fn into_boxed_text(self: Box<Self>) -> Box<str> {
         self.into()
     }
 
@@ -958,7 +1113,7 @@ impl TextStr {
     /// Converts a `Box<TextStr>` into a `TextString` without copying or
     /// allocating.
     #[inline]
-    pub fn into_string(self: Box<Self>) -> TextString {
+    pub fn into_text_string(self: Box<Self>) -> TextString {
         unsafe { TextString::from_text_unchecked(Self::into_utf8(self)) }
     }
 
@@ -1046,30 +1201,42 @@ impl<'a, 'b> PartialEq<Cow<'a, TextStr>> for &'b TextStr {
     }
 }
 
-impl<'a> PartialEq<str> for TextStr {
+impl<'a> PartialEq<Cow<'a, str>> for TextStr {
+    #[inline]
+    fn eq(&self, other: &Cow<'a, str>) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl PartialEq<str> for TextStr {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<String> for TextStr {
+impl PartialEq<String> for TextStr {
     #[inline]
     fn eq(&self, other: &String) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<TextStr> for String {
+impl PartialEq<TextStr> for String {
     #[inline]
     fn eq(&self, other: &TextStr) -> bool {
         self.eq(&other.0)
     }
 }
 
-// TODO: all the PartialEq impls for TextStr
-
 impl PartialOrd<Self> for TextStr {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.partial_cmp(&other.0)
+    }
+}
+
+impl PartialOrd<Self> for TextString {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
@@ -1177,7 +1344,7 @@ impl From<Box<TextStr>> for Box<str> {
 impl From<Box<TextStr>> for TextString {
     #[inline]
     fn from(s: Box<TextStr>) -> Self {
-        s.into_string()
+        s.into_text_string()
     }
 }
 
@@ -1215,7 +1382,7 @@ impl From<Cow<'_, TextStr>> for Box<TextStr> {
 impl From<TextString> for Box<TextStr> {
     #[inline]
     fn from(s: TextString) -> Self {
-        s.into_boxed_str()
+        s.into_boxed_text()
     }
 }
 
