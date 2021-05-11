@@ -9,8 +9,7 @@ use std::{
     io::{Read, Write},
     str,
 };
-use unicode_normalization::UnicodeNormalization;
-use utf8_io::{Utf8Reader, Utf8Writer, WriteStr};
+use utf8_io::{Utf8Reader, Utf8Writer};
 
 fuzz_target!(|bytes: &[u8]| {
     let mut reader = TextReader::new(Utf8Reader::new(SliceReader::new(bytes)));
@@ -41,23 +40,49 @@ fuzz_target!(|bytes: &[u8]| {
 
     // Writing it back out to a text writer should either preserve the bytes,
     // or report an error.
-    writer.write_str(&s).unwrap();
     let inner = writer
-        .close_into_inner()
-        .unwrap()
-        .close_into_inner()
-        .unwrap()
-        .close_into_inner();
+        .write_all(bytes)
+        .and_then(|()| writer.close_into_inner())
+        .and_then(|writer| writer.close_into_inner())
+        .and_then(|writer| writer.close_into_inner());
     match inner {
         Ok(written) => {
-            assert_eq!(&s, str::from_utf8(&written).unwrap());
+            assert_eq!(
+                &s,
+                str::from_utf8(&written).unwrap(),
+                "writer wrote something different than reader"
+            );
+            TextStr::from_text(str::from_utf8(&written).unwrap())
+                .expect("TextStr didn't accept otput from writer");
         }
         Err(e) => {
-            assert!(false, e);
+            // Writer failed; check that the reader transformed something. Use `str`
+            // comparisons when we can, to get prettier assertion failures.
             if let Ok(utf8) = str::from_utf8(&bytes) {
-                assert_ne!(&s, utf8);
+                assert_ne!(
+                    &s, utf8,
+                    "writer failed with '{:?}', but reader didn't transform anything",
+                    e
+                );
+                if utf8.ends_with('\n') {
+                    TextStr::from_text(utf8).expect_err(&format!(
+                        "writer failed with '{:?}', but TextStr accepted it",
+                        e
+                    ));
+                }
             } else {
-                assert_ne!(s.as_bytes(), bytes);
+                assert_ne!(
+                    s.as_bytes(),
+                    bytes,
+                    "writer failed with '{:?}', but reader didn't transform anything",
+                    e
+                );
+                if bytes.ends_with(&[b'\n']) {
+                    TextStr::from_text_bytes(bytes).expect_err(&format!(
+                        "writer failed with '{:?}', but TextStr accepted it",
+                        e
+                    ));
+                }
             }
         }
     }
