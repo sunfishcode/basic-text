@@ -2,7 +2,7 @@
 
 use crate::{
     categorize::Categorize,
-    text_utils::{is_end_ok, is_start_ok},
+    text_utils::{is_basic_text_end, is_basic_text_start},
     unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
     TextDuplexer, TextStr, TextWriter,
 };
@@ -217,7 +217,7 @@ impl TextOutput {
         impl_.buffer.push_str(s);
         let ground = match s.chars().next_back() {
             None | Some('\n') => Ground::Newline,
-            Some(c) if !is_end_ok(c) => Ground::ZwjOrPrepend,
+            Some(c) if !is_basic_text_end(c) => Ground::ZwjOrPrepend,
             _ => Ground::Other,
         };
         impl_.state = State::Ground(ground);
@@ -246,7 +246,7 @@ impl TextOutput {
             impl_.buffer.push_str(slice);
             let ground = match slice.chars().next_back() {
                 None | Some('\n') => Ground::Newline,
-                Some(c) if !is_end_ok(c) => Ground::ZwjOrPrepend,
+                Some(c) if !is_basic_text_end(c) => Ground::ZwjOrPrepend,
                 _ => Ground::Other,
             };
             impl_.state = State::Ground(ground);
@@ -262,7 +262,7 @@ impl TextOutput {
         if internals.impl_().expect_starter {
             internals.impl_().expect_starter = false;
             if let Some(c) = internals.impl_().buffer.chars().next() {
-                if !is_start_ok(c) {
+                if !is_basic_text_start(c) {
                     Self::reset_state(internals);
                     return Err(io::Error::new(
                         io::ErrorKind::Other,
@@ -331,12 +331,16 @@ impl TextOutput {
                 }
 
                 (State::Ground(_), ESC) => {
-                    impl_.state = State::Esc;
+                    Self::reset_state(internals);
+                    return Err(io::Error::new(
+                        io::ErrorKind::Other,
+                        format!("escape control code"),
+                    ));
                 }
 
                 // Common case: in ground state and reading a normal char.
                 (State::Ground(_), c) => {
-                    let ground = if !is_end_ok(c) {
+                    let ground = if !is_basic_text_end(c) {
                         Ground::ZwjOrPrepend
                     } else {
                         Ground::Other

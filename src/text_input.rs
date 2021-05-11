@@ -2,7 +2,7 @@
 
 use crate::{
     replace_selected::ReplaceSelected,
-    text_utils::{is_end_ok, is_start_ok},
+    text_utils::{is_basic_text_end, is_basic_text_start},
     unicode::{
         BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, REPL,
     },
@@ -262,7 +262,7 @@ impl TextInput {
                     (State::Ground(_), mut c) => {
                         if self.expect_starter {
                             self.expect_starter = false;
-                            if !is_start_ok(c) {
+                            if !is_basic_text_start(c) {
                                 c = REPL;
                             }
                         }
@@ -393,7 +393,7 @@ impl TextInput {
 
             // If the stream ends in a non-ending char, append a REPL.
             if let Some(last) = internals.impl_().queue.back() {
-                if !is_end_ok(*last) {
+                if !is_basic_text_end(*last) {
                     internals.impl_().queue.push_back(REPL);
                 }
             }

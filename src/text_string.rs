@@ -1,4 +1,5 @@
 use crate::{
+    text_utils::is_basic_text,
     unicode::{BOM, WJ},
     TextReader, TextWriter,
 };
@@ -28,11 +29,18 @@ use std::{
 use utf8_io::{Utf8Reader, Utf8Writer, WriteStr};
 
 /// A Basic Text encoded, growable string.
+///
+/// This is an owning string similar to [`String`], but ensures the contents
+/// are Basic Text rather than just UTF-8. It's accompanied by a borrowing
+/// [`TextStr`], which plays an analogous role [`str`].
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
 pub struct TextString(String);
 
-/// `TextStr` is to `TextString` as `str` is to `String`.
+/// Text slices.
+///
+/// `TextStr` is to `TextString` as [`str`] is to `String`. It is usually used
+/// for borrowing, in the form of `&TextStr`.
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
 pub struct TextStr(str);
@@ -81,7 +89,7 @@ impl TextString {
             Ok(()) => (),
             Err(_err) => {
                 writer.abandon();
-                let valid_up_to = compute_valid_string_up_to(&s);
+                let valid_up_to = compute_valid_up_to(&s);
                 return Err(FromTextError {
                     bytes: s.into_bytes(),
                     error: TextError { valid_up_to },
@@ -332,7 +340,7 @@ impl TextString {
 }
 
 #[cold]
-fn compute_valid_str_up_to(s: &str) -> usize {
+fn compute_valid_up_to(s: &str) -> usize {
     // Binary search in `s` for the place where the error starts. We do
     // this after the fact rather than tracking the positions of everything
     // as we go, because tracking the positions through multiple iterators
@@ -354,43 +362,11 @@ fn compute_valid_str_up_to(s: &str) -> usize {
             }
         }
         let substr = &s[..mid];
-        match TextString::from_text(substr.to_owned()) {
-            Ok(text_string) if text_string.as_utf8() == substr => begin = mid,
-            _ => end = mid,
+        if is_basic_text(substr) {
+            begin = mid;
+        } else {
+            end = mid;
         }
-    }
-    begin
-}
-
-#[cold]
-fn compute_valid_string_up_to(s: &String) -> usize {
-    // Binary search in `s` for the place where the error starts. We do
-    // this after the fact rather than tracking the positions of everything
-    // as we go, because tracking the positions through multiple iterators
-    // is complex.
-    let mut begin = 0;
-    let mut end = s.len();
-    while begin != end {
-        let bytes = Vec::new();
-        let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(bytes)));
-        let mut mid = begin + (end - begin) / 2;
-        while !s.is_char_boundary(mid) {
-            mid -= 1;
-        }
-        if mid == begin {
-            mid = begin + (end - begin) / 2 + 1;
-            while !s.is_char_boundary(mid) {
-                mid += 1;
-            }
-            if mid == end {
-                break;
-            }
-        }
-        match writer.write_str(&s[..mid]).and_then(|()| writer.flush()) {
-            Ok(()) => begin = mid,
-            Err(_err) => end = mid,
-        }
-        writer.abandon();
     }
     begin
 }
@@ -561,12 +537,8 @@ impl TextStr {
     /// Converts a string slice to a text string slice.
     #[inline]
     pub fn from_text(s: &str) -> Result<&Self, TextError> {
-        // TODO: Do this without constructing temporaries.
-        let text_string = TextString::from_text(s.to_owned()).map_err(|e| e.text_error())?;
-
-        // If any bytes got rewritten (eg. by normalization), fail.
-        if text_string.as_utf8() != s {
-            let valid_up_to = compute_valid_str_up_to(s);
+        if !is_basic_text(s) {
+            let valid_up_to = compute_valid_up_to(s);
             return Err(TextError { valid_up_to });
         }
 
@@ -582,12 +554,8 @@ impl TextStr {
     /// Converts a mutable string slice to a mutable text string slice.
     #[inline]
     pub fn from_text_mut(s: &mut str) -> Result<&mut Self, TextError> {
-        // TODO: Do this without constructing temporaries.
-        let text_string = TextString::from_text(s.to_owned()).map_err(|e| e.text_error())?;
-
-        // If any bytes got rewritten (eg. by normalization), fail.
-        if text_string.as_utf8() != s {
-            let valid_up_to = compute_valid_str_up_to(s);
+        if !is_basic_text(s) {
+            let valid_up_to = compute_valid_up_to(s);
             return Err(TextError { valid_up_to });
         }
 
