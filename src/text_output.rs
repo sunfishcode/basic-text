@@ -332,10 +332,7 @@ impl TextOutput {
 
                 (State::Ground(_), ESC) => {
                     Self::reset_state(internals);
-                    return Err(io::Error::new(
-                        io::ErrorKind::Other,
-                        format!("escape control code"),
-                    ));
+                    return Err(io::Error::new(io::ErrorKind::Other, "escape control code"));
                 }
 
                 // Common case: in ground state and reading a normal char.
