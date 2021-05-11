@@ -1,12 +1,12 @@
 //! Input for `TextReader` and the reader half of `TextDuplexer`.
 
-use crate::{
-    replace_selected::ReplaceSelected,
-    text_utils::{is_basic_text_end, is_basic_text_start},
+use crate::{TextDuplexer, TextReader, TextStr};
+use basic_text_internals::{
+    is_basic_text_end, is_basic_text_start,
     unicode::{
         BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, REPL,
     },
-    TextDuplexer, TextReader, TextStr,
+    ReplaceSelected,
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{

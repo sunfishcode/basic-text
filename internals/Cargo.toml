@@ -1,0 +1,15 @@
+[package]
+name = "basic-text-internals"
+version = "0.2.6-alpha.0"
+description = "Basic Text string literal implementation details"
+authors = ["Dan Gohman <dev@sunfishcode.online>"]
+edition = "2018"
+license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
+repository = "https://github.com/sunfishcode/basic-text"
+
+[dependencies]
+ucd = "0.1.1"
+unicode-normalization = "0.1.17"
+
+[badges]
+maintenance = { status = "actively-developed" }

@@ -190,7 +190,7 @@ fn translate_via_slice_reader(bytes: &[u8]) -> String {
 fn translate_with_small_buffer(bytes: &[u8]) -> String {
     let mut reader = TextReader::new(Utf8Reader::new(layered_io::LayeredReader::new(bytes)));
     let mut v = Vec::new();
-    let mut buf = [0; crate::unicode::NORMALIZATION_BUFFER_SIZE];
+    let mut buf = [0; basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE];
     loop {
         let size = match reader.read(&mut buf) {
             Ok(0) => break,
@@ -207,7 +207,7 @@ fn translate_with_small_buffer(bytes: &[u8]) -> String {
 fn translate_with_small_buffer_layered(bytes: &[u8]) -> String {
     let mut reader = TextReader::new(Utf8Reader::new(layered_io::SliceReader::new(bytes)));
     let mut v = Vec::new();
-    let mut buf = [0; crate::unicode::NORMALIZATION_BUFFER_SIZE];
+    let mut buf = [0; basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE];
     loop {
         let (size, status) = reader.read_with_status(&mut buf).unwrap();
         v.extend_from_slice(&buf[..size]);

@@ -1,7 +1,7 @@
-use crate::{
-    text_utils::is_basic_text,
+use crate::{TextReader, TextWriter};
+use basic_text_internals::{
+    is_basic_text,
     unicode::{BOM, WJ},
-    TextReader, TextWriter,
 };
 use layered_io::{Bufferable, LayeredReader, LayeredWriter};
 #[cfg(try_reserve)]
@@ -41,6 +41,22 @@ pub struct TextString(String);
 ///
 /// `TextStr` is to `TextString` as [`str`] is to `String`. It is usually used
 /// for borrowing, in the form of `&TextStr`.
+///
+/// # Examples
+///
+/// Text literals are text slices:
+///
+/// ```rust
+/// use basic_text::{text, TextStr};
+///
+/// let hello = text!("Hello, world!");
+///
+/// // with an explicit type annotation
+/// let hello: &'static TextStr = text!("Hello, world!");
+/// ```
+///
+/// They are 'static because they’re stored directly in the final binary, and so
+/// will be valid for the 'static duration.
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
 pub struct TextStr(str);

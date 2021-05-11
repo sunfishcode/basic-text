@@ -4,7 +4,7 @@
 use crate::unicode::{BOM, ESC, ORC, SUB};
 use std::{cell::RefCell, io, rc::Rc};
 
-pub(crate) struct Categorize<Iter: Iterator<Item = char>> {
+pub struct Categorize<Iter: Iterator<Item = char>> {
     iter: Iter,
 
     // Because we wrap this iterator in the NFC etc. iterator chain, it has
@@ -16,7 +16,7 @@ pub(crate) struct Categorize<Iter: Iterator<Item = char>> {
 
 impl<Iter: Iterator<Item = char>> Categorize<Iter> {
     #[inline]
-    pub(crate) fn new(iter: Iter, error: Rc<RefCell<Option<io::Error>>>) -> Self {
+    pub fn new(iter: Iter, error: Rc<RefCell<Option<io::Error>>>) -> Self {
         Self { iter, error }
     }
 

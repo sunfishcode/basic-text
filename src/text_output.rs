@@ -1,10 +1,10 @@
 //! Output for `TextWriter` and the writer half of `TextDuplexer`.
 
-use crate::{
-    categorize::Categorize,
-    text_utils::{is_basic_text_end, is_basic_text_start},
+use crate::{TextDuplexer, TextStr, TextWriter};
+use basic_text_internals::{
+    is_basic_text_end, is_basic_text_start,
     unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
-    TextDuplexer, TextStr, TextWriter,
+    Categorize,
 };
 #[cfg(can_vector)]
 use layered_io::default_is_write_vectored;

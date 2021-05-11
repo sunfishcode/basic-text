@@ -6,7 +6,7 @@ use crate::unicode::{BOM, LS, ORC, PS, REPL, WJ};
 
 /// An iterator over `char`s which replaces occurrences of
 /// characters that have replacement sequences.
-pub(crate) struct ReplaceSelected<Inner: Iterator<Item = char>> {
+pub struct ReplaceSelected<Inner: Iterator<Item = char>> {
     inner: Inner,
 
     /// At this time, the longest replacement sequence is 3 USVs,
@@ -17,7 +17,7 @@ pub(crate) struct ReplaceSelected<Inner: Iterator<Item = char>> {
 
 impl<Inner: Iterator<Item = char>> ReplaceSelected<Inner> {
     #[inline]
-    pub(crate) fn new(inner: Inner) -> Self {
+    pub fn new(inner: Inner) -> Self {
         Self {
             inner,
             buffer: None,
