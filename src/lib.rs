@@ -1,4 +1,20 @@
 //! Basic Text strings and I/O streams
+//!
+//! This crate provides several utilities for working with [Basic Text].
+//!
+//!  - [`TextString`] and [`TextStr`] are similar to the standard library's [`String`]
+//!    and [`str`], but use the Basic Text string format, along with a `text!("...")`
+//!    [macro] for Basic Text string literals.
+//!
+//!  - [`TextReader`] and [`TextWriter`] are input and output streams which use the
+//!    Basic Text stream format. On input, content is converted in a way which is
+//!    lossy with respect to the original bytestream. Output uses the "strict"
+//!    conversion method, in which invalid content is diagnosed with errors.
+//!
+//!  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
+//!    stream using Basic Text.
+//!
+//! [Basic Text format]: https://github.com/sunfishcode/basic-text/blob/main/docs/BasicText.md#basic-text
 
 #![deny(missing_docs)]
 #![cfg_attr(can_vector, feature(can_vector))]
