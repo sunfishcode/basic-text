@@ -1,3 +1,4 @@
+use crate::{default_read_to_text_string, TextString};
 use layered_io::Status;
 use std::io;
 use utf8_io::{ReadStr, ReadStrLayered};
@@ -14,6 +15,12 @@ pub trait ReadText: ReadStr {
     #[inline]
     fn read_exact_text(&mut self, buf: &mut str) -> io::Result<()> {
         default_read_exact_text(self, buf)
+    }
+
+    /// Like `read_to_string`, but reads into a `TextString`.
+    #[inline]
+    fn read_to_text_string(&mut self, buf: &mut TextString) -> io::Result<usize> {
+        default_read_to_text_string(self, buf)
     }
 }
 

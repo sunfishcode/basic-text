@@ -1,8 +1,8 @@
 //! The `TextString` and `TextStr` types.
 
-use crate::{TextReader, TextWriter};
+use crate::{ReadText, TextReader, TextWriter};
 use basic_text_internals::{
-    is_basic_text,
+    is_basic_text, is_basic_text_start,
     unicode::{BOM, WJ},
 };
 use layered_io::Bufferable;
@@ -1458,6 +1458,25 @@ impl<'a> arbitrary::Arbitrary<'a> for TextString {
     fn size_hint(depth: usize) -> (usize, Option<usize>) {
         <&TextStr as arbitrary::Arbitrary>::size_hint(depth)
     }
+}
+
+/// Default implementation of [`ReadText::read_to_text_string`].
+pub fn default_read_to_text_string<Inner: ReadText + ?Sized>(
+    inner: &mut Inner,
+    buf: &mut TextString,
+) -> io::Result<usize> {
+    // Read directly into the inner `String`. Since we're reading the
+    let start = buf.0.len();
+    let n = inner.read_to_string(&mut buf.0)?;
+    if let Some(c) = buf.0[start..].chars().next() {
+        if !is_basic_text_start(c) {
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                "read_to_text_string requires a starter",
+            ));
+        }
+    }
+    Ok(n)
 }
 
 #[test]

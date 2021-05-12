@@ -39,6 +39,6 @@ pub use copy::{copy_text, copy_text_using_status};
 pub use read_text::{default_read_exact_text, ReadText, ReadTextLayered};
 pub use text_duplexer::TextDuplexer;
 pub use text_reader::TextReader;
-pub use text_string::{TextStr, TextString};
+pub use text_string::{default_read_to_text_string, TextStr, TextString};
 pub use text_writer::TextWriter;
 pub use write_text::{default_write_text, WriteText};
