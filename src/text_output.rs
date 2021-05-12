@@ -1,4 +1,5 @@
-//! Output for `TextWriter` and the writer half of `TextDuplexer`.
+//! Shared implementation for `TextWriter` and the writer half of
+//! `TextDuplexer`.
 
 use crate::{TextDuplexer, TextStr, TextWriter};
 use basic_text_internals::{
@@ -14,7 +15,6 @@ use layered_io::{default_write_vectored, HalfDuplexLayered, WriteLayered};
 use std::{
     cell::RefCell,
     io::{self, Write},
-    mem,
     mem::take,
     rc::Rc,
     str,
@@ -22,6 +22,7 @@ use std::{
 use unicode_normalization::UnicodeNormalization;
 use utf8_io::{ReadStrLayered, WriteStr};
 
+/// Abstract over `TextWriter` and the writer half of `TextDuplexer`.
 pub(crate) trait TextWriterInternals<Inner: WriteStr + WriteLayered>: Write {
     fn impl_(&mut self) -> &mut TextOutput;
     fn inner(&self) -> &Inner;
@@ -327,7 +328,7 @@ impl TextOutput {
                     // chain, and the Rc<RefCell<Option<io::Error>>> holds the
                     // actual error.
                     Self::reset_state(internals);
-                    return Err(mem::take(&mut *error.borrow_mut()).unwrap());
+                    return Err(take(&mut *error.borrow_mut()).unwrap());
                 }
 
                 (State::Ground(_), ESC) => {

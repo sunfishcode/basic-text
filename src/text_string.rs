@@ -1,3 +1,5 @@
+//! The `TextString` and `TextStr` types.
+
 use crate::{TextReader, TextWriter};
 use basic_text_internals::{
     is_basic_text,

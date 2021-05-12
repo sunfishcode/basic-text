@@ -3,7 +3,7 @@ use layered_io::{default_read_to_end, Bufferable, ReadLayered, Status};
 #[cfg(not(windows))]
 use unsafe_io::os::posish::{AsRawFd, RawFd};
 use std::{
-    fmt,
+    fmt::{self, Debug, Formatter},
     io::{self, Read},
     str,
 };
@@ -189,8 +189,8 @@ impl<Inner: ReadStrLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for Restri
 // Safety: `RestrictedReader` implements `OwnsRaw` if `Inner` does.
 unsafe impl<Inner: ReadStrLayered + OwnsRaw> OwnsRaw for RestrictedReader<Inner> {}
 
-impl<Inner: ReadStrLayered + fmt::Debug> fmt::Debug for RestrictedReader<Inner> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl<Inner: ReadStrLayered + Debug> Debug for RestrictedReader<Inner> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("RestrictedReader");
         b.field("inner", &self.inner);
         b.finish()

@@ -7,7 +7,7 @@ use layered_io::{
 use unsafe_io::os::posish::{AsRawFd, RawFd};
 use std::{
     cmp::max,
-    fmt,
+    fmt::{self, Debug, Formatter},
     io::{self, Read, Write},
     str,
 };
@@ -229,10 +229,10 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawH
 // Safety: `RestrictedDuplexer` implements `OwnsRaw` if `Inner` does.
 unsafe impl<Inner: OwnsRaw> OwnsRaw for RestrictedDuplexer<Inner> {}
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + Debug> Debug
     for RestrictedDuplexer<Inner>
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("RestrictedDuplexer");
         b.field("inner", &self.inner);
         b.finish()

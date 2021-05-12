@@ -1,4 +1,5 @@
-//! Input for `TextReader` and the reader half of `TextDuplexer`.
+//! Shared implementation for `TextReader` and the reader half of
+//! `TextDuplexer`.
 
 use crate::{TextDuplexer, TextReader, TextStr};
 use basic_text_internals::{
@@ -13,11 +14,13 @@ use std::{
     cmp::max,
     collections::{vec_deque, VecDeque},
     io::{self, copy, repeat, Cursor, Read},
-    mem, str,
+    mem::take,
+    str,
 };
 use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
 use utf8_io::{ReadStrLayered, WriteStr};
 
+/// Abstract over `TextReader` and the reader half of `TextDuplexer`.
 pub(crate) trait TextReaderInternals<Inner: ReadStrLayered>: ReadStrLayered {
     fn impl_(&mut self) -> &mut TextInput;
     fn inner(&self) -> &Inner;
@@ -231,7 +234,7 @@ impl TextInput {
 
     fn process_raw_string(&mut self) {
         for c in self.raw_string.chars() {
-            let at_start = mem::take(&mut self.at_start);
+            let at_start = take(&mut self.at_start);
             loop {
                 match (self.state, c) {
                     (State::Ground(_), BOM) if at_start => (),
@@ -364,7 +367,7 @@ impl TextInput {
             return Ok((nread, internals.impl_().pending_status));
         }
 
-        let mut raw_bytes = mem::take(&mut internals.impl_().raw_string).into_bytes();
+        let mut raw_bytes = take(&mut internals.impl_().raw_string).into_bytes();
         raw_bytes.resize(4096, 0_u8);
         let (size, status) = internals.inner_mut().read_with_status(&mut raw_bytes)?;
         raw_bytes.resize(size, 0);

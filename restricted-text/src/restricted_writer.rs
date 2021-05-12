@@ -3,7 +3,7 @@ use layered_io::{Bufferable, WriteLayered};
 #[cfg(not(windows))]
 use unsafe_io::os::posish::{AsRawFd, RawFd};
 use std::{
-    fmt,
+    fmt::{self, Debug, Formatter},
     io::{self, Write},
     str,
 };
@@ -170,8 +170,8 @@ impl<Inner: WriteStr + WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket
 // Safety: `RestrictedWriter` implements `OwnsRaw` if `Inner` does.
 unsafe impl<Inner: OwnsRaw> OwnsRaw for RestrictedWriter<Inner> {}
 
-impl<Inner: fmt::Debug> fmt::Debug for RestrictedWriter<Inner> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl<Inner: Debug> Debug for RestrictedWriter<Inner> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("RestrictedWriter");
         b.field("inner", &self.inner);
         b.finish()

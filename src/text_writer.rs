@@ -1,7 +1,7 @@
 use crate::{text_output::TextOutput, TextStr, WriteText};
 use layered_io::{Bufferable, LayeredWriter, WriteLayered};
 use std::{
-    fmt,
+    fmt::{self, Debug, Formatter},
     io::{self, Write},
     str,
 };
@@ -242,8 +242,8 @@ impl<Inner: WriteStr + WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket
 // Safety: `TextWriter` implements `OwnsRaw` if `Inner` does.
 unsafe impl<Inner: OwnsRaw> OwnsRaw for TextWriter<Inner> {}
 
-impl<Inner: fmt::Debug> fmt::Debug for TextWriter<Inner> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl<Inner: Debug> Debug for TextWriter<Inner> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("TextWriter");
         b.field("inner", &self.inner);
         b.finish()

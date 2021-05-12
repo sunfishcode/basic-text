@@ -1,11 +1,14 @@
-use crate::{text_input::TextInput, text_output::TextOutput, ReadText, TextStr, WriteText};
+use crate::{
+    text_input::TextInput, text_output::TextOutput, ReadText, ReadTextLayered, TextStr, WriteText,
+};
 use duplex::{Duplex, HalfDuplex};
 use layered_io::{
-    default_read_to_end, Bufferable, HalfDuplexLayered, ReadLayered, Status, WriteLayered, LayeredDuplexer
+    default_read_to_end, Bufferable, HalfDuplexLayered, LayeredDuplexer, ReadLayered, Status,
+    WriteLayered,
 };
 use std::{
     cmp::max,
-    fmt,
+    fmt::{self, Debug, Formatter},
     io::{self, Read, Write},
     str,
 };
@@ -16,7 +19,7 @@ use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
 use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
 use unsafe_io::OwnsRaw;
-use utf8_io::{ReadStr, ReadStrLayered, WriteStr, Utf8Duplexer};
+use utf8_io::{ReadStr, ReadStrLayered, Utf8Duplexer, WriteStr};
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`
 /// implementation producing an arbitrary byte sequence into a valid Basic Text
@@ -271,6 +274,18 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDupl
     }
 }
 
+impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadTextLayered for TextDuplexer<Inner> {
+    #[inline]
+    fn read_text_with_status(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
+        TextInput::read_text_with_status(self, buf)
+    }
+
+    #[inline]
+    fn read_exact_text_using_status(&mut self, buf: &mut TextStr) -> io::Result<Status> {
+        TextInput::read_exact_text_using_status(self, buf)
+    }
+}
+
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> Read for TextDuplexer<Inner> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
@@ -364,10 +379,8 @@ unsafe impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + OwnsRaw> OwnsRaw
 {
 }
 
-impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + fmt::Debug> fmt::Debug
-    for TextDuplexer<Inner>
-{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + Debug> Debug for TextDuplexer<Inner> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("TextDuplexer");
         b.field("inner", &self.inner);
         b.finish()

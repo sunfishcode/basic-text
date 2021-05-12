@@ -8,7 +8,7 @@ use std::{
     cmp::max,
     collections::{vec_deque, VecDeque},
     io::{self, copy, repeat, Cursor, Read},
-    mem, str,
+    mem::take, str,
 };
 use unicode_normalization::{Recompositions, UnicodeNormalization};
 use utf8_io::{ReadStrLayered, WriteStr};
@@ -252,7 +252,7 @@ impl RestrictedInput {
         }
 
         let mut raw_bytes =
-            mem::take(&mut internals.impl_().raw_string).into_bytes();
+            take(&mut internals.impl_().raw_string).into_bytes();
         raw_bytes.resize(4096, 0_u8);
         let (size, status) = internals.inner_mut().read_with_status(&mut raw_bytes)?;
         raw_bytes.resize(size, 0);

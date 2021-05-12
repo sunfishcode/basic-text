@@ -1,7 +1,7 @@
 use crate::{text_input::TextInput, ReadText, ReadTextLayered, TextStr};
 use layered_io::{default_read_to_end, Bufferable, LayeredReader, ReadLayered, Status};
 use std::{
-    fmt,
+    fmt::{self, Debug, Formatter},
     io::{self, Read},
     str,
 };
@@ -12,8 +12,7 @@ use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
 use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
 use unsafe_io::OwnsRaw;
-use utf8_io::Utf8Reader;
-use utf8_io::{ReadStr, ReadStrLayered};
+use utf8_io::{ReadStr, ReadStrLayered, Utf8Reader};
 
 /// A [`Read`] implementation which translates from an input `Read`
 /// implementation producing an arbitrary byte sequence into a valid Basic Text
@@ -182,8 +181,8 @@ impl<Inner: ReadStrLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for TextRe
 // Safety: `TextReader` implements `OwnsRaw` if `Inner` does.
 unsafe impl<Inner: ReadStrLayered + OwnsRaw> OwnsRaw for TextReader<Inner> {}
 
-impl<Inner: ReadStrLayered + fmt::Debug> fmt::Debug for TextReader<Inner> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl<Inner: ReadStrLayered + Debug> Debug for TextReader<Inner> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut b = f.debug_struct("TextReader");
         b.field("inner", &self.inner);
         b.finish()
