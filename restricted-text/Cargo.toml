@@ -8,6 +8,7 @@ keywords = ["stream", "text"]
 categories = ["os", "text-processing"]
 repository = "https://github.com/sunfishcode/basic-text"
 edition = "2018"
+publish = false
 
 [build-dependencies]
 rustc_version = "0.3.2"
