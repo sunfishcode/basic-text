@@ -12,8 +12,8 @@ use std::{
 use utf8_io::{Utf8Reader, Utf8Writer};
 
 fuzz_target!(|bytes: &[u8]| {
-    let mut reader = TextReader::new(Utf8Reader::new(SliceReader::new(bytes)));
-    let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::<u8>::new())));
+    let mut reader = TextReader::from_utf8(Utf8Reader::new(SliceReader::new(bytes)));
+    let mut writer = TextWriter::new(Vec::<u8>::new());
 
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();

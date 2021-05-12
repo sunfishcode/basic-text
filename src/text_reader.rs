@@ -1,5 +1,5 @@
 use crate::{text_input::TextInput, ReadText, ReadTextLayered, TextStr};
-use layered_io::{default_read_to_end, Bufferable, ReadLayered, Status};
+use layered_io::{default_read_to_end, Bufferable, LayeredReader, ReadLayered, Status};
 use std::{
     fmt,
     io::{self, Read},
@@ -12,13 +12,22 @@ use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
 use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
 use unsafe_io::OwnsRaw;
-#[cfg(test)]
 use utf8_io::Utf8Reader;
 use utf8_io::{ReadStr, ReadStrLayered};
 
 /// A [`Read`] implementation which translates from an input `Read`
 /// implementation producing an arbitrary byte sequence into a valid Basic Text
 /// stream.
+///
+/// # Examples
+///
+/// ```rust
+/// use basic_text::TextReader;
+///
+/// let input = TextReader::new(std::io::stdin());
+///
+/// // read from `input`
+/// ```
 pub struct TextReader<Inner: ReadStrLayered> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
@@ -27,10 +36,21 @@ pub struct TextReader<Inner: ReadStrLayered> {
     pub(crate) input: TextInput,
 }
 
-impl<Inner: ReadStrLayered> TextReader<Inner> {
-    /// Construct a new instance of `TextReader` wrapping `inner`.
+impl<Inner: Read> TextReader<Utf8Reader<LayeredReader<Inner>>> {
+    /// Construct a new instance of `TextReader` wrapping `inner`, which can
+    /// be anything that implements [`Read`].
     #[inline]
     pub fn new(inner: Inner) -> Self {
+        Self::from_utf8(Utf8Reader::new(LayeredReader::new(inner)))
+    }
+}
+
+impl<Inner: ReadStrLayered> TextReader<Inner> {
+    /// Construct a new instance of `TextReader` wrapping `inner`, which
+    /// can be anything that implements `ReadStrLayered`, such as a
+    /// [`Utf8Reader`].
+    #[inline]
+    pub fn from_utf8(inner: Inner) -> Self {
         Self {
             inner,
             input: TextInput::new(),
@@ -172,7 +192,7 @@ impl<Inner: ReadStrLayered + fmt::Debug> fmt::Debug for TextReader<Inner> {
 
 #[cfg(test)]
 fn translate_via_reader(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(Utf8Reader::new(layered_io::LayeredReader::new(bytes)));
+    let mut reader = TextReader::new(bytes);
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -180,7 +200,7 @@ fn translate_via_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_via_slice_reader(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(Utf8Reader::new(layered_io::SliceReader::new(bytes)));
+    let mut reader = TextReader::from_utf8(Utf8Reader::new(layered_io::SliceReader::new(bytes)));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -188,7 +208,7 @@ fn translate_via_slice_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_with_small_buffer(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(Utf8Reader::new(layered_io::LayeredReader::new(bytes)));
+    let mut reader = TextReader::new(bytes);
     let mut v = Vec::new();
     let mut buf = [0; basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE];
     loop {
@@ -205,7 +225,7 @@ fn translate_with_small_buffer(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_with_small_buffer_layered(bytes: &[u8]) -> String {
-    let mut reader = TextReader::new(Utf8Reader::new(layered_io::SliceReader::new(bytes)));
+    let mut reader = TextReader::from_utf8(Utf8Reader::new(layered_io::SliceReader::new(bytes)));
     let mut v = Vec::new();
     let mut buf = [0; basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE];
     loop {

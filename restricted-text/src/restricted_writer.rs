@@ -180,9 +180,9 @@ impl<Inner: fmt::Debug> fmt::Debug for RestrictedWriter<Inner> {
 
 #[cfg(test)]
 fn translate_via_layered_writer(bytes: &[u8]) -> io::Result<String> {
-    let mut writer = RestrictedWriter::new(TextWriter::new(Utf8Writer::new(layered_io::LayeredWriter::new(
+    let mut writer = RestrictedWriter::new(TextWriter::new(
         Vec::<u8>::new(),
-    ))));
+    ));
     writer.write_all(bytes)?;
     let inner = writer.close_into_inner()?.close_into_inner()?;
     Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())

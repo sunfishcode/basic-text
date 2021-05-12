@@ -67,15 +67,11 @@ pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Buffer
 #[test]
 fn test_copy_text() {
     use crate::{TextReader, TextStr, TextWriter};
-    use layered_io::{LayeredReader, LayeredWriter};
     use std::{io::Cursor, str};
-    use utf8_io::{Utf8Reader, Utf8Writer};
 
     let text = "hello world ☃\n";
-    let mut input = TextReader::new(Utf8Reader::new(LayeredReader::new(Cursor::new(
-        text.to_string(),
-    ))));
-    let mut output = TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::new())));
+    let mut input = TextReader::new(Cursor::new(text.to_string()));
+    let mut output = TextWriter::new(Vec::new());
 
     copy_text(&mut input, &mut output).unwrap();
 
@@ -90,15 +86,11 @@ fn test_copy_text() {
 #[test]
 fn test_copy_text_using_status() {
     use crate::{TextReader, TextStr, TextWriter};
-    use layered_io::{LayeredReader, LayeredWriter};
     use std::{io::Cursor, str};
-    use utf8_io::{Utf8Reader, Utf8Writer};
 
     let text = "hello world ☃";
-    let mut input = TextReader::new(Utf8Reader::new(LayeredReader::new(Cursor::new(
-        text.to_string(),
-    ))));
-    let mut output = TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::new())));
+    let mut input = TextReader::new(Cursor::new(text.to_string()));
+    let mut output = TextWriter::new(Vec::new());
 
     copy_text_using_status(&mut input, &mut output).unwrap();
 

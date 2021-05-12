@@ -71,10 +71,10 @@ fn test_copy_restricted() {
     use basic_text::{TextReader, TextWriter};
 
     let restricted = "hello world ☃\n";
-    let mut input = RestrictedReader::new(TextReader::new(Utf8Reader::new(LayeredReader::new(Cursor::new(
+    let mut input = RestrictedReader::new(TextReader::new(Cursor::new(
         restricted.to_string(),
-    )))));
-    let mut output = RestrictedWriter::new(TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::new()))));
+    )));
+    let mut output = RestrictedWriter::new(TextWriter::new(Vec::new()));
 
     copy_restricted(&mut input, &mut output).unwrap();
 
@@ -94,10 +94,10 @@ fn test_copy_restricted_using_status() {
     use utf8_io::{Utf8Reader, Utf8Writer};
 
     let restricted = "hello world ☃";
-    let mut input = TextReader::new(Utf8Reader::new(LayeredReader::new(Cursor::new(
+    let mut input = TextReader::new(Cursor::new(
         restricted.to_string(),
-    ))));
-    let mut output = TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::new())));
+    ));
+    let mut output = TextWriter::new(Vec::new());
 
     copy_restricted_using_status(&mut input, &mut output).unwrap();
 

@@ -199,7 +199,7 @@ impl<Inner: ReadStrLayered + fmt::Debug> fmt::Debug for RestrictedReader<Inner> 
 
 #[cfg(test)]
 fn translate_via_reader(bytes: &[u8]) -> String {
-    let mut reader = RestrictedReader::new(TextReader::new(Utf8Reader::new(layered_io::LayeredReader::new(bytes))));
+    let mut reader = RestrictedReader::new(TextReader::new(bytes));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -207,7 +207,7 @@ fn translate_via_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_via_slice_reader(bytes: &[u8]) -> String {
-    let mut reader = RestrictedReader::new(TextReader::new(Utf8Reader::new(layered_io::SliceReader::new(bytes))));
+    let mut reader = RestrictedReader::new(TextReader::from_utf8(Utf8Reader::new(layered_io::SliceReader::new(bytes))));
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
@@ -215,7 +215,7 @@ fn translate_via_slice_reader(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_with_small_buffer(bytes: &[u8]) -> String {
-    let mut reader = RestrictedReader::new(TextReader::new(Utf8Reader::new(layered_io::LayeredReader::new(bytes))));
+    let mut reader = RestrictedReader::new(TextReader::new(bytes));
     let mut v = Vec::new();
     let mut buf = [0; basic_text::NORMALIZATION_BUFFER_SIZE];
     loop {
@@ -232,7 +232,7 @@ fn translate_with_small_buffer(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 fn translate_with_small_buffer_layered(bytes: &[u8]) -> String {
-    let mut reader = RestrictedReader::new(TextReader::new(Utf8Reader::new(layered_io::SliceReader::new(bytes))));
+    let mut reader = RestrictedReader::new(TextReader::from_utf8(Utf8Reader::new(layered_io::SliceReader::new(bytes))));
     let mut v = Vec::new();
     let mut buf = [0; basic_text::NORMALIZATION_BUFFER_SIZE];
     loop {

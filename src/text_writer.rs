@@ -1,5 +1,5 @@
 use crate::{text_output::TextOutput, TextStr, WriteText};
-use layered_io::{Bufferable, WriteLayered};
+use layered_io::{Bufferable, LayeredWriter, WriteLayered};
 use std::{
     fmt,
     io::{self, Write},
@@ -12,7 +12,7 @@ use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
 use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
 use unsafe_io::OwnsRaw;
-use utf8_io::WriteStr;
+use utf8_io::{Utf8Writer, WriteStr};
 
 /// A `WriteLayered` implementation which translates to an output
 /// `WriteLayered` producing a valid Basic Text stream from an arbitrary
@@ -20,6 +20,16 @@ use utf8_io::WriteStr;
 ///
 /// `write` is not guaranteed to perform a single operation, because short
 /// writes could produce invalid UTF-8, so `write` will retry as needed.
+///
+/// # Examples
+///
+/// ```rust
+/// use basic_text::TextWriter;
+///
+/// let output = TextWriter::new(std::io::stdout());
+///
+/// // write to `output`
+/// ```
 pub struct TextWriter<Inner> {
     /// The wrapped byte stream.
     pub(crate) inner: Inner,
@@ -28,23 +38,20 @@ pub struct TextWriter<Inner> {
     pub(crate) output: TextOutput,
 }
 
-impl<Inner: WriteStr + WriteLayered> TextWriter<Inner> {
-    /// Construct a new instance of `TextWriter` wrapping `inner`.
+impl<Inner: Write> TextWriter<Utf8Writer<LayeredWriter<Inner>>> {
+    /// Construct a new instance of `TextWriter` wrapping `inner`, which can be
+    /// anything that implements [`Write`].
     #[inline]
     pub fn new(inner: Inner) -> Self {
-        Self {
-            inner,
-            output: TextOutput::new(),
-        }
+        Self::from_utf8(Utf8Writer::new(LayeredWriter::new(inner)))
     }
 
     /// Like `new`, but writes a U+FEFF (BOM) to the beginning of the output
     /// stream for compatibility with consumers that require that to determine
     /// the text encoding.
     #[inline]
-    pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
-        let output = TextOutput::with_bom_compatibility(&mut inner)?;
-        Ok(Self { inner, output })
+    pub fn with_bom_compatibility(inner: Inner) -> io::Result<Self> {
+        Self::from_utf8_with_bom_compatibility(Utf8Writer::new(LayeredWriter::new(inner)))
     }
 
     /// Like `new`, but enables CRLF output mode, which translates "\n" to
@@ -59,6 +66,43 @@ impl<Inner: WriteStr + WriteLayered> TextWriter<Inner> {
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
     #[inline]
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
+        Self::from_utf8_with_crlf_compatibility(Utf8Writer::new(LayeredWriter::new(inner)))
+    }
+}
+
+impl<Inner: WriteStr + WriteLayered> TextWriter<Inner> {
+    /// Construct a new instance of `TextWriter` wrapping `inner`, which
+    /// can be anything that implements `WriteStr + WriteLayered`, such as a
+    /// [`Utf8Writer`].
+    #[inline]
+    pub fn from_utf8(inner: Inner) -> Self {
+        Self {
+            inner,
+            output: TextOutput::new(),
+        }
+    }
+
+    /// Like `from_utf8`, but writes a U+FEFF (BOM) to the beginning of the output
+    /// stream for compatibility with consumers that require that to determine
+    /// the text encoding.
+    #[inline]
+    pub fn from_utf8_with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
+        let output = TextOutput::with_bom_compatibility(&mut inner)?;
+        Ok(Self { inner, output })
+    }
+
+    /// Like `from_utf8`, but enables CRLF output mode, which translates "\n" to
+    /// "\r\n" for compatibility with consumers that need that.
+    ///
+    /// Note: This is not often needed; even on Windows these days most
+    /// things are ok with plain '\n' line endings, [including Windows Notepad].
+    /// The main notable things that really need them are IETF RFCs, for example
+    /// [RFC-5198].
+    ///
+    /// [including Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
+    /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
+    #[inline]
+    pub fn from_utf8_with_crlf_compatibility(inner: Inner) -> Self {
         Self {
             inner,
             output: TextOutput::with_crlf_compatibility(),
@@ -208,9 +252,7 @@ impl<Inner: fmt::Debug> fmt::Debug for TextWriter<Inner> {
 
 #[cfg(test)]
 fn translate_via_layered_writer(bytes: &[u8]) -> io::Result<String> {
-    let mut writer = TextWriter::new(utf8_io::Utf8Writer::new(layered_io::LayeredWriter::new(
-        Vec::<u8>::new(),
-    )));
+    let mut writer = TextWriter::new(Vec::<u8>::new());
     match writer.write_all(bytes) {
         Ok(()) => (),
         Err(err) => {
@@ -227,9 +269,7 @@ fn translate_via_layered_writer(bytes: &[u8]) -> io::Result<String> {
 
 #[cfg(test)]
 fn translate_str_via_layered_writer(s: &str) -> io::Result<String> {
-    let mut writer = TextWriter::new(utf8_io::Utf8Writer::new(layered_io::LayeredWriter::new(
-        Vec::<u8>::new(),
-    )));
+    let mut writer = TextWriter::new(Vec::<u8>::new());
     match writer.write_str(s) {
         Ok(()) => (),
         Err(err) => {

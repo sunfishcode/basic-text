@@ -1,7 +1,7 @@
 use crate::{text_input::TextInput, text_output::TextOutput, ReadText, TextStr, WriteText};
 use duplex::{Duplex, HalfDuplex};
 use layered_io::{
-    default_read_to_end, Bufferable, HalfDuplexLayered, ReadLayered, Status, WriteLayered,
+    default_read_to_end, Bufferable, HalfDuplexLayered, ReadLayered, Status, WriteLayered, LayeredDuplexer
 };
 use std::{
     cmp::max,
@@ -16,7 +16,7 @@ use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
 use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
 use unsafe_io::OwnsRaw;
-use utf8_io::{ReadStr, ReadStrLayered, WriteStr};
+use utf8_io::{ReadStr, ReadStrLayered, WriteStr, Utf8Duplexer};
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`
 /// implementation producing an arbitrary byte sequence into a valid Basic Text
@@ -30,30 +30,20 @@ pub struct TextDuplexer<Inner: HalfDuplex + ReadStr + WriteStr> {
     pub(crate) output: TextOutput,
 }
 
-impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + WriteLayered>
-    TextDuplexer<Inner>
-{
-    /// Construct a new instance of `TextDuplexer` wrapping `inner`.
+impl<Inner: HalfDuplex> TextDuplexer<Utf8Duplexer<LayeredDuplexer<Inner>>> {
+    /// Construct a new instance of `TextDuplexer` wrapping `inner`, which can be
+    /// anything that implements [`HalfDuplex`].
     #[inline]
     pub fn new(inner: Inner) -> Self {
-        Self {
-            inner,
-            input: TextInput::new(),
-            output: TextOutput::new(),
-        }
+        Self::from_utf8(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
     }
 
     /// Like `new`, but writes a U+FEFF (BOM) to the beginning of the output
     /// stream for compatibility with consumers that require that to determine
     /// the text encoding.
     #[inline]
-    pub fn with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
-        let output = TextOutput::with_bom_compatibility(&mut inner)?;
-        Ok(Self {
-            inner,
-            input: TextInput::new(),
-            output,
-        })
+    pub fn with_bom_compatibility(inner: Inner) -> io::Result<Self> {
+        Self::from_utf8_with_bom_compatibility(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
     }
 
     /// Like `new`, but enables CRLF output mode, which translates "\n" to
@@ -68,6 +58,48 @@ impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + Wri
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
     #[inline]
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
+        Self::from_utf8_with_crlf_compatibility(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
+    }
+}
+
+impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + WriteLayered>
+    TextDuplexer<Inner>
+{
+    /// Construct a new instance of `TextDuplexer` wrapping `inner`.
+    #[inline]
+    pub fn from_utf8(inner: Inner) -> Self {
+        Self {
+            inner,
+            input: TextInput::new(),
+            output: TextOutput::new(),
+        }
+    }
+
+    /// Like `from_utf8`, but writes a U+FEFF (BOM) to the beginning of the output
+    /// stream for compatibility with consumers that require that to determine
+    /// the text encoding.
+    #[inline]
+    pub fn from_utf8_with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
+        let output = TextOutput::with_bom_compatibility(&mut inner)?;
+        Ok(Self {
+            inner,
+            input: TextInput::new(),
+            output,
+        })
+    }
+
+    /// Like `from_utf8`, but enables CRLF output mode, which translates "\n" to
+    /// "\r\n" for compatibility with consumers that need that.
+    ///
+    /// Note: This is not often needed; even on Windows these days most
+    /// things are ok with plain '\n' line endings, [including Windows Notepad].
+    /// The main notable things that really need them are IETF RFCs, for example
+    /// [RFC-5198].
+    ///
+    /// [including Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
+    /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
+    #[inline]
+    pub fn from_utf8_with_crlf_compatibility(inner: Inner) -> Self {
         Self {
             inner,
             input: TextInput::new(),

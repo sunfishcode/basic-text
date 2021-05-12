@@ -3,7 +3,7 @@ use basic_text_internals::{
     is_basic_text,
     unicode::{BOM, WJ},
 };
-use layered_io::{Bufferable, LayeredReader, LayeredWriter};
+use layered_io::Bufferable;
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
 #[cfg(pattern)]
@@ -26,7 +26,7 @@ use std::{
     string::FromUtf8Error,
     vec,
 };
-use utf8_io::{Utf8Reader, Utf8Writer, WriteStr};
+use utf8_io::WriteStr;
 
 /// A Basic Text encoded, growable string.
 ///
@@ -149,7 +149,7 @@ impl TextString {
     #[inline]
     pub fn from_text(s: String) -> Result<Self, FromTextError> {
         let bytes: Vec<u8> = Vec::new();
-        let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(bytes)));
+        let mut writer = TextWriter::new(bytes);
 
         match writer.write_str(&s).and_then(|()| writer.flush()) {
             Ok(()) => (),
@@ -188,7 +188,7 @@ impl TextString {
     pub fn from_text_lossy(mut v: &str) -> Cow<TextStr> {
         // TODO: If `v` is already valid, fast-path to `Cow::Borrowed(v)`.
         // TODO: Also, this currently redoes UTF-8 validation for `v`.
-        let mut reader = TextReader::new(Utf8Reader::new(LayeredReader::new(v.as_bytes())));
+        let mut reader = TextReader::new(v.as_bytes());
         let mut text = String::new();
         reader.read_to_string(&mut text).unwrap();
 

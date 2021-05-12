@@ -75,7 +75,7 @@ impl RestrictedString {
     #[inline]
     pub fn from_text(s: String) -> Result<Self, FromRestrictedError> {
         let bytes: Vec<u8> = Vec::new();
-        let mut writer = RestrictedWriter::new(TextWriter::new(Utf8Writer::new(LayeredWriter::new(bytes))));
+        let mut writer = RestrictedWriter::new(TextWriter::new(bytes));
         writer.write_str(&s).map_err(|_err| FromRestrictedError {
             bytes: s.into_bytes(),
             error: RestrictedError {},
