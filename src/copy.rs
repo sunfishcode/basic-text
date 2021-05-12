@@ -67,7 +67,7 @@ fn test_copy_text() {
     use std::{io::Cursor, str};
 
     let text = "hello world ☃\n";
-    let mut input = TextReader::new(Cursor::new(text.to_string()));
+    let mut input = TextReader::new(Cursor::new(text.to_owned()));
     let mut output = TextWriter::new(Vec::new());
 
     copy_text(&mut input, &mut output).unwrap();
@@ -86,7 +86,7 @@ fn test_copy_text_using_status() {
     use std::{io::Cursor, str};
 
     let text = "hello world ☃";
-    let mut input = TextReader::new(Cursor::new(text.to_string()));
+    let mut input = TextReader::new(Cursor::new(text.to_owned()));
     let mut output = TextWriter::new(Vec::new());
 
     copy_text_using_status(&mut input, &mut output).unwrap();
