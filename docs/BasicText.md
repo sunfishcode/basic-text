@@ -4,7 +4,7 @@ The *Basic Text* format is a subset of the [Unicode] format and meant to
 fulfill common notions of "plain text".
 
 Basic Text permits homoglyphs and other visual ambiguities; see
-[Restricted Text] for an alternative which provides some mitigations.
+[Restricted Text] for an alternative which might provide some mitigations.
 
 For rationale and background information, see [Background].
 
