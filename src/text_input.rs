@@ -356,13 +356,7 @@ impl TextInput {
 
             // We may have overwritten part of a codepoint; overwrite the rest
             // of the buffer.
-            // TODO: Use [`fill`] when it becomes available:
-            // https://doc.rust-lang.org/std/primitive.slice.html#method.fill
-            copy(
-                &mut repeat(b'?').take((buf.len() - nread) as u64),
-                &mut Cursor::new(&mut buf[nread..]),
-            )
-            .unwrap();
+            buf[nread..].fill(b'?');
 
             return Ok((nread, internals.impl_().pending_status));
         }
@@ -427,11 +421,7 @@ impl TextInput {
 
         // We may have overwritten part of a codepoint; overwrite the rest
         // of the buffer.
-        copy(
-            &mut repeat(b'?').take((buf.len() - nread) as u64),
-            &mut Cursor::new(&mut buf[nread..]),
-        )
-        .unwrap();
+        buf[nread..].fill(b'?');
 
         Ok((
             nread,
