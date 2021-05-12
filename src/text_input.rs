@@ -88,7 +88,7 @@ pub(crate) struct TextInput {
     /// normalization-form starter.
     expect_starter: bool,
 
-    /// For emitting BOM at the start of a stream.
+    /// For ignoring BOM at the start of a stream.
     at_start: bool,
 
     /// Control-code and escape-sequence state machine.
