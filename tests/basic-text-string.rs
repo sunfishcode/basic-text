@@ -5,77 +5,74 @@ use basic_text::TextString;
 /// Various miscellaenous testcases.
 #[test]
 fn basic_text_string_basics() {
-    assert_eq!(TextString::from_text("".to_owned()).unwrap().as_utf8(), "");
+    assert_eq!(TextString::from_text("".to_owned()).unwrap().as_str(), "");
     assert_eq!(
         TextString::from_text("hello world!".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "hello world!"
     );
     assert_eq!(
-        TextString::from_text("\n".to_owned()).unwrap().as_utf8(),
+        TextString::from_text("\n".to_owned()).unwrap().as_str(),
         "\n"
     );
     assert_eq!(
-        TextString::from_text("\t".to_owned()).unwrap().as_utf8(),
+        TextString::from_text("\t".to_owned()).unwrap().as_str(),
         "\t"
     );
-    assert_eq!(
-        TextString::from_text(" ".to_owned()).unwrap().as_utf8(),
-        " "
-    );
+    assert_eq!(TextString::from_text(" ".to_owned()).unwrap().as_str(), " ");
     assert_eq!(
         TextString::from_text("[({\"\\~@".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "[({\"\\~@"
     );
     assert_eq!(
         TextString::from_text("\t\n \u{a0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\t\n \u{a0}"
     );
     assert_eq!(
         TextString::from_text("\u{2011}\u{ad}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2011}\u{ad}"
     );
     assert_eq!(
         TextString::from_text("A\u{34f}\u{200c}\u{200d}\u{2060}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "A\u{34f}\u{200c}\u{200d}\u{2060}"
     );
     assert_eq!(
         TextString::from_text("\u{200e}\u{202a}\u{202d}\u{2066}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{200e}\u{202a}\u{202d}\u{2066}"
     );
     assert_eq!(
         TextString::from_text("\u{200f}\u{202b}\u{202e}\u{2067}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{200f}\u{202b}\u{202e}\u{2067}"
     );
     assert_eq!(
         TextString::from_text("\u{202c}\u{2068}\u{2069}\u{61c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{202c}\u{2068}\u{2069}\u{61c}"
     );
     assert_eq!(
         TextString::from_text("\u{fffd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{fffd}"
     );
     assert_eq!(
         TextString::from_text("\u{10fffd}\u{fdfa}\u{2800}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{10fffd}\u{fdfa}\u{2800}"
     );
 }
@@ -84,38 +81,38 @@ fn basic_text_string_basics() {
 #[test]
 fn basic_text_string_ssnfc() {
     // Stream-Safe
-    assert_eq!(TextString::from_text("hello\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_utf8(), "hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
-    assert_eq!(TextString::from_text("hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_utf8(), "hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
+    assert_eq!(TextString::from_text("hello\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_str(), "hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
+    assert_eq!(TextString::from_text("hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_str(), "hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
     // NFC
     assert_eq!(
         TextString::from_text("\u{41}\u{30a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{c5}"
     );
     assert_eq!(
         TextString::from_text("\u{387}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{b7}"
     );
     // Stream-Safe NFC.
     assert_eq!(
         TextString::from_text("A\u{0327}\u{030a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "Å\u{0327}"
     );
-    assert_eq!(TextString::from_text("A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_utf8(),
+    assert_eq!(TextString::from_text("A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_str(),
                "Å\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}");
-    assert_eq!(TextString::from_text("A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_utf8(),
+    assert_eq!(TextString::from_text("A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_str(),
                "A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{34f}\u{30a}");
     // Stream-Safe before NFC.
-    assert_eq!(TextString::from_text_lossy("A뮤$\u{a8e4}<\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}Z").as_utf8(),
+    assert_eq!(TextString::from_text_lossy("A뮤$\u{a8e4}<\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}Z").as_str(),
                 "A뮤$\u{a8e4}<\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{34f}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}Z");
-    assert_eq!(TextString::from_text_lossy("A\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}ꤤ갤Z").as_utf8(),
+    assert_eq!(TextString::from_text_lossy("A\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}ꤤ갤Z").as_str(),
                 "A\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{324}\u{324}\u{324}\u{32e}\u{324}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e1}\u{34f}\u{a8c4}ꤤ갤Z");
-    assert_eq!(TextString::from_text_lossy("A\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}ꤤ갤Z").as_utf8(),
+    assert_eq!(TextString::from_text_lossy("A\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}ꤤ갤Z").as_str(),
                "A\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{324}\u{32e}\u{324}\u{324}\u{32e}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{34f}\u{a8c4}\u{324}\u{a8e1}ꤤ갤Z");
 }
 
@@ -125,42 +122,42 @@ fn basic_text_string_ssnfc() {
 fn basic_text_string_start() {
     // non-starter
     assert_eq!(
-        TextString::from_text_lossy("\u{327}hello").as_utf8(),
+        TextString::from_text_lossy("\u{327}hello").as_str(),
         "\u{fffd}hello"
     );
     assert_eq!(
-        TextString::from_text_lossy("hello\u{327}world").as_utf8(),
+        TextString::from_text_lossy("hello\u{327}world").as_str(),
         "hello\u{327}world"
     );
     // Grapheme_Cluster_Break = ZWJ.
     assert_eq!(
-        TextString::from_text_lossy("\u{34f}\u{200c}\u{200d}\u{2060}").as_utf8(),
+        TextString::from_text_lossy("\u{34f}\u{200c}\u{200d}\u{2060}").as_str(),
         "\u{fffd}\u{200c}\u{200d}\u{2060}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{200d}hello").as_utf8(),
+        TextString::from_text_lossy("\u{200d}hello").as_str(),
         "\u{fffd}hello"
     );
     assert_eq!(
-        TextString::from_text_lossy("hello\u{200d}world").as_utf8(),
+        TextString::from_text_lossy("hello\u{200d}world").as_str(),
         "hello\u{200d}world"
     );
     // Grapheme_Cluster_Break = SpacingMark.
     assert_eq!(
-        TextString::from_text_lossy("\u{903}hello").as_utf8(),
+        TextString::from_text_lossy("\u{903}hello").as_str(),
         "\u{fffd}hello"
     );
     assert_eq!(
-        TextString::from_text_lossy("hello\u{903}world").as_utf8(),
+        TextString::from_text_lossy("hello\u{903}world").as_str(),
         "hello\u{903}world"
     );
     // Grapheme_Cluster_Break = Extend.
     assert_eq!(
-        TextString::from_text_lossy("\u{9be}hello").as_utf8(),
+        TextString::from_text_lossy("\u{9be}hello").as_str(),
         "\u{fffd}hello"
     );
     assert_eq!(
-        TextString::from_text_lossy("hello\u{9be}world").as_utf8(),
+        TextString::from_text_lossy("hello\u{9be}world").as_str(),
         "hello\u{9be}world"
     );
 }
@@ -171,20 +168,20 @@ fn basic_text_string_start() {
 fn basic_text_string_end() {
     // Grapheme_Cluster_Break = ZWJ.
     assert_eq!(
-        TextString::from_text_lossy("hello\u{200d}").as_utf8(),
+        TextString::from_text_lossy("hello\u{200d}").as_str(),
         "hello\u{200d}\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("hello\u{200d}world").as_utf8(),
+        TextString::from_text_lossy("hello\u{200d}world").as_str(),
         "hello\u{200d}world"
     );
     // Grapheme_Cluster_Break = Prepend.
     assert_eq!(
-        TextString::from_text_lossy("hello\u{110bd}").as_utf8(),
+        TextString::from_text_lossy("hello\u{110bd}").as_str(),
         "hello\u{110bd}\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("hello\u{110bd}world").as_utf8(),
+        TextString::from_text_lossy("hello\u{110bd}world").as_str(),
         "hello\u{110bd}world"
     );
 }
@@ -195,151 +192,139 @@ fn basic_text_string_end() {
 #[test]
 fn basic_text_string_pre_nfc_table() {
     // Unassigned characters with replacements.
-    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9e5}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{a64}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{a65}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{ae4}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{ae5}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{b64}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{b65}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{be4}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{be5}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{c64}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{c65}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{ce4}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{ce5}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{d64}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{d65}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9e5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{a64}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{a65}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ae4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ae5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{b64}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{b65}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{be4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{be5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{c64}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{c65}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ce4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ce5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{d64}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{d65}").as_str(), "\u{fffd}");
     // Unassigned characters with replacements.
-    assert_eq!(
-        TextString::from_text_lossy("\u{2072}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{2073}").as_utf8(),
-        "\u{fffd}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{2072}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2073}").as_str(), "\u{fffd}");
     // `Ω`
-    assert_eq!(TextString::from_text_lossy("\u{2126}").as_utf8(), "\u{3a9}");
+    assert_eq!(TextString::from_text_lossy("\u{2126}").as_str(), "\u{3a9}");
     // `K`
-    assert_eq!(TextString::from_text_lossy("\u{212a}").as_utf8(), "\u{4b}");
+    assert_eq!(TextString::from_text_lossy("\u{212a}").as_str(), "\u{4b}");
     // `Å`
-    assert_eq!(TextString::from_text_lossy("\u{212b}").as_utf8(), "\u{c5}");
+    assert_eq!(TextString::from_text_lossy("\u{212b}").as_str(), "\u{c5}");
     // `〈`
-    assert_eq!(
-        TextString::from_text_lossy("\u{2329}").as_utf8(),
-        "\u{fffd}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{2329}").as_str(), "\u{fffd}");
     // `〉`
-    assert_eq!(
-        TextString::from_text_lossy("\u{232a}").as_utf8(),
-        "\u{fffd}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{232a}").as_str(), "\u{fffd}");
     // Latin Ligatures
-    assert_eq!(TextString::from_text_lossy("\u{fb00}").as_utf8(), "ff");
-    assert_eq!(TextString::from_text_lossy("\u{fb01}").as_utf8(), "fi");
-    assert_eq!(TextString::from_text_lossy("\u{fb02}").as_utf8(), "fl");
-    assert_eq!(TextString::from_text_lossy("\u{fb03}").as_utf8(), "ffi");
-    assert_eq!(TextString::from_text_lossy("\u{fb04}").as_utf8(), "ffl");
-    assert_eq!(TextString::from_text_lossy("\u{fb05}").as_utf8(), "ſt");
-    assert_eq!(TextString::from_text_lossy("\u{fb06}").as_utf8(), "st");
+    assert_eq!(TextString::from_text_lossy("\u{fb00}").as_str(), "ff");
+    assert_eq!(TextString::from_text_lossy("\u{fb01}").as_str(), "fi");
+    assert_eq!(TextString::from_text_lossy("\u{fb02}").as_str(), "fl");
+    assert_eq!(TextString::from_text_lossy("\u{fb03}").as_str(), "ffi");
+    assert_eq!(TextString::from_text_lossy("\u{fb04}").as_str(), "ffl");
+    assert_eq!(TextString::from_text_lossy("\u{fb05}").as_str(), "ſt");
+    assert_eq!(TextString::from_text_lossy("\u{fb06}").as_str(), "st");
     // Unassigned alphanumeric mathematical symbols.
     assert_eq!(
-        TextString::from_text_lossy("\u{1d455}").as_utf8(),
+        TextString::from_text_lossy("\u{1d455}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d49d}").as_utf8(),
+        TextString::from_text_lossy("\u{1d49d}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4a0}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4a0}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4a1}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4a1}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4a3}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4a3}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4a4}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4a4}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4a7}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4a7}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4a8}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4a8}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4ad}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4ad}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4ba}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4ba}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4bc}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4bc}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d4c4}").as_utf8(),
+        TextString::from_text_lossy("\u{1d4c4}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d506}").as_utf8(),
+        TextString::from_text_lossy("\u{1d506}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d50b}").as_utf8(),
+        TextString::from_text_lossy("\u{1d50b}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d50c}").as_utf8(),
+        TextString::from_text_lossy("\u{1d50c}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d515}").as_utf8(),
+        TextString::from_text_lossy("\u{1d515}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d51d}").as_utf8(),
+        TextString::from_text_lossy("\u{1d51d}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d53a}").as_utf8(),
+        TextString::from_text_lossy("\u{1d53a}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d53f}").as_utf8(),
+        TextString::from_text_lossy("\u{1d53f}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d545}").as_utf8(),
+        TextString::from_text_lossy("\u{1d545}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d547}").as_utf8(),
+        TextString::from_text_lossy("\u{1d547}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d548}").as_utf8(),
+        TextString::from_text_lossy("\u{1d548}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d549}").as_utf8(),
+        TextString::from_text_lossy("\u{1d549}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1d551}").as_utf8(),
+        TextString::from_text_lossy("\u{1d551}").as_str(),
         "\u{fffd}"
     );
 }
@@ -349,497 +334,335 @@ fn basic_text_string_pre_nfc_table() {
 #[test]
 fn basic_text_string_main_table() {
     // CRLF
-    assert_eq!(TextString::from_text_lossy("\r\n").as_utf8(), "\n");
+    assert_eq!(TextString::from_text_lossy("\r\n").as_str(), "\n");
 
     // CR
-    assert_eq!(TextString::from_text_lossy("\r").as_utf8(), "\n");
-    assert_eq!(TextString::from_text_lossy("\r\r").as_utf8(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\r").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\r\r").as_str(), "\n\n");
 
     // FF
-    assert_eq!(TextString::from_text_lossy("\u{c}").as_utf8(), " ");
+    assert_eq!(TextString::from_text_lossy("\u{c}").as_str(), " ");
 
     // Escape sequences.
-    assert_eq!(TextString::from_text_lossy("\u{1b}[").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[AB").as_utf8(), "B");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[+").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[+A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[+AB").as_utf8(), "B");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[++").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[++A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[++AB").as_utf8(), "B");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[\u{18}A").as_utf8(), "A");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[A").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[AB").as_str(), "B");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[+").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[+A").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[+AB").as_str(), "B");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[++").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[++A").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[++AB").as_str(), "B");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[\u{18}A").as_str(), "A");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[\u{1b}AB").as_str(), "B");
+    assert_eq!(TextString::from_text_lossy("\u{1b}]\u{7}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}]\u{18}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}]A\u{7}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}]A\u{18}").as_str(), "");
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}[\u{1b}AB").as_utf8(),
-        "B"
-    );
-    assert_eq!(TextString::from_text_lossy("\u{1b}]\u{7}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}]\u{18}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}]A\u{7}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}]A\u{18}").as_utf8(), "");
-    assert_eq!(
-        TextString::from_text_lossy("\u{1b}]A\u{1b}[BC").as_utf8(),
+        TextString::from_text_lossy("\u{1b}]A\u{1b}[BC").as_str(),
         "C"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}]A\u{1b}]CD\u{7}E").as_utf8(),
+        TextString::from_text_lossy("\u{1b}]A\u{1b}]CD\u{7}E").as_str(),
         "E"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}]A\n\tB၌\u{7}").as_utf8(),
+        TextString::from_text_lossy("\u{1b}]A\n\tB၌\u{7}").as_str(),
         ""
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}]A\n\tB၌\u{18}").as_utf8(),
+        TextString::from_text_lossy("\u{1b}]A\n\tB၌\u{18}").as_str(),
         ""
     );
-    assert_eq!(TextString::from_text_lossy("\u{1b}]\u{18}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}]A\u{18}").as_utf8(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}]\u{18}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}]A\u{18}").as_str(), "");
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}]A\n\tB၌\u{18}").as_utf8(),
+        TextString::from_text_lossy("\u{1b}]A\n\tB၌\u{18}").as_str(),
         ""
     );
-    assert_eq!(TextString::from_text_lossy("\u{1b}A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}\u{18}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}\u{1b}A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}A\n").as_utf8(), "\n");
+    assert_eq!(TextString::from_text_lossy("\u{1b}A").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}\u{18}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}\u{1b}A").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}A\n").as_str(), "\n");
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}\t").as_utf8(),
+        TextString::from_text_lossy("\u{1b}\t").as_str(),
         "\u{fffd}\t"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}\n").as_utf8(),
+        TextString::from_text_lossy("\u{1b}\n").as_str(),
         "\u{fffd}\n"
     );
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[A").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[\0").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7f}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[\n").as_utf8(), "\n");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[A\n").as_utf8(), "\n");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{18}").as_utf8(), "");
-    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7}").as_utf8(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[A").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\0").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7f}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\n").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[A\n").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{18}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{1b}A").as_str(), "A");
+    assert_eq!(TextString::from_text_lossy("\u{1b}").as_str(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("\u{1b}[[\u{1b}A").as_utf8(),
-        "A"
-    );
-    assert_eq!(TextString::from_text_lossy("\u{1b}").as_utf8(), "\u{fffd}");
-    assert_eq!(
-        TextString::from_text_lossy("\u{1b}\n").as_utf8(),
+        TextString::from_text_lossy("\u{1b}\n").as_str(),
         "\u{fffd}\n"
     );
 
     // DEL
-    assert_eq!(TextString::from_text_lossy("\u{7f}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{7f}").as_str(), "\u{fffd}");
 
     // NEL
-    assert_eq!(TextString::from_text_lossy("\u{85}").as_utf8(), " ");
+    assert_eq!(TextString::from_text_lossy("\u{85}").as_str(), " ");
 
     // C1
-    assert_eq!(TextString::from_text_lossy("\u{80}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{81}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{82}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{83}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{84}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{86}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{87}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{88}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{89}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{8a}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{8b}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{8c}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{8d}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{8e}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{8f}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{90}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{91}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{92}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{93}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{94}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{95}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{96}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{97}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{98}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{99}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9a}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9b}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9c}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9d}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9e}").as_utf8(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9f}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{80}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{81}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{82}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{83}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{84}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{86}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{87}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{88}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{89}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{8a}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{8b}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{8c}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{8d}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{8e}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{8f}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{90}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{91}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{92}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{93}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{94}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{95}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{96}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{97}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{98}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{99}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9a}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9b}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9c}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9d}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9e}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{9f}").as_str(), "\u{fffd}");
 
     assert_eq!(
-        TextString::from_text_lossy("\u{149}").as_utf8(),
+        TextString::from_text_lossy("\u{149}").as_str(),
         "\u{2bc}\u{6e}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{673}").as_utf8(),
+        TextString::from_text_lossy("\u{673}").as_str(),
         "\u{627}\u{65f}"
     );
-    assert_eq!(TextString::from_text_lossy("\u{f77}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{f77}").as_str(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("A\u{f77}").as_utf8(),
+        TextString::from_text_lossy("A\u{f77}").as_str(),
         "A\u{fb2}\u{f71}\u{f80}"
     );
-    assert_eq!(TextString::from_text_lossy("\u{f79}").as_utf8(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{f79}").as_str(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("A\u{f79}").as_utf8(),
+        TextString::from_text_lossy("A\u{f79}").as_str(),
         "A\u{fb3}\u{f71}\u{f80}"
     );
+    assert_eq!(TextString::from_text_lossy("\u{17a3}").as_str(), "\u{17a2}");
     assert_eq!(
-        TextString::from_text_lossy("\u{17a3}").as_utf8(),
-        "\u{17a2}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{17a4}").as_utf8(),
+        TextString::from_text_lossy("\u{17a4}").as_str(),
         "\u{17a2}\u{17b6}"
     );
+    assert_eq!(TextString::from_text_lossy("\u{17b4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{17b5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{17d8}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2028}").as_str(), " ");
+    assert_eq!(TextString::from_text_lossy("\u{2029}").as_str(), " ");
+    assert_eq!(TextString::from_text_lossy("\u{206a}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{206b}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{206b}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{206c}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{206d}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{206e}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{206f}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2df5}").as_str(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("\u{17b4}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{17b5}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{17d8}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(TextString::from_text_lossy("\u{2028}").as_utf8(), " ");
-    assert_eq!(TextString::from_text_lossy("\u{2029}").as_utf8(), " ");
-    assert_eq!(
-        TextString::from_text_lossy("\u{206a}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{206b}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{206b}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{206c}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{206d}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{206e}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{206f}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{2df5}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("A\u{2df5}").as_utf8(),
+        TextString::from_text_lossy("A\u{2df5}").as_str(),
         "A\u{2ded}\u{2dee}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{111c4}").as_utf8(),
+        TextString::from_text_lossy("\u{111c4}").as_str(),
         "\u{1118f}\u{11180}"
     );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd0}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd1}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd2}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd3}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd4}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd5}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd6}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd7}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd8}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdd9}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdda}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fddb}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fddc}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fddd}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdde}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fddf}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde0}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde1}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde2}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde3}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde4}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde5}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde6}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde7}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde8}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fde9}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdea}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdeb}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdec}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fded}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdee}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fdef}").as_utf8(),
-        "\u{fffd}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{fdd0}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd1}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd2}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd3}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd6}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd7}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd8}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdd9}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdda}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fddb}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fddc}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fddd}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdde}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fddf}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde0}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde1}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde2}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde3}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde4}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde5}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde6}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde7}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde8}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fde9}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdea}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdeb}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdec}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fded}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdee}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fdef}").as_str(), "\u{fffd}");
     // A BOM at the beginning. Unlike streams, strings don't ignore this.
-    assert_eq!(
-        TextString::from_text_lossy("\u{feff}").as_utf8(),
-        "\u{2060}"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{feff}").as_str(), "\u{2060}");
     // A BOM not at the beginning.
     assert_eq!(
-        TextString::from_text_lossy("A\u{feff}").as_utf8(),
+        TextString::from_text_lossy("A\u{feff}").as_str(),
         "A\u{2060}"
     );
+    assert_eq!(TextString::from_text_lossy("\u{fff9}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fffa}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fffb}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fffc}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fffd}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{fffe}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{ffff}").as_str(), "\u{fffd}");
     assert_eq!(
-        TextString::from_text_lossy("\u{fff9}").as_utf8(),
+        TextString::from_text_lossy("\u{1fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{fffa}").as_utf8(),
+        TextString::from_text_lossy("\u{1ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{fffb}").as_utf8(),
+        TextString::from_text_lossy("\u{2fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{fffc}").as_utf8(),
+        TextString::from_text_lossy("\u{2ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{fffd}").as_utf8(),
+        TextString::from_text_lossy("\u{3fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{3ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{4fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{4ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{1ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{5fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{2fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{5ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{2ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{6fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{3fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{6ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{3ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{7fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{4fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{7ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{4ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{8fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{5fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{8ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{5ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{9fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{6fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{9ffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{6ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{afffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{7fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{affff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{7ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{bfffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{8fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{bffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{8ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{cfffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{9fffe}").as_utf8(),
+        TextString::from_text_lossy("\u{cffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{9ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{dfffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{afffe}").as_utf8(),
+        TextString::from_text_lossy("\u{dffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{affff}").as_utf8(),
+        TextString::from_text_lossy("\u{efffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{bfffe}").as_utf8(),
+        TextString::from_text_lossy("\u{effff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{bffff}").as_utf8(),
+        TextString::from_text_lossy("\u{ffffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{cfffe}").as_utf8(),
+        TextString::from_text_lossy("\u{fffff}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{cffff}").as_utf8(),
+        TextString::from_text_lossy("\u{10fffe}").as_str(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text_lossy("\u{dfffe}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{dffff}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{efffe}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{effff}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{ffffe}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{fffff}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{10fffe}").as_utf8(),
-        "\u{fffd}"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{10ffff}").as_utf8(),
+        TextString::from_text_lossy("\u{10ffff}").as_str(),
         "\u{fffd}"
     );
 }
@@ -851,6013 +674,6013 @@ fn basic_text_string_cjk_compatibility_ideographs() {
     assert_eq!(
         TextString::from_text("\u{2f80c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{349e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f813}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{34b9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ca}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{34bb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f81f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{34df}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f824}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3515}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f867}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{36ee}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f868}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{36fc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f876}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3781}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f883}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{382f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f888}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3862}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f88a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{387c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f896}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{38c7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f89b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{38e3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{391c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{393a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3a2e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3a6c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3ae4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3b08}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ce}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3b19}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8de}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3b49}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3b9d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3b9d}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ee}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3c18}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3c4e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f90a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3d33}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f916}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3d96}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f92a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3eac}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f92c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3eb8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f92d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3eb8}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f933}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3f1b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f93e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{3ffc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f93f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4008}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4018}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4039}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f949}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4039}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f94b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4046}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f94c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4096}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f951}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{40e3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f958}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{412f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f960}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4202}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f964}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4227}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f967}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{42a0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f96d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4301}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f971}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4334}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f974}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4359}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f981}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{43d5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{43d9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f984}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{440b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f98e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{446b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{452b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ae}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{455d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9af}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4561}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{456b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9bf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{45d7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{45f9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4635}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9cd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{46be}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ce}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{46c7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ef}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4995}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{49e6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4a6e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4a76}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9fc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4ab2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa03}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4b33}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa08}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4bce}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa0d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4cce}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa0e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4ced}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa11}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4cf8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa16}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4d56}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f967}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e0d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa70}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e26}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f905}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e32}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f801}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e38}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f95e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e39}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f800}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e3d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f802}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e41}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f91b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e82}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ba}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4e86}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f977}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4eae}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9fd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4ec0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f819}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4ecc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4ee4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f804}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4f60}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa73}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4f80}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f92d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4f86}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4f8b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa30}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4fae}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f805}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4fae}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f806}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4fbb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f965}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{4fbf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f807}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5002}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{502b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f808}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{507a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f809}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5099}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f80b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{50cf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9bb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{50da}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa31}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{50e7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f80a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{50e7}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa0c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5140}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa74}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5145}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa32}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{514d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f80e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{514d}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f80f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5154}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f810}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5164}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f814}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5167}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa72}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5168}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f978}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5169}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{516d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f811}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5177}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa75}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5180}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f815}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{518d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5192}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5195}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f817}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5197}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f818}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51a4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f81a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51ac}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa71}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51b5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f81b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51b5}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f92e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51b7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f979}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51c9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f955}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51cc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f954}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51dc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa15}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f81d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{51f5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f81e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5203}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa00}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5207}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f850}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5207}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f99c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5217}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9dd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5229}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ff}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{523a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f820}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{523b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f821}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5246}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f822}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5272}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f823}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5277}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5289}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f98a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{529b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f99d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52a3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f992}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52b3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa76}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52c7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f825}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52c7}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa33}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52c9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f826}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52c9}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f952}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52d2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f92f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa34}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52e4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f827}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52e4}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f97f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52f5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa77}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52fa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f828}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{52fa}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f829}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5305}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f82a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5306}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f963}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5317}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f82b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5317}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9eb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{533f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f82c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5349}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa35}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5351}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f82d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5351}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f82e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{535a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f82f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5373}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f91c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5375}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f830}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{537d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f831}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{537f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f832}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{537f}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f833}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{537f}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f96b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{53c3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f836}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{53ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f837}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{53df}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f906}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{53e5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f839}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{53eb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f83a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{53f1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f83b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5406}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9de}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{540f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ed}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{541d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f83d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5438}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f980}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5442}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f83e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5448}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f83f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5468}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f83c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{549e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f840}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{54a2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f99e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{54bd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f841}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{54f6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f842}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5510}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f843}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5553}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa79}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5555}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f844}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5563}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f845}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5584}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f846}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5584}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f90b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5587}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa7a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5599}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f847}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5599}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa36}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{559d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa78}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{559d}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f848}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{55ab}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f849}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{55b3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa0d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{55c0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f84a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{55c2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa7b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{55e2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa37}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5606}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f84c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5606}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f84e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5651}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa38}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5668}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f84f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5674}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{56f9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f84b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5716}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f84d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5717}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f855}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{578b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f852}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{57ce}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f853}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{57f4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f854}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{580d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f857}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5831}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f856}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5832}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa39}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5840}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa10}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{585a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa7c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{585a}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f96c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{585e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa3a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58a8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f858}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58ac}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa7d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58b3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f94a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58d8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f942}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58df}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f851}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58ee}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f85a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58f2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f85b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{58f7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f85c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5906}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f85d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{591a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f85e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5922}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa7e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5944}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f90c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5948}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f909}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5951}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa7f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5954}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f85f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5962}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f981}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5973}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f865}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{59d8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f862}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{59ec}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f863}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5a1b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f864}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5a27}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa80}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5a62}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f866}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5a66}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f986}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ab5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f869}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5b08}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa81}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5b28}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f86a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5b3e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f86b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5b3e}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa04}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5b85}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f86d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5bc3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f86e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5bd8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f95f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5be7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9aa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5be7}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f86f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5be7}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f9bc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5bee}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f870}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5bf3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f872}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5bff}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f873}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c06}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f875}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c22}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9bd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c3f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f877}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c60}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f94b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c62}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa3b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c64}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9df}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c65}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa3c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c6e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f878}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c6e}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f87a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5c8d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f879}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5cc0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5d19}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f87c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5d43}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f921}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5d50}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f87f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5d6b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f87e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5d6e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f880}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5d7c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5db2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ab}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5dba}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f881}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5de1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f882}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5de2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f884}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5dfd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f885}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5e28}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f886}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5e3d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f887}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5e69}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f98e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5e74}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa01}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ea6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f88b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5eb0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f88c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5eb3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f88d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5eb6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ec9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f928}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5eca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f88e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5eca}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa82}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ed2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa0b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ed3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa83}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ed9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f982}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5eec}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f890}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5efe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f943}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f04}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f894}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f22}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f895}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f22}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f874}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f53}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f899}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f62}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa84}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f69}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f89a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f6b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f8b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f89c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5f9a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f966}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5fa9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa85}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5fad}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f89d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5fcd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f89e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5fd7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ff5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f89f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{5ff9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f960}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6012}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ac}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{601c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa6b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6075}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6081}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa3d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6094}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6094}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{60c7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa86}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{60d8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{60e1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa88}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6108}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6144}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6148}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{614c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{614c}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa87}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{614e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{614e}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa8a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6160}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa3e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6168}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8aa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{617a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa3f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{618e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa89}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{618e}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ab}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{618e}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f98f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6190}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ad}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61a4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ae}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61af}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ac}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61b2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8af}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa40}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61f2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa8b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61f2}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61f2}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f90d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61f6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{61f6}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f990}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6200}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6210}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{621b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{622e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa8c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6234}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{625d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62b1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f925}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62c9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f95b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62cf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa02}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62d3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62d4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ba}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62fc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f973}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{62fe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{633d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6350}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8bb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6368}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{637b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8bc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6383}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f975}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{63a0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{63a9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa8d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{63c4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{63c5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8bd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{63e4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa8e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{641c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8bf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6422}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa8f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6452}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6469}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6477}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{647e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f991}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{649a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{649d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f930}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{64c4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa41}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{654f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{654f}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa90}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6556}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8c9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{656c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f969}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6578}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9be}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6599}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f983}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{65c5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa42}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{65e2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8cb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{65e3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6613}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8cd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6649}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa12}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6674}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa91}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6674}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6688}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa43}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6691}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8cf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6691}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{669c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa06}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{66b4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f98b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{66c6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f901}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{66f4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8cc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{66f8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6700}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f929}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6717}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa92}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6717}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6717}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{fa93}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{671b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{671b}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8da}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6721}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{674e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8dc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6753}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa94}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6756}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8db}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{675e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{677b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6785}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6797}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{67f3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8df}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{67fa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9da}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6817}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{681f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6852}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f97a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6881}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa44}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6885}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6885}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{688e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{68a8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6914}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6942}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{69a3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ea}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{69ea}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f914}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6a02}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f95c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6a02}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9bf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6a02}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f94c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6a13}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8eb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6aa8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f931}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ad3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ed}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6adb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f91d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b04}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ef}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b21}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b54}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b72}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f98c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b77}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa95}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b79}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6b9f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6bae}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f970}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6bba}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa96}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6bba}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6bba}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6bbb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8fa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6c4e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8fe}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6c67}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f972}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6c88}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8fc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6cbf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f968}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ccc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8fd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ccd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ce5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ff}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d16}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f915}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d1b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa05}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d1e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f907}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d34}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f900}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d3e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ca}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d41}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa97}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d41}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f902}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d41}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{2f903}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d69}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f92a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d6a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa45}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d77}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f901}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d77}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f904}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d78}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f905}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6d85}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6dcb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f94d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6dda}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6dea}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f90e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6df9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa46}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6e1a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f908}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6e2f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f909}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6e6e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9cb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6e9c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ec}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6eba}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f90c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ec7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa99}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ecb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f90b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ecb}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f904}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ed1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa98}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6edb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f94e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6f0f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa47}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6f22}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa9a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6f22}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f992}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6f23}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f90f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6f6e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f912}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6fc6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f922}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6feb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f984}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{6ffe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f915}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{701b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa9b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{701e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f914}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{701e}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f913}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7039}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f917}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{704a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f835}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7070}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f919}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7077}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f918}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{707d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9fb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7099}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f91a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{70ad}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f99f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{70c8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f916}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{70d9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f91c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7145}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f993}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7149}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa48}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{716e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa9c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{716e}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f91e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{719c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{71ce}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ee}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{71d0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f932}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7210}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f91e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{721b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f920}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7228}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa49}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{722b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa9e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7235}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f921}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7235}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f922}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7250}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f946}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7262}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f924}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7280}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f925}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7295}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa9f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{72af}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9fa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{72c0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f92b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{72fc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa16}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{732a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{732a}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7375}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f928}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{737a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f961}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7387}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9db}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7387}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f929}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{738b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f92b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{73a5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ad}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{73b2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f917}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{73de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7406}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9cc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7409}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa4a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7422}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f92e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7447}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f92f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{745c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ae}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7469}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7471}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f930}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7471}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f931}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7485}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f994}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7489}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ef}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7498}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f932}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{74ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7506}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f934}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7524}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{753b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f936}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{753e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9cd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7559}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f976}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7565}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f962}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7570}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f938}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7570}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{75e2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f93a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7610}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{761d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{761f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7642}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f90e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7669}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa17}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{76ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{76ca}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{faa7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{76db}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f933}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{76e7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{76f4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f940}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{76f4}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f96d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7701}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f945}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{771e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f946}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{771f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f947}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{771f}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{faaa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7740}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faa9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{774a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f948}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{774a}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f94a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{778b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa9d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{77a7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f94e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{784e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ce}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{786b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f93b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{788c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f94f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{788c}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa4b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7891}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f947}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{78ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faab}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{78cc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f950}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{78cc}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f964}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{78fb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f985}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{792a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa18}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{793c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa4c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{793e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa4e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7948}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa4d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7949}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa4f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7950}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa50}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7956}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f953}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7956}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa51}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{795d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa19}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{795e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa1a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7965}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f93c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{797f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa52}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{798d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa53}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{798e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa1b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{798f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f956}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{798f}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{79ae}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f995}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{79ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f957}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{79eb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f956}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7a1c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa54}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7a40}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f959}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7a40}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f95a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7a4a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f95b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7a4f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa55}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7a81}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faac}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7ab1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7acb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f95f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7aee}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7b20}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa56}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7bc0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faad}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7bc0}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f962}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7bc6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f963}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7bc9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7c3e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f944}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7c60}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faae}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7c7b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7c92}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa1d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7cbe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f966}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7cd2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa03}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7cd6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f969}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7ce3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f97b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7ce7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f968}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7ce8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f96a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7d00}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9cf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7d10}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f96a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7d22}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f94f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7d2f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faaf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7d5b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f96c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7d63}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f93d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7da0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f957}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7dbe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f96e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7dc7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f996}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7df4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa57}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7df4}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fab0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7df4}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{2f96f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7e02}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa58}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7e09}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f950}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7e37}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa59}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7e41}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f970}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7e45}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f3e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa5a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f72}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f79}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f976}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f7a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f90f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f85}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f978}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f95}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9af}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7f9a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa1e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7fbd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f979}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{7ffa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f934}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8001}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa5b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8005}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8005}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f97a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8005}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8046}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f97d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8060}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f997}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{806f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f97f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8070}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f945}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{807e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f953}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{808b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8d6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{80ad}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f982}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{80b2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f983}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8103}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f985}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{813e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f926}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{81d8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{81e8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa5c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{81ed}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f893}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8201}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f98b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8201}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f98c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8204}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa6d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8218}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f97c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{826f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa5d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8279}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa5e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8279}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f990}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{828b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f98f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8291}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f991}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{829d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f993}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{82b1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f994}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{82b3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f995}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{82bd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f974}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{82e5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f998}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{82e5}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f996}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{82e6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f999}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{831d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f99c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8323}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9fe}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8336}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8352}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8353}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f99a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8363}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f99b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83ad}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f99d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83bd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f93e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83c9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83cc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83dc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f99e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83e7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83ef}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f958}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{83f1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f918}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{843d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f96e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8449}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa5f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8457}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f99f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8457}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f999}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{84ee}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{84f1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{84f3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{84fc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9aa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8516}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ac}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8564}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f923}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{85cd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{85fa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f935}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8606}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa20}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8612}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f91f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{862d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f910}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{863f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8650}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f936}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{865c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{865c}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8667}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8669}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8688}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{86a9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ba}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{86e2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{870e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9bc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8728}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9bd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{876b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8779}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9bb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8779}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9be}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8786}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f911}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{87ba}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{87e1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8801}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f927}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{881f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa08}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{884c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8860}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8863}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88c2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88cf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88d7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88e1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f912}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88f8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{88fa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa60}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8910}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8941}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f924}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8964}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8986}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa0a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{898b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa61}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8996}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fab8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8996}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9cf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8aa0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f96f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8aaa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9a1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8aaa}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fab9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8abf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fabb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8acb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f97d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8ad2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f941}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8ad6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fabe}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8aed}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8aed}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa22}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8af8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faba}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8af8}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f95d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8afe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fabd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8afe}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa62}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b01}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fabc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b01}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa63}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b39}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fabf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b39}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9fc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b58}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f95a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b80}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b8a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8b8a}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f900}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8c48}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8c55}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8cab}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8cc1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f948}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8cc2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f903}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8cc8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa64}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8cd3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa65}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8d08}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8d08}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8d1b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8d77}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9db}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8dbc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9da}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8dcb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f937}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8def}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9dc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8df0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f902}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8eca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9de}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8ed4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f998}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f26}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f2a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f38}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9df}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f38}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fa07}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f3b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f98d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f62}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f98d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8f9e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f971}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8fb0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa66}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{8fb6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f99a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9023}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa25}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9038}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa67}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9038}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fac3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9072}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{907c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f913}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{908f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9094}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f92c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{90ce}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa2e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{90de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{90f1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa26}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{90fd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9111}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{911b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f919}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{916a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9199}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{91b4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9e9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{91cc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f97e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{91cf}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f90a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{91d1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9234}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9238}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9276}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ea}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{927c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{92d7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{92d8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f93f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9304}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f99b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{934a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9eb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{93f9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ec}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9415}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ee}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{958b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f986}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{95ad}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{95b7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{962e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f951}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{964b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa09}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{964d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f959}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9675}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9678}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{967c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9dc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9686}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96a3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa2f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96b7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96b8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96c3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9ea}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96e2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa68}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96e3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96e3}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96f6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f949}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{96f7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9723}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f938}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9732}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9748}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa1c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9756}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fac8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9756}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{fac9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{97db}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9fa}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{97e0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa69}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{97ff}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{faca}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{97ff}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{facb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{980b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9fe}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{980b}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ff}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{980b}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{f9b4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9818}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa00}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9829}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa6a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{983b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{facc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{983b}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f9d0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{985e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa02}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{98e2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa2a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{98ef}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa2b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{98fc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa2c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9928}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa04}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9929}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa05}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{99a7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa06}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{99c2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f91a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{99f1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa07}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{99fe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f987}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9a6a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{facd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9b12}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa0a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9b12}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{f939}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9b6f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa0b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9c40}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f2}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9c57}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa0c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9cfd}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa0f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9d67}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa2d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9db4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f93a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9dfa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f920}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9e1e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f940}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9e7f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f988}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9e97}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9f3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9e9f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa15}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9ebb}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f989}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9ece}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa17}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9ef9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa18}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9efe}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa19}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f05}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa1a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f0f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa1b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f16}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa1c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f3b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f43}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f9c4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f8d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f8e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f907}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f9c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{f908}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f9c}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{face}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{9f9c}\u{fe02}"
     );
     assert_eq!(
         TextString::from_text("\u{2f803}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{20122}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f812}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2051c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f91b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{20525}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f816}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2054b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f80d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2063a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{20804}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9dd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{208de}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f834}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{20a2c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f838}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{20b63}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f859}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{214e4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f860}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{216a8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f861}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{216ea}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f86c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{219c8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f871}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{21b18}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{21d0b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f87b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{21de4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f87d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{21de6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f889}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{22183}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f939}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2219f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f891}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{22331}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f892}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{22331}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8a4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{226d4}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{22844}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{facf}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2284a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8b8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{22b0c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8be}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{22bf1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ca}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2300a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f897}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{232b8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f980}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2335f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f989}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23393}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f98a}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2339c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8dd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{233c3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{233d5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8e3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2346d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8ec}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{236a3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{238a7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23a8d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8f9}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23afa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f8fb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23cbc}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f906}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23d1e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f90d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23ed1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f910}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23f5e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f911}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{23f8e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f91d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24263}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fa6c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{242ee}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f91f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{243ab}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f923}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24608}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f926}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24735}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f927}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24814}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f935}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24c36}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f937}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24c92}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f93b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24fa1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f93c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{24fb8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f93d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25044}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f942}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{250f2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f941}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{250f3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f943}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25119}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f944}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25133}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25249}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f94d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2541d}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f952}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25626}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f954}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2569a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f955}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{256c5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f95c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2597c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f95d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25aa7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f95e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25aa7}\u{fe01}"
     );
     assert_eq!(
         TextString::from_text("\u{2f961}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25bab}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f965}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25c80}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25cd0}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f96b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{25f86}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f898}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{261da}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f972}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26228}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f973}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26247}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f975}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{262d9}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f977}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2633e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f97b}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{264da}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f97c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26523}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f97e}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{265a8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f987}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{267a7}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f988}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{267b5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f997}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26b3c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a4}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26c36}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26cd5}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9a5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26d6b}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ad}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26f2c}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{26fb1}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9b1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{270d2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ab}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{273ca}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9c5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{27667}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9cb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{278ae}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9cc}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{27966}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d3}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{27ca8}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{fad7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{27ed3}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9d8}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{27f2f}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e0}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{285d2}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{285ed}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9e5}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2872e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9ed}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{28bfa}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f1}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{28d77}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f6}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{29145}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f81c}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{291df}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9f7}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2921a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9fb}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2940a}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f9fd}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{29496}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa01}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{295b6}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa09}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{29b30}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa10}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2a0ce}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa12}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2a105}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa13}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2a20e}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa14}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2a291}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2f88f}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2a392}\u{fe00}"
     );
     assert_eq!(
         TextString::from_text("\u{2fa1d}".to_owned())
             .unwrap()
-            .as_utf8(),
+            .as_str(),
         "\u{2a600}\u{fe00}"
     );
 }

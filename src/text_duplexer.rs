@@ -255,12 +255,12 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadStrLayered for Te
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDuplexer<Inner> {
     #[inline]
-    fn read_text(&mut self, buf: &mut TextStr) -> io::Result<usize> {
+    fn read_text(&mut self, buf: &mut str) -> io::Result<usize> {
         TextInput::read_text(self, buf)
     }
 
     #[inline]
-    fn read_exact_text(&mut self, buf: &mut TextStr) -> io::Result<()> {
+    fn read_exact_text(&mut self, buf: &mut str) -> io::Result<()> {
         TextInput::read_exact_text(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
@@ -276,12 +276,12 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDupl
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadTextLayered for TextDuplexer<Inner> {
     #[inline]
-    fn read_text_with_status(&mut self, buf: &mut TextStr) -> io::Result<(usize, Status)> {
+    fn read_text_with_status(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
         TextInput::read_text_with_status(self, buf)
     }
 
     #[inline]
-    fn read_exact_text_using_status(&mut self, buf: &mut TextStr) -> io::Result<Status> {
+    fn read_exact_text_using_status(&mut self, buf: &mut str) -> io::Result<Status> {
         TextInput::read_exact_text_using_status(self, buf)
     }
 }

@@ -246,7 +246,7 @@ impl TextString {
     /// Converts a `TextString` into a `String`.
     #[inline]
     #[must_use]
-    pub fn into_utf8(self) -> String {
+    pub fn into_string(self) -> String {
         self.0
     }
 
@@ -260,28 +260,28 @@ impl TextString {
     /// Extracts a UTF-8 string slice containing the entire `TextString`.
     #[inline]
     #[must_use]
-    pub fn as_utf8(&self) -> &str {
+    pub fn as_str(&self) -> &str {
         &self.0
     }
 
     /// Extracts a Basic Text string slice containing the entire `TextString`.
     #[inline]
     #[must_use]
-    pub fn as_str(&self) -> &TextStr {
+    pub fn as_text(&self) -> &TextStr {
         self
     }
 
     /// Converts a `TextString` into a mutable UTF-8 string slice.
     #[inline]
     #[must_use]
-    pub fn as_mut_utf8(&mut self) -> &mut str {
+    pub fn as_mut_str(&mut self) -> &mut str {
         &mut self.0
     }
 
     /// Converts a `TextString` into a mutable Basic Text string slice.
     #[inline]
     #[must_use]
-    pub fn as_mut_str(&mut self) -> &mut TextStr {
+    pub fn as_mut_text(&mut self) -> &mut TextStr {
         self
     }
 
@@ -395,14 +395,14 @@ impl TextString {
 
     /// Converts this `TextString` into a `Box<str>`.
     #[inline]
-    pub fn into_boxed_utf8(self) -> Box<str> {
+    pub fn into_boxed_str(self) -> Box<str> {
         self.0.into_boxed_str()
     }
 
     /// Converts this `TextString` into a `Box<TextStr>`.
     #[inline]
     pub fn into_boxed_text(self) -> Box<TextStr> {
-        let slice = self.into_boxed_utf8();
+        let slice = self.into_boxed_str();
         unsafe { TextStr::from_boxed_text_unchecked(slice) }
     }
 }
@@ -465,7 +465,7 @@ impl AsRef<Path> for TextString {
 impl AsRef<str> for TextString {
     #[inline]
     fn as_ref(&self) -> &str {
-        self.as_utf8()
+        self.as_str()
     }
 }
 
@@ -871,7 +871,7 @@ impl TextStr {
 
     /// Extracts a UTF-8 string slice containing the entire `TextStr`.
     #[inline]
-    pub fn as_utf8(&self) -> &str {
+    pub fn as_str(&self) -> &str {
         &self.0
     }
 
@@ -1107,7 +1107,7 @@ impl TextStr {
 
     /// Converts a `Box<TextStr>` into a `String` without copying or allocating.
     #[inline]
-    pub fn into_utf8(self: Box<Self>) -> String {
+    pub fn into_string(self: Box<Self>) -> String {
         let slice = Box::<[u8]>::from(self);
         unsafe { String::from_utf8_unchecked(slice.into_vec()) }
     }
@@ -1116,7 +1116,7 @@ impl TextStr {
     /// allocating.
     #[inline]
     pub fn into_text_string(self: Box<Self>) -> TextString {
-        unsafe { TextString::from_text_unchecked(Self::into_utf8(self)) }
+        unsafe { TextString::from_text_unchecked(Self::into_string(self)) }
     }
 
     // TODO: make_ascii_uppercase, make_ascii_lowercase, escape_debug,
