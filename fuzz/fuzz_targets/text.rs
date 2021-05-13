@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate libfuzzer_sys;
 
-use basic_text::{TextReader, TextWriter};
+use basic_text::{TextReader, TextWriter, TextStr};
 use layered_io::{LayeredWriter, SliceReader};
 use std::{
     io::{Read, Write},
@@ -81,4 +81,8 @@ fuzz_target!(|bytes: &[u8]| {
                 .unwrap_err();
         }
     }
+
+    // Basic text is closed under concatenation.
+    s.push_str(&s.clone());
+    assert_eq!(TextStr::from_text(&s).unwrap(), &s);
 });
