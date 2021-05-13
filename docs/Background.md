@@ -1,7 +1,7 @@
 # Background
 
-This document explains the decisions behind the [Basic Text] format and provides
-links to related standards, documentation, and other resources.
+This document explains the decisions behind the [Basic Text] format and
+provides links to related standards, documentation, and other resources.
 
 ## Overall approach to Basic Text
 
@@ -32,8 +32,8 @@ makes, and links to related standards and documentation.
 
 ### NFC, Normalization
 
-[Basic Text] normalizes to NFC, using a special algorithm to minimize loss
-of intent. See [this page](NFC.md) for motivation and rationale.
+[Basic Text] normalizes to NFC, using a special algorithm to minimize loss of
+intent. See [this page](NFC.md) for motivation and rationale.
 
 ### Newlines
 
@@ -99,9 +99,8 @@ practice, however it's fairly obscure, and often not recognized.
 
 And even in places where U+C is recognized, there is ambiguity about what it
 means. Implementations differ on whether it's meant to position the cursor at
-the beginning of a line in the next page or at its previous column in
-the next page. And, they differ on whether it should be considered a line
-terminator.
+the beginning of a line in the next page or at its previous column in the next
+page. And, they differ on whether it should be considered a line terminator.
 
 And, on devices where U+C clears the current screen, that's a significant
 side effect which could interfere with the visibility of other unrelated data.
@@ -116,9 +115,9 @@ about its meaning is resolved.
 
 It might be tempting to disallow tab on the basis of it being a control
 code primarily concerned with how text is aligned on the screen, which is
-typically considered a feature of higher-level protocols. However, Tab's effects
-are much more mild than other control codes, and in practice it has several uses,
-some of which [require it], so we allow it.
+typically considered a feature of higher-level protocols. However, Tab's
+effects are much more mild than other control codes, and in practice it has
+several uses, some of which [require it], so we allow it.
 
 We can refer to it as just "Tab" though, rather than "Horizontal Tab", since
 [Basic Text] excludes Vertical Tab.
@@ -143,9 +142,9 @@ Escape sequences can cause a wide variety of side effects. Plain text
 shouldn't be able to have side effects.
 
 Basic Text includes some fairly conservative regular expressions for matching
-not just the U+1B, but also the sequences which commonly make up escape sequences,
-such as CSI and OSC, so that entire sequences are cleanly ignored, as is common
-with unrecognized escape sequences.
+not just the U+1B, but also the sequences which commonly make up escape
+sequences, such as CSI and OSC, so that entire sequences are cleanly ignored,
+as is common with unrecognized escape sequences.
 
 ### Deprecated scalar values
 
@@ -284,7 +283,7 @@ The rest of the C1 controls are non-printing control codes rather than text.
 The Latin Ligatures were added to Unicode for round-trip compatibility with
 other character sets. As explained in the [Unicode FAQ on Ligatures], ligatures
 should be handled by a display system, rather than being encoded in the text
-iself.
+itself.
 
 [Unicode FAQ on Ligatures]: https://unicode.org/faq/ligature_digraph.html
 
@@ -301,10 +300,10 @@ The Musical Controls U+1D173–U+1D17A are non-printing control characters,
 however they can usually be safely ignored by producers that don't support
 them.
 
-The musical symbols and controls in Unicode are not sufficient to express
-most forms of music, however higher-level formats built on top of Unicode do
-use these symbols, in combination with their own specialized markup features,
-so Basic Text includes them.
+The musical symbols and controls in Unicode are not sufficient to express most
+forms of music, however higher-level formats built on top of Unicode do use
+these symbols, in combination with their own specialized markup features, so
+Basic Text includes them.
 
 See also [Musical Controls in Markup].
 

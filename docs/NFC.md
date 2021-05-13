@@ -124,8 +124,8 @@ Compatibility Punctuation, is:
 is not necessary for interoperating with legacy Greek data, and [its] use is
 not generally encouraged for representation of Greek punctuation.
 
-According to (English) Wikipedia, U+387 is [infrequently encountered]. And Greek
-Wikipedia seems to use U+387 and U+B7 [interchangeably].
+According to (English) Wikipedia, U+387 is [infrequently encountered]. And
+Greek Wikipedia seems to use U+387 and U+B7 [interchangeably].
 
 [infrequently encountered]: https://en.wikipedia.org/wiki/Interpunct#Greek
 [interchangeably]: https://el.wikipedia.org/wiki/%CE%86%CE%BD%CF%89_%CF%84%CE%B5%CE%BB%CE%B5%CE%AF%CE%B1
