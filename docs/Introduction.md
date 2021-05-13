@@ -1,5 +1,16 @@
 # Introduction
 
+Basic Text is a subset of Unicode intending to simplify plain text use cases,
+so that consumers don't need to worry about control codes, deprecated
+codepoints, newline conventions, or other complexities.
+
+This book contains the specification and supporting documentation. There is
+also [a Github repo] containing a prototype implementation.
+
+[a Github repo]: https://github.com/sunfishcode/basic-text/
+
+## Background
+
 *Plain text* is an intuitive concept that plays an important role in
 computing.
 
