@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate libfuzzer_sys;
 
-use basic_text::{TextReader, TextWriter, TextStr};
+use basic_text::{TextReader, TextStr, TextWriter};
 use layered_io::{LayeredWriter, SliceReader};
 use std::{
     io::{Read, Write},
