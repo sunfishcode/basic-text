@@ -19,7 +19,8 @@ use std::{
     rc::Rc,
     str,
 };
-use unicode_normalization::UnicodeNormalization;
+use unicode_normalization::is_nfc_stream_safe_quick;
+use unicode_normalization::{IsNormalized, UnicodeNormalization};
 use utf8_io::{ReadStrLayered, WriteStr};
 
 /// Abstract over `TextWriter` and the writer half of `TextDuplexer`.
@@ -294,67 +295,98 @@ impl TextOutput {
         s: &str,
     ) -> io::Result<()> {
         let error = Rc::new(RefCell::new(None));
-        let impl_ = internals.impl_();
+
+        if is_nfc_stream_safe_quick(s.chars()) == IsNormalized::Yes {
+            // Fast path: Data is already Stream-Safe and NFC. Just check it
+            // for errors.
+            for c in Categorize::new(s.chars(), Rc::clone(&error)) {
+                Self::state_machine_char(internals, c, &error)?;
+            }
+        } else {
+            Self::state_machine_slow_path(internals, s, &error)?;
+        }
+
+        Ok(())
+    }
+
+    #[cold]
+    fn state_machine_slow_path<Inner: WriteStr + WriteLayered>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        s: &str,
+        error: &Rc<RefCell<Option<io::Error>>>,
+    ) -> io::Result<()> {
+        // Slow path: Compute Stream-Safe and NFC.
         for c in Categorize::new(s.chars(), Rc::clone(&error))
             .cjk_compat_variants()
             .stream_safe()
             .nfc()
         {
-            match (&impl_.state, c) {
-                // Recognize ANSI-style color escape sequences.
-                (State::Ground(_), ESC) if impl_.ansi_color => {
-                    impl_.state = State::Esc;
-                    impl_.escape_sequence.clear();
-                    impl_.escape_sequence.push(ESC);
-                }
-                (State::Esc, '[') => {
-                    impl_.state = State::Csi;
-                    impl_.escape_sequence.push('[');
-                }
-                (State::Csi, c) if matches!(c, ' '..='?') => impl_.escape_sequence.push(c),
-                (State::Csi, 'm') => {
-                    impl_.escape_sequence.push('m');
-                    impl_.buffer.push_str(&impl_.escape_sequence);
-                    impl_.state = State::Ground(Ground::Other);
-                }
+            Self::state_machine_char(internals, c, &error)?;
+        }
 
-                (State::Ground(_), '\n') => {
-                    impl_.state = State::Ground(Ground::Newline);
-                    impl_.buffer.push(c);
-                }
+        Ok(())
+    }
 
-                (State::Ground(_), SUB) => {
-                    // SUB indicates an error sent through the NFC iterator
-                    // chain, and the Rc<RefCell<Option<io::Error>>> holds the
-                    // actual error.
-                    Self::reset_state(internals);
-                    return Err(take(&mut *error.borrow_mut()).unwrap());
-                }
+    fn state_machine_char<Inner: WriteStr + WriteLayered>(
+        internals: &mut impl TextWriterInternals<Inner>,
+        c: char,
+        error: &Rc<RefCell<Option<io::Error>>>,
+    ) -> io::Result<()> {
+        let impl_ = internals.impl_();
+        match (&impl_.state, c) {
+            // Recognize ANSI-style color escape sequences.
+            (State::Ground(_), ESC) if impl_.ansi_color => {
+                impl_.state = State::Esc;
+                impl_.escape_sequence.clear();
+                impl_.escape_sequence.push(ESC);
+            }
+            (State::Esc, '[') => {
+                impl_.state = State::Csi;
+                impl_.escape_sequence.push('[');
+            }
+            (State::Csi, c) if matches!(c, ' '..='?') => impl_.escape_sequence.push(c),
+            (State::Csi, 'm') => {
+                impl_.escape_sequence.push('m');
+                impl_.buffer.push_str(&impl_.escape_sequence);
+                impl_.state = State::Ground(Ground::Other);
+            }
 
-                (State::Ground(_), ESC) => {
-                    Self::reset_state(internals);
-                    return Err(io::Error::new(io::ErrorKind::Other, "escape control code"));
-                }
+            (State::Ground(_), '\n') => {
+                impl_.state = State::Ground(Ground::Newline);
+                impl_.buffer.push(c);
+            }
 
-                // Common case: in ground state and reading a normal char.
-                (State::Ground(_), c) => {
-                    let ground = if !is_basic_text_end(c) {
-                        Ground::ZwjOrPrepend
-                    } else {
-                        Ground::Other
-                    };
-                    impl_.state = State::Ground(ground);
-                    impl_.buffer.push(c);
-                }
+            (State::Ground(_), SUB) => {
+                // SUB indicates an error sent through the NFC iterator
+                // chain, and the Rc<RefCell<Option<io::Error>>> holds the
+                // actual error.
+                Self::reset_state(internals);
+                return Err(take(&mut *error.borrow_mut()).unwrap());
+            }
 
-                // Escape sequence not recognized.
-                (State::Esc, c) | (State::Csi, c) => {
-                    Self::reset_state(internals);
-                    return Err(io::Error::new(
-                        io::ErrorKind::Other,
-                        format!("unrecognized escape sequence, ending in {:?}", c),
-                    ));
-                }
+            (State::Ground(_), ESC) => {
+                Self::reset_state(internals);
+                return Err(io::Error::new(io::ErrorKind::Other, "escape control code"));
+            }
+
+            // Common case: in ground state and reading a normal char.
+            (State::Ground(_), c) => {
+                let ground = if !is_basic_text_end(c) {
+                    Ground::ZwjOrPrepend
+                } else {
+                    Ground::Other
+                };
+                impl_.state = State::Ground(ground);
+                impl_.buffer.push(c);
+            }
+
+            // Escape sequence not recognized.
+            (State::Esc, c) | (State::Csi, c) => {
+                Self::reset_state(internals);
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    format!("unrecognized escape sequence, ending in {:?}", c),
+                ));
             }
         }
         Ok(())

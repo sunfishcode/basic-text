@@ -17,7 +17,10 @@ use std::{
     mem::take,
     str,
 };
-use unicode_normalization::{Recompositions, Replacements, StreamSafe, UnicodeNormalization};
+use unicode_normalization::{
+    is_nfc_stream_safe_quick, IsNormalized, Recompositions, Replacements, StreamSafe,
+    UnicodeNormalization,
+};
 use utf8_io::{ReadStrLayered, WriteStr};
 
 /// Abstract over `TextReader` and the reader half of `TextDuplexer`.
@@ -77,8 +80,11 @@ pub(crate) struct TextInput {
     queue: VecDeque<char>,
 
     /// An iterator over the chars in `self.queue`.
-    queue_iter:
-        Recompositions<StreamSafe<ReplaceSelected<Replacements<vec_deque::IntoIter<char>>>>>,
+    ssnfc_iter: Recompositions<StreamSafe<Replacements<vec_deque::IntoIter<char>>>>,
+
+    /// The number of characters in the queue which are already verified to be
+    /// Stream-Safe NFC and can skip normalization.
+    quick: usize,
 
     /// When we can't fit all the data from an underlying read in our buffer,
     /// we buffer it up. Remember the status value so we can replay that too.
@@ -103,11 +109,12 @@ impl TextInput {
         Self {
             raw_string: String::new(),
             queue,
-            queue_iter: ReplaceSelected::new(
-                VecDeque::<char>::new().into_iter().cjk_compat_variants(),
-            )
-            .stream_safe()
-            .nfc(),
+            ssnfc_iter: VecDeque::<char>::new()
+                .into_iter()
+                .cjk_compat_variants()
+                .stream_safe()
+                .nfc(),
+            quick: 0,
             pending_status: Status::active(),
             expect_starter: true,
             at_start: true,
@@ -207,15 +214,31 @@ impl TextInput {
     }
 
     fn queue_next(&mut self) -> Option<char> {
-        match self.queue_iter.next() {
-            Some(c) => Some(c),
-            None => {
-                let index = self.queue.iter().position(|c| matches!(*c, '\n' | CGJ))?;
-                let tmp = self.queue.drain(0..=index).collect::<VecDeque<char>>();
-                self.queue_iter = ReplaceSelected::new(tmp.into_iter().cjk_compat_variants())
-                    .stream_safe()
-                    .nfc();
-                self.queue_iter.next()
+        let quick = self.quick;
+        if quick != 0 {
+            self.quick = quick - 1;
+            self.queue.pop_front()
+        } else {
+            match self.ssnfc_iter.next() {
+                Some(c) => Some(c),
+                None => {
+                    let index = self.queue.len()
+                        - self
+                            .queue
+                            .iter()
+                            .rev()
+                            .position(|c| matches!(*c, '\n' | CGJ))?;
+                    if is_nfc_stream_safe_quick(self.queue.iter().take(index).copied())
+                        == IsNormalized::Yes
+                    {
+                        self.quick = index - 1;
+                        self.queue.pop_front()
+                    } else {
+                        let tmp = self.queue.drain(..index).collect::<VecDeque<char>>();
+                        self.ssnfc_iter = tmp.into_iter().cjk_compat_variants().stream_safe().nfc();
+                        self.ssnfc_iter.next()
+                    }
+                }
             }
         }
     }
@@ -257,7 +280,7 @@ impl TextInput {
                                 c = REPL;
                             }
                         }
-                        self.queue.push_back(c);
+                        self.queue.extend(ReplaceSelected::new([c].iter().copied()));
                         self.state = State::Ground(false);
                     }
 
@@ -328,13 +351,15 @@ impl TextInput {
         }
 
         let mut nread = 0;
-
         loop {
             match internals.impl_().queue_next() {
                 Some(c) => nread += c.encode_utf8(&mut buf[nread..]).len(),
                 None => break,
             }
             if buf.len() - nread < MAX_UTF8_SIZE {
+                // We may have overwritten part of a codepoint; overwrite the rest
+                // of the buffer.
+                buf[nread..].fill(b'\0');
                 return Ok((nread, Status::active()));
             }
         }
@@ -344,7 +369,7 @@ impl TextInput {
 
             // We may have overwritten part of a codepoint; overwrite the rest
             // of the buffer.
-            buf[nread..].fill(b'?');
+            buf[nread..].fill(b'\0');
 
             return Ok((nread, internals.impl_().pending_status));
         }
@@ -409,7 +434,7 @@ impl TextInput {
 
         // We may have overwritten part of a codepoint; overwrite the rest
         // of the buffer.
-        buf[nread..].fill(b'?');
+        buf[nread..].fill(b'\0');
 
         Ok((
             nread,
