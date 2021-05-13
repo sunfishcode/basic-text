@@ -1012,7 +1012,7 @@ impl AsRef<str> for TextStr {
     }
 }
 
-impl AsRef<TextStr> for TextStr {
+impl AsRef<Self> for TextStr {
     #[inline]
     fn as_ref(&self) -> &Self {
         self
@@ -1048,7 +1048,7 @@ impl Ord for TextStr {
     }
 }
 
-impl<'a> PartialEq<Cow<'a, TextStr>> for TextStr {
+impl<'a> PartialEq<Cow<'a, Self>> for TextStr {
     #[inline]
     fn eq(&self, other: &Cow<'a, Self>) -> bool {
         self.0.eq(&other.0)
@@ -1085,7 +1085,7 @@ impl<'a> PartialEq<TextStr> for String {
 
 // TODO: all the PartialEq impls for TextStr
 
-impl PartialOrd<TextStr> for TextStr {
+impl PartialOrd<Self> for TextStr {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
@@ -1197,9 +1197,9 @@ impl From<Box<TextStr>> for TextString {
     }
 }
 
-impl From<&'_ TextString> for TextString {
+impl From<&'_ Self> for TextString {
     #[inline]
-    fn from(s: &TextString) -> Self {
+    fn from(s: &Self) -> Self {
         s.clone()
     }
 }
