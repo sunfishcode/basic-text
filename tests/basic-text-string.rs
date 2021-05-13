@@ -17,6 +17,10 @@ fn basic_text_string_basics() {
         "\n"
     );
     assert_eq!(
+        TextString::from_text("\t".to_owned()).unwrap().as_utf8(),
+        "\t"
+    );
+    assert_eq!(
         TextString::from_text(" ".to_owned()).unwrap().as_utf8(),
         " "
     );
