@@ -77,11 +77,11 @@ fn basic_text_string_basics() {
 }
 
 /// Test that text strings are in Stream-Safe NFC form.
-#[ignore] // not yet implemented; TODO: implement this
 #[test]
 fn basic_text_string_ssnfc() {
     // Stream-Safe
-    assert_eq!(TextString::from_text("hello\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_utf8(), "hello\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
+    assert_eq!(TextString::from_text("hello\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_utf8(), "hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
+    assert_eq!(TextString::from_text("hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}".to_owned()).unwrap().as_utf8(), "hellŏ\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{306}\u{34f}\u{306}");
     // NFC
     assert_eq!(
         TextString::from_text("\u{41}\u{30a}".to_owned())
@@ -95,11 +95,24 @@ fn basic_text_string_ssnfc() {
             .as_utf8(),
         "\u{b7}"
     );
-    // Stream-Safe before NFC.
-    assert_eq!(TextString::from_text("\u{c5}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_utf8(),
-               "A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}");
+    // Stream-Safe NFC.
+    assert_eq!(
+        TextString::from_text("A\u{0327}\u{030a}".to_owned())
+            .unwrap()
+            .as_utf8(),
+        "Å\u{0327}"
+    );
     assert_eq!(TextString::from_text("A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_utf8(),
-               "A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{34f}\u{030a}");
+               "Å\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}");
+    assert_eq!(TextString::from_text("A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{030a}".to_owned()).unwrap().as_utf8(),
+               "A\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{0327}\u{34f}\u{30a}");
+    // Stream-Safe before NFC.
+    assert_eq!(TextString::from_text_lossy("A뮤$\u{a8e4}<\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}Z").as_utf8(),
+                "A뮤$\u{a8e4}<\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{34f}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}Z");
+    assert_eq!(TextString::from_text_lossy("A\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}ꤤ갤Z").as_utf8(),
+                "A\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{324}\u{324}\u{324}\u{32e}\u{324}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e1}\u{34f}\u{a8c4}ꤤ갤Z");
+    assert_eq!(TextString::from_text_lossy("A\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8c4}\u{a8e1}\u{324}\u{a8c4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{32e}\u{a8e4}\u{a8e1}\u{324}\u{a8c4}ꤤ갤Z").as_utf8(),
+               "A\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{a8c4}\u{324}\u{32e}\u{324}\u{324}\u{32e}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e4}\u{a8e1}\u{a8e4}\u{34f}\u{a8c4}\u{324}\u{a8e1}ꤤ갤Z");
 }
 
 /// Test that text strings don't start with a non-starter, or a scalar value
