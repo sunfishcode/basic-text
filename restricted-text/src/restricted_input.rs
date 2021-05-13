@@ -252,7 +252,7 @@ impl RestrictedInput {
         }
 
         let mut raw_bytes =
-            mem::replace(&mut internals.impl_().raw_string, String::new()).into_bytes();
+            mem::take(&mut internals.impl_().raw_string).into_bytes();
         raw_bytes.resize(4096, 0_u8);
         let (size, status) = internals.inner_mut().read_with_status(&mut raw_bytes)?;
         raw_bytes.resize(size, 0);

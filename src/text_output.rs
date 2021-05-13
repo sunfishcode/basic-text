@@ -15,7 +15,7 @@ use std::{
     cell::RefCell,
     io::{self, Write},
     mem,
-    mem::replace,
+    mem::take,
     rc::Rc,
     str,
 };
@@ -272,7 +272,7 @@ impl TextOutput {
             }
         }
 
-        let buffer = replace(&mut internals.impl_().buffer, String::new());
+        let buffer = take(&mut internals.impl_().buffer);
         match internals.write_str(&buffer) {
             Ok(()) => (),
             Err(err) => {
@@ -327,7 +327,7 @@ impl TextOutput {
                     // chain, and the Rc<RefCell<Option<io::Error>>> holds the
                     // actual error.
                     Self::reset_state(internals);
-                    return Err(mem::replace(&mut *error.borrow_mut(), None).unwrap());
+                    return Err(mem::take(&mut *error.borrow_mut()).unwrap());
                 }
 
                 (State::Ground(_), ESC) => {

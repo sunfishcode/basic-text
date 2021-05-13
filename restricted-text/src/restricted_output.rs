@@ -11,7 +11,7 @@ use layered_io::{default_write_vectored, HalfDuplexLayered, WriteLayered};
 use std::{
     io::{self, Write},
     str,
-    mem::replace,
+    mem::take,
 };
 use utf8_io::{ReadStrLayered, WriteStr};
 use basic_text::TextStr;
@@ -139,7 +139,7 @@ impl RestrictedOutput {
     fn write_buffer<Inner: WriteStr + WriteLayered>(
         internals: &mut impl RestrictedWriterInternals<Inner>,
     ) -> io::Result<()> {
-        let buffer = replace(&mut internals.impl_().buffer, String::new());
+        let buffer = take(&mut internals.impl_().buffer);
         match internals.write_str(&buffer) {
             Ok(()) => (),
             Err(e) => {
