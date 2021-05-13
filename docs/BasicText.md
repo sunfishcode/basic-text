@@ -127,14 +127,14 @@ A buffered stream is in Basic Text form iff:
 | U+2028              | LS   | U+20              | "Line separation is a rich-text function" |
 | U+2029              | PS   | U+20              | "Paragraph separation is a rich-text function" |
 | \[U+206A–U+206F\]   |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
-| U+2DF5              | ` ⷵ`  | U+2DED U+2DEE     | "Use U+2DED U+2DEE instead of U+2DF5"     |
+| U+2DF5              | ` ⷭⷮ`  | U+2DED U+2DEE     | "Use U+2DED U+2DEE instead of U+2DF5"     |
 | \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in Basic Text"   |
 | \[U+FFF9–U+FFFB\]   |      | U+FFFD            | "Interlinear Annotations depend on out-of-band information" |
 | U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
 | \[U+FFFE,U+FFFF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+1FFFE,U+1FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
-| U+111C4             | `𑇄`  | U+1118F U+11180   | "Use U+1118F U+11180 instead of U+111C4"  |
+| U+111C4             | `𑆏𑆀`  | U+1118F U+11180   | "Use U+1118F U+11180 instead of U+111C4"  |
 | \[U+2FFFE,U+2FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+3FFFE,U+3FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+4FFFE,U+4FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
