@@ -13,7 +13,7 @@ edition = "2018"
 rustc_version = "0.3.2"
 
 [dependencies]
-basic-text = { path = "..", version = "^0.2.5-alpha.0"}
+basic-text = { path = "..", version = "^0.2.6-alpha.0"}
 duplex = "0.3.0"
 layered-io = "0.4.0"
 unicode-normalization = "0.1.17"
