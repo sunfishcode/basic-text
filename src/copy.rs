@@ -1,4 +1,4 @@
-use crate::{ReadText, ReadTextLayered, TextStr, TextString, WriteText};
+use crate::{ReadText, ReadTextLayered, TextString, WriteText};
 use layered_io::Bufferable;
 use std::{cmp::max, io};
 
@@ -24,8 +24,9 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
             Err(err) if err.kind() == io::ErrorKind::Interrupted => continue,
             Err(err) => return Err(err),
         };
-        // TODO: Implement `Index` for `TextStr`?
-        writer.write_text(TextStr::from_text(&buf.as_utf8()[..len]).unwrap())?;
+        // Use `write_str` here instead of `write_text` because we may split
+        // strings at non-starters.
+        writer.write_str(&buf.as_utf8()[..len])?;
         written += len as u64;
     }
     Ok(written)
@@ -50,8 +51,9 @@ pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Buffer
     let mut written = 0;
     loop {
         let (len, status) = reader.read_text_with_status(&mut buf)?;
-        // TODO: Implement `Index` for `TextStr`?
-        writer.write_text(TextStr::from_text(&buf.as_utf8()[..len]).unwrap())?;
+        // Use `write_str` here instead of `write_text` because we may split
+        // strings at non-starters.
+        writer.write_str(&buf.as_utf8()[..len])?;
         written += len as u64;
         if status.is_end() {
             return Ok(written);
