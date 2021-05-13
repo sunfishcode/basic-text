@@ -19,8 +19,7 @@ use std::{
     rc::Rc,
     str,
 };
-use unicode_normalization::is_nfc_stream_safe_quick;
-use unicode_normalization::{IsNormalized, UnicodeNormalization};
+use unicode_normalization::{is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization};
 use utf8_io::{ReadStrLayered, WriteStr};
 
 /// Abstract over `TextWriter` and the writer half of `TextDuplexer`.

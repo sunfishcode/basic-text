@@ -53,6 +53,9 @@ pub const BOM: char = '\u{feff}';
 /// WORD JOINER
 pub const WJ: char = '\u{2060}';
 
+/// ZERO WIDTH JOINER
+pub const ZWJ: char = '\u{200d}';
+
 /// REPLACEMENT CHARACTER
 pub const REPL: char = '\u{fffd}';
 
