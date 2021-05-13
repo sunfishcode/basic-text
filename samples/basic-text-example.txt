@@ -1,0 +1,31 @@
+This file contains valid Basic Text.
+
+Basic Text includes tab	and limited format controls such as no-break space,
+non‑breaking hyphen, no-break space, non‑breaking hyphen, and
+soft­hyphen. It includes the grapheme control combining grapheme joiner
+(compare "Ü" with "U͏̈"), zero-with non-joiner (compare "deafly" with
+"deaf‌ly"), zero with joiner (compare "😶‍🌫️" with "😶🌫️"),
+and word join⁠er. And it includes the implicit‎ directional‏
+formatting؜ characters and the replacement character (�). And the
+Mongolian vowel separator (compare "ᠯᠤᠭ᠎ᠠ" with "ᠯᠤᠭᠠ"). And, of course,
+emoji, both BMP ☺ and non-BMP 😀.
+
+It includes all of the private use characters (including 􏿽), characters
+with complex decompositions (such as ﷺ), and characters with no⠀visible
+display.
+
+It uses variation sequences to preserve the intent of 
+CJK compatibility ideographs (compare 慈 with 慈︀).
+
+يتضمن نصًا من اليمين إلى اليسار.
+
+Z̛̖̗̘̙̜̝̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̕̚a̴̵̶̷̸̡̢̧̨̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼l͇͈͉͍͎͓͔͕͖͙͚̾̿͂͆͊͋͌͐͑͒͗͛͘͜͟͝͞͠ͅg𞀀𞀁𞀂𞀃𞀄𞀅𞀆𞀈𞀉𞀊𞀋𞀌𞀍𞀎𞀏𞀐𞀑𞀒𞀓𞀔𞀕𞀖𞀗𞀘𞀛𞀜𞀝𞀞𞀟𞀠oࣔࣕࣖࣗࣘࣙࣚࣛࣜࣝࣞࣟ࣠࣡ࣤࣥࣧࣨ࣪࣫࣬ࣳࣴࣵࣷࣸࣻࣼࣽࣾ, up to Stream-Safe limits.
+
+And of course all the rest of displayable Unicode, including:
+ - 彁💃ཧ𑋰ྐྵྨླྺྼྻྂ🎈🐞👩‍❤️‍💋‍👨🎒🤹🏾‍♀️◯‍◯‍◯‍◯‍◯🤾🏼‍♂️𒐫👯🏾‍♀️𒈙🤸🏽‍♂️⸻🚵🏿‍♀️🏋🏻‍♀️ ꧅💇🏾‍♂️👁️‍🗨️‱𪚥﷽♜⚅♠⛃☗🂱🂓🀡🃏□🎵💫🎍🐱‍🏍
+ - ▁▂▃▄▅▆▇┌─┬┐└─┴┘🌷🌞⇞𝔙⠼𓄑֍¦д🎲ᐛڜ🍅🢪‽⤺Ⲩ⊉⥩⪒⟏⮀✴♯╅◃⯧⤞⏫⏉ⅻ✭⹔⚰⃒⒛⃭♬⢈⵪⡩⸹⃼⤱⑔⩻⪟⤜⥐⧯➳⇫Ⱎ⻈ⴚ▅␿⯺▚↤⋬⡅⌒⁞☙🧸
+ - 0_$~!@#$%^&*()_+`-={}|[]\:";'<>?,./ 
+ - ␀␁␂␃␄␅␆␇␈␉␊␋␌␍␎␏␐␑␒␓␔␕␖␗␘␙␚␛␜␝␞␟␠␡￰￱￲￳￴￵￶￷￸ ͏⁠ ⵿ 𑁿￯ ­⁠ ‑   ⁡⁢⁣⁤Z̴͇̫̥̪͓͈͔͎̗̞̺̯̱̞̙̱̜̖̠̏͆̆͛͌͘͞ḁ̶̰̳̭͙̲̱̹̝͎̼͗ͨ̎̄̆͗̿̀́͟͡l̶̷͉̩̹̫̝͖̙̲̼͇͚͍̮͎̥̞̈́͊͗ͦ̈́ͫ̇́̚ͅ͏ͅg̶͕͔͚̩̓̐̅ͮ̔̐̎̂̏̾͊̍͋͊ͧ́̆ͦ͞o̡͋̔͐ͪͩ͏̢̧̫̙̤̮͖͙͓̺̜̩̼̘̠́ᅟᅠㅤﾠ ︀ ︄ 󠄀 󠇯 ̈␤  …⏎↵↩⌤⤶↲⮨⮰ ̈‽̈̉
+ - aA⁠ÅÅ𝑨𝐴𝘈𝘼𝐀𝓐𝕬𝗔𝒜𝔄𝔸𝖠𝙰ᴀᴬⒶＡ🄐🄰AАꙖ ⷼ ⷶⱯ🅐🅰Ⱝ𐐂𐐈𐒰ÀÁÂÃÄĀĂĄǍǞǠǺȀȂȦȺӐӒߊ ࠡ ࠢ ࠣࠤ ࠥऄअॲঅਅઅଅஅఅಅഅะະ༁ཨ ྸအဢ ႜᅡአዐᎠᐊᖳᚨᚪᛆᜀᜠᝀᝠᠠᢇ ᤠᥣᨕᩋ ᩡᮃᯀᯁᰣḀẠẢẤẦẨẪẬẮẰẲẴẶあアㄚㅏ㈎㈏㈐㈑㈒㈓㈔㈕㈖㈗㈘㈙㈚㈛㉮㉯㉰㉱㉲㉳㉴㉵㉶㉷㉸㉹㉺㉻㋐ꀊꓮꕉꚠꠀ ꠣꡝꢂ ꣪ꤢꥆꦄꨀｱￂ𐀀𐊀𐊠𐌀𐎠𐒖𐔀𐝀𐠀𐤠𐦀𐦠𐨀𐬀𐰀𐰁𐲀𑀅𑂃 𑄧𑅐𑆃𑈀𑊀𑊰𑌅 𑍰𑐀𑒁𑖀𑘀𑚀𑜒 𑜠𑢡𑫕𑰀𑲏 𑲯𒀀𖧕𖩆𖫧 𖽔𛱁𛱤𞠣🇦ⱭΛⱰª∀₳𐤀Ⲁ𐌰ΆΑἈἉἊἋἌἍἎἏᾈᾉᾊᾋᾌᾍᾎᾏᾸᾹᾺᾼ𝚨𝛢𝜜𝝖𝞐⍶⍺⩜ᗅᎪ
+ - )˺˼𔗏𝅴𝅶𝅸𝅺⁾₎❩❫⟯﴿︶﹚）｠❳❵⟧⟩⟫⟭⦈⦊⦖⸣⸥︘︸︺︼︾﹀﹂﹄﹈﹜﹞］｝｣»’”›❯(˹˻𔗎𝅳𝅵𝅷𝅹⁽₍❨❪⟮﴾︵﹙（｟❲❴⟦⟨⟪⟬⦇⦉⦕⸢⸤︗︷︹︻︽︿﹁﹃﹇﹛﹝［｛｢«‘“‹❮𝪋𝪤𝪋½⁄୳൴⳽꠱𐅁𐅵𐅶𐦽𐹻＂⌫⌦␈␡ ᷻←⌧⍒⍔⍢⍫␦␚?¿᥅;՞؟፧⁇⍰❓❔⳺⳻⸮㉄꘏꛷︖﹖？𑅃𞥟𖡄⯑¶⁋܀჻፨〷❡⸏⸐⸑⸎☙⸿〇๛ꙮϓϔẛ❂
+ - anⅾ lоtѕ mоrеǃ
