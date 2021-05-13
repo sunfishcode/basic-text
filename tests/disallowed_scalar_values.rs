@@ -1,4 +1,4 @@
-pub const DISALLOWED_SCALAR_VALUES: [char; 310] = [
+pub const DISALLOWED_SCALAR_VALUES: [char; 319] = [
     // All C0, U+007F, and C1 control codes other than U+000A (newline),
     // U+0009 (horizontal tab), U+000D (carriage return), U+000C (form feed),
     // U+0007 (alert), U+001B (escape) and U+0085 (NEL). Many of these are
@@ -84,6 +84,16 @@ pub const DISALLOWED_SCALAR_VALUES: [char; 310] = [
     '\u{17b4}',
     '\u{17b5}',
     '\u{17d8}',
+    // Bidirectional Format Characters.
+    '\u{202a}',
+    '\u{202b}',
+    '\u{202c}',
+    '\u{202d}',
+    '\u{202e}',
+    '\u{2066}',
+    '\u{2067}',
+    '\u{2068}',
+    '\u{2069}',
     // Deprecated Format Characters
     '\u{206a}',
     '\u{206b}',

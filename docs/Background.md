@@ -317,6 +317,38 @@ flags. So Basic Text includes them.
 
 [Language Tagging in Markup]: http://www.unicode.org/reports/tr20/tr20-9.html#Language
 
+### Directional Formatting Characters
+
+Unicode specifies several [Directional Formatting Characters] with special
+behavior. The "implicit" characters U+200E (LRM), U+200F (RLM), and
+U+61C (ARM), are supported, however the "explicit characters" U+202A (LRE),
+U+202B (RLE), U+202D (LRO), U+202E (RLO), U+202C (PDF), U+2066 (LRI),
+U+2067 (RLI), U+2068 (FSI), and U+2069 (PDI) are not, since they can have
+non-local display effects.
+
+Also, the explicit characters can be used in a way that depends on U+2029,
+the Paragraph Separator, for correct interpretation, and Basic Text excludes
+that scalar value. It can also depend on higher-level protocols, such as
+table cell boundaries in markup formats, which are outside the scope of
+Basic Text.
+
+[Explicit Directional Overrides] also have some security concerns.
+
+In terms of [Bidirectional Conformance], Basic Text does not specify how content
+is displayed or rendered, and does not specify any interactions with
+higher-level protocols. In terms of [Explicit Formatting Characters], Basic Text
+itself supports "No bidirectional formatting" or "Implicit bidirectionality",
+but not "Non-isolate bidirectionality" or "Full bidirectionality" by itself.
+
+Users needing explicit bidirectional display control may use higher-level
+markup languages layered on top, providing [Markup And Formatting] syntax.
+
+[Directional Formatting Characters]: https://unicode.org/reports/tr9/#Directional_Formatting_Characters
+[Bidirectional Conformance]: https://unicode.org/reports/tr9/#Bidirectional_Conformance
+[Explicit Formatting Characters]: https://unicode.org/reports/tr9/#Explicit_Formatting_Characters
+[Explicit Directional Overrides]: https://unicode.org/reports/tr9/#Explicit_Directional_Overrides
+[Markup And Formatting]: https://unicode.org/reports/tr9/#Markup_And_Formatting
+
 ## Relationships to other standards and conventions
 
 ### Relationship to IETF RFC 8264 "PRECIS"

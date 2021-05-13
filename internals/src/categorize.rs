@@ -57,6 +57,16 @@ impl<Iter: Iterator<Item = char>> Iterator for Categorize<Iter> {
             c @ '\u{fb00}' ..= '\u{fb06}' => self.latin_ligature(c),
             // Markup Characters
             c @ '\u{2028}' | c @ '\u{2029}' => self.markup_character(c),
+            // Bidirectional Formatting Characters
+            c @ '\u{202a}' |
+            c @ '\u{202b}' |
+            c @ '\u{202c}' |
+            c @ '\u{202d}' |
+            c @ '\u{202e}' |
+            c @ '\u{2066}' |
+            c @ '\u{2067}' |
+            c @ '\u{2068}' |
+            c @ '\u{2069}' => self.bidirectional_formatting_character(c),
             // Noncharacters
             c @ '\u{fffe}'..='\u{ffff}'
             | c @ '\u{1fffe}'..='\u{1ffff}'
@@ -208,6 +218,17 @@ impl<Iter: Iterator<Item = char>> Categorize<Iter> {
         self.record_error(io::Error::new(
             io::ErrorKind::Other,
             format!("Markup character written to text output stream: {:?}", c),
+        ))
+    }
+
+    #[cold]
+    fn bidirectional_formatting_character(&mut self, c: char) -> char {
+        self.record_error(io::Error::new(
+            io::ErrorKind::Other,
+            format!(
+                "Bidirectional formatting character written to text output stream: {:?}",
+                c
+            ),
         ))
     }
 

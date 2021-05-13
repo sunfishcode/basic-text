@@ -35,8 +35,8 @@ providing several utilities:
    stream using Basic Text.
 
 The code here is usable, but not very mature or optimized yet. At this point it
-implements everything in the Basic Text spec except for BiDi validation and some
-of the non-default options.
+implements everything in the Basic Text spec, except for some of the non-default
+options.
 
 [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
 [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html

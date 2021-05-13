@@ -91,6 +91,8 @@ possibly others, may display as whitespace despite not being categorized as
 whitespace. Can we constrain them with a mixed-script constraint, or some
 other mechanism?
 
+TODO: [Implicit Directional Marks] have no display.
+
 [NFKC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Moderately Restricted]: https://www.unicode.org/reports/tr39/#Restriction_Level_Detection
 [Stream Safe Text Format]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
@@ -102,3 +104,4 @@ other mechanism?
 [Normalization Process for Stabilized Strings]: https://unicode.org/reports/tr15/#Normalization_Process_for_Stabilized_Strings
 [Tag Characters]: https://www.unicode.org/versions/Unicode13.0.0/ch23.pdf#G30110
 [Private-Use Characters]: http://www.unicode.org/faq/private_use.html#private_use
+[Implicit Directional Marks]: https://unicode.org/reports/tr9/#Implicit_Directional_Marks

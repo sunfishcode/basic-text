@@ -21,8 +21,6 @@ A string is in Basic Text form iff:
    `ZWJ`, `SpacingMark` or `Extend`, and
  - it doesn't end with a scalar value with a `Grapheme_Cluster_Break` of `ZWJ`
    or `Prepend`, and
- - it doesn't attempt [Bidirectional formatting character] nesting less than 0
-   or greater than the [Unicode Bidirectional Algorithm `max_depth`], and
  - it doesn't contain any of the sequences listed in the [Tables].
 
 A stream is in Basic Text form iff:
@@ -36,8 +34,6 @@ A buffered stream is in Basic Text form iff:
 
 [Tables]: #tables
 [non-starter]: https://unicode.org/reports/tr15/#Description_Norm
-[Bidirectional formatting character]:  http://www.unicode.org/reports/tr9/
-[Unicode Bidirectional Algorithm `max_depth`]: http://www.unicode.org/reports/tr9/#BD2
 [`Grapheme_Cluster_Break`]: https://unicode.org/reports/tr29/#Grapheme_Cluster_Break_Property_Values
 
 ## Tables
@@ -129,6 +125,15 @@ A buffered stream is in Basic Text form iff:
 | U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
 | U+2028              | LS   | U+20              | "Line separation is a rich-text function" |
 | U+2029              | PS   | U+20              | "Paragraph separation is a rich-text function" |
+| U+202A              | LRE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202B              | RLE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202C              | PDF  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202D              | LRO  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202E              | RLO  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2066              | LRI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2067              | RLI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2068              | FSI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2069              | PDI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
 | \[U+206A–U+206F\]   |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
 | U+2DF5              | ` ⷭⷮ`  | U+2DED U+2DEE     | "Use U+2DED U+2DEE instead of U+2DF5"     |
 | \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |

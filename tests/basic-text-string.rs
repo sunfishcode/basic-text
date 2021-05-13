@@ -1,7 +1,5 @@
 use basic_text::TextString;
 
-// TODO: Bidi nesting depth >= 0 and <= 125
-
 /// Various miscellaenous testcases.
 #[test]
 fn basic_text_string_basics() {
@@ -46,22 +44,10 @@ fn basic_text_string_basics() {
         "A\u{34f}\u{200c}\u{200d}\u{2060}"
     );
     assert_eq!(
-        TextString::from_text("\u{200e}\u{202a}\u{202d}\u{2066}".to_owned())
+        TextString::from_text("\u{200e}\u{200f}\u{61c}".to_owned())
             .unwrap()
             .as_str(),
-        "\u{200e}\u{202a}\u{202d}\u{2066}"
-    );
-    assert_eq!(
-        TextString::from_text("\u{200f}\u{202b}\u{202e}\u{2067}".to_owned())
-            .unwrap()
-            .as_str(),
-        "\u{200f}\u{202b}\u{202e}\u{2067}"
-    );
-    assert_eq!(
-        TextString::from_text("\u{202c}\u{2068}\u{2069}\u{61c}".to_owned())
-            .unwrap()
-            .as_str(),
-        "\u{202c}\u{2068}\u{2069}\u{61c}"
+        "\u{200e}\u{200f}\u{61c}"
     );
     assert_eq!(
         TextString::from_text("\u{fffd}".to_owned())
@@ -475,6 +461,15 @@ fn basic_text_string_main_table() {
     assert_eq!(TextString::from_text_lossy("\u{17d8}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{2028}").as_str(), " ");
     assert_eq!(TextString::from_text_lossy("\u{2029}").as_str(), " ");
+    assert_eq!(TextString::from_text_lossy("\u{202a}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{202b}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{202c}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{202d}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{202e}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2066}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2067}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2068}").as_str(), "\u{fffd}");
+    assert_eq!(TextString::from_text_lossy("\u{2069}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{206a}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{206b}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{206b}").as_str(), "\u{fffd}");

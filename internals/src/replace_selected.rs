@@ -122,6 +122,9 @@ impl<Inner: Iterator<Item = char>> Iterator for ReplaceSelected<Inner> {
             '\u{17b4}' | '\u{17b5}' | '\u{17d8}' |
             // Deprecated Format Characters
             '\u{206a}'..='\u{206f}' |
+            // Bidirectional Format Characters
+            '\u{202a}' | '\u{202b}' | '\u{202c}' | '\u{202d}' | '\u{202e}' |
+            '\u{2066}' | '\u{2067}' | '\u{2068}' | '\u{2069}' |
             // Tag Characters
             '\u{e0000}'..='\u{e007f}' |
             // Noncharacters
