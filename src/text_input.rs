@@ -222,12 +222,12 @@ impl TextInput {
             match self.ssnfc_iter.next() {
                 Some(c) => Some(c),
                 None => {
-                    let index = self.queue.len()
-                        - self
-                            .queue
-                            .iter()
-                            .rev()
-                            .position(|c| matches!(*c, '\n' | CGJ))?;
+                    let last_boundary = self
+                        .queue
+                        .iter()
+                        .rev()
+                        .position(|c| matches!(*c, '\n' | CGJ))?;
+                    let index = self.queue.len() - last_boundary;
                     if is_nfc_stream_safe_quick(self.queue.iter().take(index).copied())
                         == IsNormalized::Yes
                     {
