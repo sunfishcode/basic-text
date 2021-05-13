@@ -16,12 +16,12 @@ computing.
 
 Reading plain text content shouldn't have side effects. This may seem obvious,
 however Unicode contains multiple sets of control codes which effectively
-form a bytecode language, with a variety of loosely-defined and
-non-standardized side effects. Historically, text content and control codes were
-often mixed together in the same encoding standards, and now, Unicode itself
-must maintain compatibility with those standards. And, many of them continue
-to be recognized, particularly in virtual terminals, such that one must be
-careful about even displaying text from untrusted sources, for example in
+form a bytecode language, with a variety of loosely-defined and often
+non-standardized side effects. Historically, text content and in-band control
+codes were often mixed together in the same encoding standards, and now, Unicode
+itself must maintain compatibility with those standards. And, many of them
+continue to be recognized, particularly in virtual terminals, such that one must
+be careful about even displaying text from untrusted sources, for example in
 [CVE-2017-10906], [CVE-2019-8325], and others.
 
 [CVE-2017-10906]: https://nvd.nist.gov/vuln/detail/CVE-2017-10906
@@ -47,7 +47,7 @@ they either restrict codepoints that are frequently used in "plain text"
 content, or don't restrict deprecated codepoints.
 
 Basic Text is a subset of Unicode aiming to make it as simple as possible
-(and no simpler) to work with plain text. It is not yet standardized, and
+(but no simpler) to work with plain text. It is not yet standardized, and
 may evolve, but it is usable for many purposes.
 
 ## Development
