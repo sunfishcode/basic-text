@@ -39,46 +39,26 @@ fuzz_target!(|bytes: &[u8]| {
         assert!(unicode_normalization::char::canonical_combining_class(first) == 0);
     }
 
-    // Writing it back out to a text writer should preserve the bytes.
+    // Writing it back out to a text writer should either preserve the bytes,
+    // or report an error.
     writer.write_str(&s).unwrap();
     let inner = writer
         .close_into_inner()
         .unwrap()
         .close_into_inner()
-        .unwrap();
-    assert_eq!(inner.get_ref(), s.as_bytes());
-
-    // Iff a text reader normalized something, that same thing should fail
-    // when written as output.
-    let mut writer = TextWriter::new(Utf8Writer::new(LayeredWriter::new(Vec::<u8>::new())));
-    match str::from_utf8(bytes) {
-        Ok(utf8) => {
-            let result = writer.write_all(bytes).and_then(|()| {
-                writer
-                    .close_into_inner()?
-                    .close_into_inner()?
-                    .close_into_inner()
-            });
-            if !bytes.contains(&b'\x1b') {
-                if utf8
-                    .chars()
-                    .cjk_compat_variants()
-                    .stream_safe()
-                    .nfc()
-                    .collect::<String>()
-                    == s
-                {
-                    assert_eq!(String::from_utf8(result.unwrap()).unwrap(), s);
-                } else {
-                    result.unwrap_err();
-                }
-            }
+        .unwrap()
+        .close_into_inner();
+    match inner {
+        Ok(written) => {
+            assert_eq!(&s, str::from_utf8(&written).unwrap());
         }
-        Err(_) => {
-            writer
-                .write_all(bytes)
-                .and_then(|()| writer.close_into_inner().map(|_| ()))
-                .unwrap_err();
+        Err(e) => {
+            assert!(false, e);
+            if let Ok(utf8) = str::from_utf8(&bytes) {
+                assert_ne!(&s, utf8);
+            } else {
+                assert_ne!(s.as_bytes(), bytes);
+            }
         }
     }
 
