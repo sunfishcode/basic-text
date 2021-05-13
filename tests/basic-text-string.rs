@@ -179,7 +179,6 @@ fn basic_text_string_end() {
 fn basic_text_string_pre_nfc_table() {
     // Unassigned characters with replacements.
     assert_eq!(TextString::from_text_lossy("\u{9e4}").as_str(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{9e4}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{9e5}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{a64}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{a65}").as_str(), "\u{fffd}");
