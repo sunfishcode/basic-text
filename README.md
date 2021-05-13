@@ -17,7 +17,7 @@ a subset of Unicode being developed to focus on *text*: it excludes unprintable
 control characters, characters which depend on out-of-band information to
 interpret, non-characters, deprecated characters, and more, while aiming to
 preserve everything of practical use to plain text and formats built on top of
-plain text. See the [Background] document for further background information.
+plain text. See the [Book] for further information.
 
 It also includes a Rust crate which aims to implement the Basic Text format,
 providing several utilities:
@@ -46,4 +46,4 @@ remaining missing pieces.
 [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
 [`Duplex`]: https://docs.rs/duplex/latest/duplex/trait.Duplex.html
 [Basic Text]: docs/BasicText.md
-[Background]: docs/Background.md
+[Book]: https://basic-text.sunfishcode.online

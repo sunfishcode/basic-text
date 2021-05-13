@@ -1,0 +1,8 @@
+[book]
+authors = ["Dan Gohman <dev@sunfishcode.online>"]
+multilingual = false
+src = "."
+title = "Basic Text"
+
+[output.html]
+cname = "basic-text.sunfishcode.online"

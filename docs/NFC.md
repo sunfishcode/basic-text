@@ -2,6 +2,18 @@
 
 It's a good question. The following are some notes.
 
+## Which normalization form?
+
+NFC seems to be [by far the most widely used for text interchange], and mostly
+preserves the meaning of all practical Unicode text (see the following sections
+for more discussion), so it seems the best choice for the [Basic Text] format.
+
+Requiring that everything be compatibility-normalized can eliminate several
+cases of visual ambiguity, and NFKC is a subset of NFC, so it seems the best
+choice for the [Restricted Text] format.
+
+[by far the most widely used for text interchange]: https://sites.google.com/site/macchiato/unicode/nfc-faq#TOC-How-much-text-is-already-NFC-
+
 ## What are the advantages of normalizing?
 
  - Portability - Text that isn't normalized is sometimes interpreted and
@@ -19,19 +31,7 @@ It's a good question. The following are some notes.
    where two strings that look the same contain different scalar values, making
    content easier to work with.
 
-## Which normalization form?
-
-NFC seems to be [by far the most widely used for text interchange], and mostly
-preserves the meaning of all practical Unicode text (see the following sections
-for more discussion), so it seems the best choice for the [Basic Text] format.
-
-Requiring that everything be compatibility-normalized can eliminate several
-cases of visual ambiguity, and NFKC is a subset of NFC, so it seems the best
-choice for the [Restricted Text] format.
-
-[by far the most widely used for text interchange]: https://sites.google.com/site/macchiato/unicode/nfc-faq#TOC-How-much-text-is-already-NFC-
-
-## Specific concerns
+## Whare are the potential disadvantages?
 
 The following are some notes about various situations where NFC has been
 considered to be semantically lossy.
@@ -144,7 +144,7 @@ The rationale can be summed up as:
 > Normalization can remove distinctions that the users applied intentionally.
 
 As discussed in the above sections, almost all of the places where information
-about such distinctions seem to be lost either have satisfactory solutions,
+about such distinctions seem to be lost either have adequate solutions,
 or are caused by bugs or missing features in fonts or Unicode implementations.
 
 There is also a difference in priorities; [Basic Text] is all about building

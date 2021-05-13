@@ -7,18 +7,15 @@ provides links to related standards, documentation, and other resources.
 
 ### Approach
 
-Many of the decisions about what should be excluded from Basic Text in its
-current form have been made not from a place of deep expertise, but from a
-place of gathering ideas from a variety of sources, and then consulting Unicode
-standards and documentation, other standards, popular Unicode implementations,
-and Web searches, and ultimately making some guesses. If the explanations in
-the rest of this document convey confidence in the decisions, it's only because
-they're intended to be drafts of the kinds of things a more mature design
-document might say.
+Basic Text is a new and still evolving format. If the explanations in the rest
+of this document convey finality in the decisions, it's only because they're
+drafts of the kinds of things a design document may eventually want to say.
 
-Input from people with actual expertise would be greatly appreciated! As would
-corrections, bug reports, or even just example bodies of text that would be
-interesting to test on.
+Feedback, corrections, bug reports, or even just example bodies of text that
+would be interesting to test on are all welcome; please file issues in
+[the issue tracker]!
+
+[the issue tracker]: https://github.com/sunfishcode/basic-text/issues
 
 ### No Stability (Yet)
 
@@ -330,6 +327,9 @@ has a [Freeform Class (4.3)] which is similar in spirit to, and one of the
 inspirations of, the formats defined here.
 
 PRECIS doesn't permit tabs; we include them for the reasons mentioned above.
+
+And, PRECIS doesn't restrict obsolete or discouraged codepoints, so in
+general it's more permissive than Basic Text.
 
 [PRECIS]: https://tools.ietf.org/html/rfc8264
 [Freeform Class (4.3)]: https://tools.ietf.org/html/rfc8264#section-4.3
