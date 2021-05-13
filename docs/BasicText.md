@@ -16,9 +16,8 @@ implementation, see [the Github repo].
 
 A string is in Basic Text form iff:
  - it is a [Unicode] string in [Stream-Safe] [NFC] form, and
- - it doesn't start with a [non-starter], and
- - it doesn't start with a scalar value with a [`Grapheme_Cluster_Break`] of
-   `ZWJ`, `SpacingMark` or `Extend`, and
+ - it doesn't start with a [non-starter] or a scalar value with a
+   [`Grapheme_Cluster_Break`] of `ZWJ`, `SpacingMark` or `Extend`, and
  - it doesn't end with a scalar value with a `Grapheme_Cluster_Break` of `ZWJ`
    or `Prepend`, and
  - it doesn't contain any of the sequences listed in the [Tables].
