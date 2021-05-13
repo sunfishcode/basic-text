@@ -103,16 +103,17 @@ A buffered stream is in Basic Text form iff:
 | ------------------- | ---- | ----------------- | ----------------------------------------- |
 | U+D U+A             | CRLF | U+A               | "Use U+A to terminate a line"             |
 | U+D                 | CR   | U+A               | "Use U+A to terminate a line"             |
-| U+C                 | FF   | U+20              | "Control character not valid in text"     |
+| U+C                 | FF   | U+20              | "Control code not valid in text"          |
 | U+1B U+5B \[U+20–U+3F\]\* U+6D                     | SGR | | "Color escape sequences are not enabled" |
+| \[U+1B\]+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence" |
 | \[U+1B\]+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence" |
 | \[U+1B\]+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence" |
-| \[U+1B\]+ \[U+40–U+7E\]?                           | ESC | | "Unrecognized escape sequence" |
-| \[U+1B\]+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence" |
-| \[U+0–U+8,U+B,U+E–U+1F\] | C0 | U+FFFD         | "Control character not valid in text"     |
-| U+7F                | DEL  | U+FFFD            | "Control character not valid in text"     |
-| U+85                | NEL  | U+20              | "Control character not valid in text"     |
-| \[U+80–U+84,U+86–U+9F\] | C1 | U+FFFD          | "Control character not valid in text"     |
+| \[U+1B\]+ \[U+40–U+7E\]                            | ESC | | "Unrecognized escape sequence" |
+| \[U+1B\]+           | ESC  | U+FFFD            | "Escape code not valid in text"           |
+| \[U+0–U+8,U+B,U+E–U+1F\] | C0 | U+FFFD         | "Control code not valid in text"          |
+| U+7F                | DEL  | U+FFFD            | "Control code not valid in text"          |
+| U+85                | NEL  | U+20              | "Control code not valid in text"          |
+| \[U+80–U+84,U+86–U+9F\] | C1 | U+FFFD          | "Control code not valid in text"          |
 | U+149               | `ʼn` | U+2BC U+6E        | "Use U+2BC U+6E instead of U+149"         |
 | U+673               | `ا ٟ` | U+627 U+65F       | "Use U+627 U+65F instead of U+673"        |
 | U+F77               | `◌ྲ◌ཱྀ` | U+FB2 U+F81       | "Use U+FB2 U+F81 instead of U+F77"        |
