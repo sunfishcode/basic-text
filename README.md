@@ -12,12 +12,12 @@
   </p>
 </div>
 
-This repository contains a project to define a text format called [Basic Text],
-a subset of Unicode being developed to focus on *text*: it excludes unprintable
-control characters, characters which depend on out-of-band information to
-interpret, non-characters, deprecated characters, and more, while aiming to
-preserve everything of practical use to plain text and formats built on top of
-plain text. See the [Book] for further information.
+This repository hosts a project to define a text format called [Basic Text], a
+subset of Unicode that focuses on *text*: it excludes unprintable control
+characters, characters which depend on out-of-band information to interpret,
+non-characters, deprecated characters, and more, while aiming to preserve
+everything of practical use to plain text and formats built on top of it. See
+the [Book] for more information.
 
 It also includes a Rust crate which aims to implement the Basic Text format,
 providing several utilities:
@@ -33,9 +33,9 @@ providing several utilities:
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
    stream using Basic Text.
 
-The code here is usable, but not very mature or optimized yet. It implements
-most of the Basic Text spec, though see the `TODO`s in the tests directory for
-remaining missing pieces.
+The code here is usable, but not very mature or optimized yet. At this point it
+implements everything in the Basic Text spec except for BiDi validation and some
+of the non-default options.
 
 [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
 [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
