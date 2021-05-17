@@ -1,7 +1,7 @@
 pub const DISALLOWED_SCALAR_VALUES: [char; 319] = [
-    // All C0, U+007F, and C1 control codes other than U+000A (newline),
-    // U+0009 (horizontal tab), U+000D (carriage return), U+000C (form feed),
-    // U+0007 (alert), U+001B (escape) and U+0085 (NEL). Many of these are
+    // All C0, U+7F, and C1 control codes other than U+A (newline),
+    // U+9 (horizontal tab), U+D (carriage return), U+C (form feed),
+    // U+7 (alert), U+1B (escape) and U+85 (NEL). Many of these are
     // nonetheless disallowed, but handled via different mechanisms.
     '\0',
     '\u{1}',

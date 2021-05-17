@@ -1481,7 +1481,7 @@ pub fn default_read_to_text_string<Inner: ReadText + ?Sized>(
 
 #[test]
 fn normalize_string() {
-    let ring = "\u{030a}";
+    let ring = "\u{30a}";
     let unnormal = "A\u{30a}";
     let unnormal_nl = "A\u{30a}\n";
     let composed = TextStr::from_text("\u{c5}").unwrap();

@@ -88,7 +88,7 @@ fn test_text_output_rules() {
 
     // Fail at specific scalar values.
     for c in &[
-        '\u{7}', '\u{c}', '\u{1b}', '\u{feff}', '\u{149}', '\u{0673}', '\u{0F77}', '\u{0F79}',
+        '\u{7}', '\u{c}', '\u{1b}', '\u{feff}', '\u{149}', '\u{673}', '\u{f77}', '\u{f79}',
         '\u{17a3}', '\u{17a4}', '\u{2329}', '\u{232a}', '\u{2126}', '\u{212a}', '\u{212b}',
         '\u{2028}', '\u{2029}',
     ] {
@@ -101,7 +101,7 @@ fn test_text_output_rules() {
     }
 
     // At the end of the stream, if any scalar values were transmitted and the
-    // last scalar value is not U+000A, fail.
+    // last scalar value is not U+A, fail.
     assert_eq!(to_text("").unwrap(), "");
     assert_eq!(to_text("\n").unwrap(), "\n");
     assert_eq!(to_text("hello\n").unwrap(), "hello\n");

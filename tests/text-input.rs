@@ -21,7 +21,7 @@ fn test_text_input_start() {
 
 #[test]
 fn test_text_input_crlf() {
-    // Replace U+000D U+000A with U+000A (newline).
+    // Replace U+D U+A with U+A (newline).
     assert_eq!(to_text("\r\n"), "\n");
     assert_eq!(to_text("hello\r\n"), "hello\n");
     assert_eq!(to_text("hello\r\nworld"), "hello\nworld\n");
@@ -29,7 +29,7 @@ fn test_text_input_crlf() {
 
 #[test]
 fn test_text_input_cr() {
-    // Replace U+000D (CR) not followed by U+000A with U+000A (newline).
+    // Replace U+D (CR) not followed by U+A with U+A (newline).
     assert_eq!(to_text("\r"), "\n");
     assert_eq!(to_text("\rhello\n"), "\nhello\n");
     assert_eq!(to_text("\rhello\r"), "\nhello\n");
@@ -84,34 +84,34 @@ fn test_text_input_replacements() {
     assert_eq!(to_text("hello\u{feff}"), "hello\u{2060}\n");
     assert_eq!(to_text("hello\u{feff}\n"), "hello\u{2060}\n");
 
-    // Replace U+0007 (BEL) with U+FFFD (REPLACEMENT CHARACTER).
+    // Replace U+7 (BEL) with U+FFFD (REPLACEMENT CHARACTER).
     assert_eq!(to_text("\u{7}"), "\u{fffd}\n");
     assert_eq!(to_text("\u{7}\n"), "\u{fffd}\n");
     assert_eq!(to_text("hello\u{7}world"), "hello\u{fffd}world\n");
 
-    // Replace U+000C (FF) with U+0020 (SP).
+    // Replace U+C (FF) with U+20 (SP).
     assert_eq!(to_text("\u{c}"), " \n");
     assert_eq!(to_text("\u{c}\n"), " \n");
     assert_eq!(to_text("\n\u{c}\n"), "\n \n");
     assert_eq!(to_text("hello\u{c}world"), "hello world\n");
 
-    // Replace U+0085 (NEL) with U+0020 (SP).
+    // Replace U+85 (NEL) with U+20 (SP).
     assert_eq!(to_text("\u{85}"), " \n");
     assert_eq!(to_text("\u{85}\n"), " \n");
     assert_eq!(to_text("\n\u{85}\n"), "\n \n");
     assert_eq!(to_text("hello\u{85}world"), "hello world\n");
 
-    // Replace U+0149 with U+02BC U+006E.
+    // Replace U+149 with U+2BC U+6E.
     assert_eq!(to_text("\u{149}"), "\u{2bc}\u{6e}\n");
 
-    // Replace U+0673 with U+0627 U+065F.
+    // Replace U+673 with U+627 U+65F.
     assert_eq!(to_text("\u{673}"), "\u{627}\u{65f}\n");
 
-    // Replace U+0F77 with U+0FB2 U+0F81. Prefix with "A" since U+F77 is Extend
+    // Replace U+F77 with U+FB2 U+F81. Prefix with "A" since U+F77 is Extend
     // and would otherwise be replaced by U+FFFD.
     assert_eq!(to_text("A\u{f77}"), "A\u{fb2}\u{f71}\u{f80}\n");
 
-    // Replace U+0F79 with U+0FB3 U+0F81. Prefix with "A" since U+F79 is Extend
+    // Replace U+F79 with U+FB3 U+F81. Prefix with "A" since U+F79 is Extend
     // and would otherwise be replaced by U+FFFD.
     assert_eq!(to_text("A\u{f79}"), "A\u{fb3}\u{f71}\u{f80}\n");
 
@@ -128,7 +128,7 @@ fn test_text_input_replacements() {
 
 #[test]
 fn test_text_input_escapes() {
-    // Replace U+001B (ESC) as part of an *escape sequence* with nothing.
+    // Replace U+1B (ESC) as part of an *escape sequence* with nothing.
     assert_eq!(to_text("\u{1b}["), "\n");
     assert_eq!(to_text("\u{1b}[A"), "\n");
     assert_eq!(to_text("\u{1b}[AB"), "B\n");
@@ -167,7 +167,7 @@ fn test_text_input_escapes() {
     assert_eq!(to_text("\u{1b}[[\u{7}"), "\n");
     assert_eq!(to_text("\u{1b}[[\u{1b}A"), "A\n");
 
-    // Replace U+001B (ESC) otherwise with U+FFFD (REPLACEMENT CHARACTER).
+    // Replace U+1B (ESC) otherwise with U+FFFD (REPLACEMENT CHARACTER).
     assert_eq!(to_text("\u{1b}"), "\u{fffd}\n");
     assert_eq!(to_text("\u{1b}\n"), "\u{fffd}\n");
 }
@@ -175,8 +175,7 @@ fn test_text_input_escapes() {
 #[test]
 fn test_text_input_end() {
     // At the end of the stream, if any scalar values were transmitted and the
-    // last scalar value is not U+000A, after replacements, a U+000A is
-    // appended.
+    // last scalar value is not U+A, after replacements, a U+A is appended.
     assert_eq!(to_text(""), "");
     assert_eq!(to_text("\n"), "\n");
     assert_eq!(to_text("hello"), "hello\n");
