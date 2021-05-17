@@ -57,7 +57,7 @@ pub fn is_basic_text(s: &str) -> bool {
 }
 
 /// Grapheme_Extend = Yes
-fn is_grapheme_extend(c: char) -> bool {
+const fn is_grapheme_extend(c: char) -> bool {
     // Unicode 13.0.0, DerivedCoreProperties.txt
     matches!(
         c,
@@ -422,14 +422,14 @@ fn is_grapheme_extend(c: char) -> bool {
 }
 
 /// Emoji_Modifier = Yes
-fn is_emoji_modifier(c: char) -> bool {
+const fn is_emoji_modifier(c: char) -> bool {
     // Unicode 13.0.0, emoji/emoji-data.txt
     matches!(c, '\u{1f3fb}'..='\u{1f3ff}')
 }
 
 /// Grapheme_Cluster_freak = SpacingMark, ignoring the
 /// Grapheme_Cluster_Break ≠ Extend rule, because it's redundant here.
-fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
+const fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
     c == '\u{e33}'
         || c == '\u{eb3}'
         || (is_general_category_spacing_mark(c)
@@ -455,7 +455,7 @@ fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
 }
 
 /// General_Category = Spacing_Mark
-fn is_general_category_spacing_mark(c: char) -> bool {
+const fn is_general_category_spacing_mark(c: char) -> bool {
     // Unicode 13.0.0, DerivedGeneralCategory.txt
     matches!(
         c,
@@ -638,13 +638,13 @@ fn is_general_category_spacing_mark(c: char) -> bool {
 }
 
 /// Indic_Syllabic_Category = Consonant_Preceding_Repha
-fn indic_syllabic_category_consonant_preceding_repha(c: char) -> bool {
+const fn indic_syllabic_category_consonant_preceding_repha(c: char) -> bool {
     // Unicode 13.0.0, IndicSyllabicCategory.txt
     matches!(c, '\u{d4e}' | '\u{11941}' | '\u{11d46}')
 }
 
 /// Indic_Syllabic_Category = Consonant_Prefixed
-fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
+const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
     // Unicode 13.0.0, IndicSyllabicCategory.txt
     matches!(
         c,
@@ -653,7 +653,7 @@ fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
 }
 
 /// Prepended_Concatenation_Mark = Yes
-fn prepended_concatenation_mark(c: char) -> bool {
+const fn prepended_concatenation_mark(c: char) -> bool {
     // Unicode 13.0.0, PropList.txt
     matches!(
         c,
