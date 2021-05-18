@@ -24,6 +24,7 @@
 #![cfg_attr(shrink_to, feature(shrink_to))]
 
 mod copy;
+mod partial_eq;
 mod read_text;
 mod text_duplexer;
 mod text_input;

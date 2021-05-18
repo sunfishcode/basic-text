@@ -79,7 +79,7 @@ use utf8_io::WriteStr;
 /// ```
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
-pub struct TextSubstring(String);
+pub struct TextSubstring(pub(crate) String);
 
 /// Text slices.
 ///
@@ -87,7 +87,7 @@ pub struct TextSubstring(String);
 /// usually used for borrowing, in the form of `&TextSubstr`.
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
-pub struct TextSubstr(str);
+pub struct TextSubstr(pub(crate) str);
 
 impl TextSubstring {
     /// Creates a new empty `TextSubstring`.
@@ -483,160 +483,6 @@ impl AsMut<TextSubstr> for TextSubstring {
     #[inline]
     fn as_mut(&mut self) -> &mut TextSubstr {
         self
-    }
-}
-
-impl PartialEq<TextSubstr> for str {
-    #[inline]
-    fn eq(&self, other: &TextSubstr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<&'a TextSubstr> for String {
-    #[inline]
-    fn eq(&self, other: &&'a TextSubstr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<&'a str> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &&'a str) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a> PartialEq<&'a TextSubstr> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &&'a TextSubstr) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, TextSubstr>> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, TextSubstr>) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, str>> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a, 'b> PartialEq<Cow<'a, str>> for &'b TextSubstr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a> PartialEq<TextSubstring> for Cow<'a, TextSubstr> {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextSubstring> for Cow<'a, str> {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextSubstr> for Cow<'a, TextSubstr> {
-    #[inline]
-    fn eq(&self, other: &TextSubstr) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a, 'b> PartialEq<&'b TextSubstr> for Cow<'a, str> {
-    #[inline]
-    fn eq(&self, other: &&TextSubstr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a, 'b> PartialEq<&'b TextSubstr> for Cow<'a, TextSubstr> {
-    #[inline]
-    fn eq(&self, other: &&TextSubstr) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl PartialEq<str> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &str) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<String> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &String) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a> PartialEq<TextSubstr> for Cow<'a, str> {
-    #[inline]
-    fn eq(&self, other: &TextSubstr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl PartialEq<TextSubstring> for String {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextSubstring> for &'a str {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextSubstring> for &'a TextSubstr {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<String> for &'a TextSubstr {
-    #[inline]
-    fn eq(&self, other: &String) -> bool {
-        self.eq(&other)
-    }
-}
-
-impl PartialEq<TextSubstring> for str {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl PartialEq<TextSubstr> for TextSubstring {
-    #[inline]
-    fn eq(&self, other: &TextSubstr) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<TextSubstring> for TextSubstr {
-    #[inline]
-    fn eq(&self, other: &TextSubstring) -> bool {
-        self.0.eq(&other.0)
     }
 }
 
@@ -1131,48 +977,6 @@ impl Ord for TextSubstr {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.cmp(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, Self>> for TextSubstr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, Self>) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a, 'b> PartialEq<Cow<'a, TextSubstr>> for &'b TextSubstr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, TextSubstr>) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, str>> for TextSubstr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<str> for TextSubstr {
-    #[inline]
-    fn eq(&self, other: &str) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<String> for TextSubstr {
-    #[inline]
-    fn eq(&self, other: &String) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<TextSubstr> for String {
-    #[inline]
-    fn eq(&self, other: &TextSubstr) -> bool {
-        self.eq(&other.0)
     }
 }
 

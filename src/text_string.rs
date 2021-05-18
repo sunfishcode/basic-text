@@ -87,7 +87,7 @@ use utf8_io::WriteStr;
 /// ```
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
-pub struct TextString(String);
+pub struct TextString(pub(crate) String);
 
 /// Text slices.
 ///
@@ -111,7 +111,7 @@ pub struct TextString(String);
 /// will be valid for the 'static duration.
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
-pub struct TextStr(str);
+pub struct TextStr(pub(crate) str);
 
 /// `TextError` is to `TextString` as `Utf8Error` is to `String`.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
@@ -547,160 +547,6 @@ impl AddAssign<&TextStr> for TextString {
     #[inline]
     fn add_assign(&mut self, other: &TextStr) {
         self.push_text(other);
-    }
-}
-
-impl PartialEq<TextStr> for str {
-    #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<&'a TextStr> for String {
-    #[inline]
-    fn eq(&self, other: &&'a TextStr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<&'a str> for TextString {
-    #[inline]
-    fn eq(&self, other: &&'a str) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a> PartialEq<&'a TextStr> for TextString {
-    #[inline]
-    fn eq(&self, other: &&'a TextStr) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, TextStr>> for TextString {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, TextStr>) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, str>> for TextString {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a, 'b> PartialEq<Cow<'a, str>> for &'b TextStr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a> PartialEq<TextString> for Cow<'a, TextStr> {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextString> for Cow<'a, str> {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextStr> for Cow<'a, TextStr> {
-    #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a, 'b> PartialEq<&'b TextStr> for Cow<'a, str> {
-    #[inline]
-    fn eq(&self, other: &&TextStr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a, 'b> PartialEq<&'b TextStr> for Cow<'a, TextStr> {
-    #[inline]
-    fn eq(&self, other: &&TextStr) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl PartialEq<str> for TextString {
-    #[inline]
-    fn eq(&self, other: &str) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<String> for TextString {
-    #[inline]
-    fn eq(&self, other: &String) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl<'a> PartialEq<TextStr> for Cow<'a, str> {
-    #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl PartialEq<TextString> for String {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextString> for &'a str {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<TextString> for &'a TextStr {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<String> for &'a TextStr {
-    #[inline]
-    fn eq(&self, other: &String) -> bool {
-        self.eq(&other)
-    }
-}
-
-impl PartialEq<TextString> for str {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.eq(&other.0)
-    }
-}
-
-impl PartialEq<TextStr> for TextString {
-    #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<TextString> for TextStr {
-    #[inline]
-    fn eq(&self, other: &TextString) -> bool {
-        self.0.eq(&other.0)
     }
 }
 
@@ -1195,48 +1041,6 @@ impl Ord for TextStr {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.cmp(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, Self>> for TextStr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, Self>) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a, 'b> PartialEq<Cow<'a, TextStr>> for &'b TextStr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, TextStr>) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl<'a> PartialEq<Cow<'a, str>> for TextStr {
-    #[inline]
-    fn eq(&self, other: &Cow<'a, str>) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<str> for TextStr {
-    #[inline]
-    fn eq(&self, other: &str) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<String> for TextStr {
-    #[inline]
-    fn eq(&self, other: &String) -> bool {
-        self.0.eq(other)
-    }
-}
-
-impl PartialEq<TextStr> for String {
-    #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
-        self.eq(&other.0)
     }
 }
 
