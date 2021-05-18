@@ -3,8 +3,8 @@
 //! This crate provides several utilities for working with [Basic Text].
 //!
 //!  - [`TextString`] and [`TextStr`] are similar to the standard library's [`String`]
-//!    and [`str`], but use the Basic Text string format, along with a `text!("...")`
-//!    [macro] for Basic Text string literals.
+//!    and [`str`], but use the Basic Text string format, along with a
+//!    [`text!("...")` macro] for Basic Text string literals.
 //!
 //!  - [`TextReader`] and [`TextWriter`] are input and output streams which use the
 //!    Basic Text stream format. On input, content is converted in a way which is
@@ -14,7 +14,32 @@
 //!  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
 //!    stream using Basic Text.
 //!
-//! [Basic Text format]: https://github.com/sunfishcode/basic-text/blob/main/docs/BasicText.md#basic-text
+//! # Examples
+//!
+//! ```rust
+//! use basic_text::text;
+//!
+//! let greeting = text!("Hello, World!");
+//! ```
+//!
+//! ```rust
+//! use basic_text::{text_substr, TextWriter, WriteText};
+//! use std::io::{stdout, Write};
+//!
+//! // Wrap stdout in an output stream that ensures that the output is
+//! // Basic Text.
+//! let mut stream = TextWriter::new(stdout());
+//!
+//! // Write Basic Text directly.
+//! stream.write_text(text_substr!("Hello, World!")).unwrap();
+//!
+//! // Invalid text is diagnosed as an error.
+//! writeln!(stream, "\u{c}Invalid!\u{7}").unwrap_err();
+//! ```
+//!
+//! [Basic Text]: https://github.com/sunfishcode/basic-text/blob/main/docs/BasicText.md#basic-text
+//! [`text!("...")` macro]: crate::text
+//! [`Duplex`]: https://docs.rs/duplex/latest/duplex/trait.Duplex.html
 
 #![deny(missing_docs)]
 #![cfg_attr(can_vector, feature(can_vector))]
@@ -42,6 +67,6 @@ pub use read_text::{default_read_exact_text, ReadText, ReadTextLayered};
 pub use text_duplexer::TextDuplexer;
 pub use text_reader::TextReader;
 pub use text_string::{default_read_to_text_string, FromTextError, TextError, TextStr, TextString};
-pub use text_substring::{default_read_to_text_substring, TextSubstr, TextSubstring};
+pub use text_substring::{TextSubstr, TextSubstring};
 pub use text_writer::TextWriter;
 pub use write_text::{default_write_text, WriteText};

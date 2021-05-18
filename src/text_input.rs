@@ -174,7 +174,8 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<usize> {
-        // Safety: This is a UTF-8 stream so we can read directly into a `str`.
+        // Safety: This is a Basic Text stream so we can read directly into a
+        // `TextSubstr`.
         internals.read(unsafe { buf.as_bytes_mut() })
     }
 
@@ -183,7 +184,8 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<()> {
-        // Safety: This is a Text stream so we can read directly into a `str`.
+        // Safety: This is a Basic Text stream so we can read directly into a
+        // `TextSubstr`.
         internals.read_exact(unsafe { buf.as_bytes_mut() })
     }
 
@@ -192,13 +194,9 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<(usize, Status)> {
-        // Safety: This is a text stream so we can read directly into a `str`.
-        let (size, status) = internals.read_with_status(unsafe { buf.as_bytes_mut() })?;
-
-        // TODO
-        //debug_assert!(buf.is_char_boundary(size));
-
-        Ok((size, status))
+        // Safety: This is a Basic Text stream so we can read directly into a
+        // `TextSubstr`.
+        internals.read_with_status(unsafe { buf.as_bytes_mut() })
     }
 
     #[inline]
@@ -206,7 +204,8 @@ impl TextInput {
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<Status> {
-        // Safety: This is a text stream so we can read directly into a `str`.
+        // Safety: This is a Basic Text stream so we can read directly into a
+        // `TextSubstr`.
         internals.read_exact_using_status(unsafe { buf.as_bytes_mut() })
     }
 

@@ -38,6 +38,9 @@ use utf8_io::WriteStr;
 /// accompanied by a borrowing [`TextSubstr`], which plays an analogous role to
 /// [`TextStr`].
 ///
+/// [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
+/// [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
+///
 /// # Examples
 ///
 /// You can create a `TextSubstring` from a literal text string with `TextSubstring::from`:
@@ -81,10 +84,13 @@ use utf8_io::WriteStr;
 #[repr(transparent)]
 pub struct TextSubstring(pub(crate) String);
 
-/// Text slices.
+/// Text substring slices.
 ///
 /// `TextSubstr` is to `TextSubstring` as [`TextStr`] is to `TextString`. It is
 /// usually used for borrowing, in the form of `&TextSubstr`.
+///
+/// [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
+/// [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
 pub struct TextSubstr(pub(crate) str);
@@ -1199,15 +1205,6 @@ impl Index<RangeFrom<usize>> for TextSubstr {
     fn index(&self, index: RangeFrom<usize>) -> &Self::Output {
         unsafe { TextSubstr::from_text_unchecked(self.0.index(index)) }
     }
-}
-
-/// Default implementation of [`ReadText::read_to_text_substring`].
-pub fn default_read_to_text_substring<Inner: ReadText + ?Sized>(
-    inner: &mut Inner,
-    buf: &mut TextSubstring,
-) -> io::Result<usize> {
-    // Read directly into the inner `String`.
-    inner.read_to_string(&mut buf.0)
 }
 
 #[test]
