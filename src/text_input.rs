@@ -250,31 +250,30 @@ impl TextInput {
         for c in chars {
             loop {
                 match (self.state, c) {
-                    (State::Ground(_), '\n') => {
-                        self.queue.push_back('\n');
-                        self.expect_starter = false;
-                        self.state = State::Ground(true);
-                    }
-                    (State::Ground(_), '\r') => self.state = State::Cr,
-                    (State::Ground(_), ESC) => self.state = State::Esc,
-                    (State::Ground(_), mut c) => {
-                        if take(&mut self.expect_starter) && !is_basic_text_start(c) {
-                            c = REPL;
+                    (State::Ground(_), c) => match c {
+                        '\n' => {
+                            self.queue.push_back('\n');
+                            self.expect_starter = false;
+                            self.state = State::Ground(true);
                         }
-                        replace(c, &mut self.queue);
-                        self.state = State::Ground(false);
-                    }
+                        '\r' => self.state = State::Cr,
+                        ESC => self.state = State::Esc,
+                        mut c => {
+                            if take(&mut self.expect_starter) && !is_basic_text_start(c) {
+                                c = REPL;
+                            }
+                            replace(c, &mut self.queue);
+                            self.state = State::Ground(false);
+                        }
+                    },
 
-                    (State::Cr, '\n') => {
+                    (State::Cr, c) => {
                         self.queue.push_back('\n');
                         self.expect_starter = false;
                         self.state = State::Ground(true);
-                    }
-                    (State::Cr, _) => {
-                        self.queue.push_back('\n');
-                        self.expect_starter = false;
-                        self.state = State::Ground(true);
-                        continue;
+                        if c != '\n' {
+                            continue;
+                        }
                     }
 
                     (State::Esc, '[') => self.state = State::CsiStart,
