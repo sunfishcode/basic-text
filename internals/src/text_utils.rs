@@ -84,7 +84,7 @@ fn is_starter(c: char) -> bool {
     c.is_ascii() || is_normalization_form_starter(c)
 }
 
-/// Grapheme_Extend = Yes
+/// `Grapheme_Extend = Yes`
 const fn is_grapheme_extend(c: char) -> bool {
     // Unicode 13.0.0, DerivedCoreProperties.txt
     matches!(
@@ -449,14 +449,14 @@ const fn is_grapheme_extend(c: char) -> bool {
     )
 }
 
-/// Emoji_Modifier = Yes
+/// `Emoji_Modifier = Yes`
 const fn is_emoji_modifier(c: char) -> bool {
     // Unicode 13.0.0, emoji/emoji-data.txt
     matches!(c, '\u{1f3fb}'..='\u{1f3ff}')
 }
 
-/// Grapheme_Cluster_freak = SpacingMark, ignoring the
-/// Grapheme_Cluster_Break ≠ Extend rule, because it's redundant here.
+/// `Grapheme_Cluster_Break = SpacingMark`, ignoring the
+/// `Grapheme_Cluster_Break ≠ Extend` rule, because it's redundant here.
 const fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
     c == '\u{e33}'
         || c == '\u{eb3}'
@@ -665,13 +665,13 @@ const fn is_general_category_spacing_mark(c: char) -> bool {
     )
 }
 
-/// Indic_Syllabic_Category = Consonant_Preceding_Repha
+/// `Indic_Syllabic_Category = Consonant_Preceding_Repha`
 const fn indic_syllabic_category_consonant_preceding_repha(c: char) -> bool {
     // Unicode 13.0.0, IndicSyllabicCategory.txt
     matches!(c, '\u{d4e}' | '\u{11941}' | '\u{11d46}')
 }
 
-/// Indic_Syllabic_Category = Consonant_Prefixed
+/// `Indic_Syllabic_Category = Consonant_Prefixed`
 const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
     // Unicode 13.0.0, IndicSyllabicCategory.txt
     matches!(
@@ -680,7 +680,7 @@ const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
     )
 }
 
-/// Prepended_Concatenation_Mark = Yes
+/// `Prepended_Concatenation_Mark = Yes`
 const fn prepended_concatenation_mark(c: char) -> bool {
     // Unicode 13.0.0, PropList.txt
     matches!(
