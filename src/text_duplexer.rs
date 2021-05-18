@@ -256,13 +256,13 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadStrLayered for Te
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDuplexer<Inner> {
     #[inline]
-    fn read_text(&mut self, buf: &mut TextSubstr) -> io::Result<usize> {
-        TextInput::read_text(self, buf)
+    fn read_text_substr(&mut self, buf: &mut TextSubstr) -> io::Result<usize> {
+        TextInput::read_text_substr(self, buf)
     }
 
     #[inline]
-    fn read_exact_text(&mut self, buf: &mut TextSubstr) -> io::Result<()> {
-        TextInput::read_exact_text(self, buf)?;
+    fn read_exact_text_substr(&mut self, buf: &mut TextSubstr) -> io::Result<()> {
+        TextInput::read_exact_text_substr(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
         // ended with a newline.
@@ -277,13 +277,16 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDupl
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadTextLayered for TextDuplexer<Inner> {
     #[inline]
-    fn read_text_with_status(&mut self, buf: &mut TextSubstr) -> io::Result<(usize, Status)> {
-        TextInput::read_text_with_status(self, buf)
+    fn read_text_substr_with_status(
+        &mut self,
+        buf: &mut TextSubstr,
+    ) -> io::Result<(usize, Status)> {
+        TextInput::read_text_substr_with_status(self, buf)
     }
 
     #[inline]
-    fn read_exact_text_using_status(&mut self, buf: &mut TextSubstr) -> io::Result<Status> {
-        TextInput::read_exact_text_using_status(self, buf)
+    fn read_exact_text_substr_using_status(&mut self, buf: &mut TextSubstr) -> io::Result<Status> {
+        TextInput::read_exact_text_substr_using_status(self, buf)
     }
 }
 
@@ -320,8 +323,8 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteStr for TextDupl
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteText for TextDuplexer<Inner> {
     #[inline]
-    fn write_text(&mut self, s: &TextSubstr) -> io::Result<()> {
-        TextOutput::write_text(self, s)
+    fn write_text_substr(&mut self, s: &TextSubstr) -> io::Result<()> {
+        TextOutput::write_text_substr(self, s)
     }
 }
 

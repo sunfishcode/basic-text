@@ -482,6 +482,13 @@ impl AsRef<TextStr> for TextString {
     }
 }
 
+impl AsRef<TextSubstr> for TextString {
+    #[inline]
+    fn as_ref(&self) -> &TextSubstr {
+        unsafe { TextSubstr::from_text_unchecked(&self.0) }
+    }
+}
+
 impl Clone for TextString {
     #[inline]
     fn clone(&self) -> Self {
@@ -1014,6 +1021,13 @@ impl AsRef<Self> for TextStr {
     #[inline]
     fn as_ref(&self) -> &Self {
         self
+    }
+}
+
+impl AsRef<TextSubstr> for TextStr {
+    #[inline]
+    fn as_ref(&self) -> &TextSubstr {
+        unsafe { TextSubstr::from_text_unchecked(&self.0) }
     }
 }
 

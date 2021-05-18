@@ -440,7 +440,7 @@ impl TextOutput {
         internals.inner().suggested_buffer_size()
     }
 
-    pub(crate) fn write_text<Inner: WriteStr + WriteLayered>(
+    pub(crate) fn write_text_substr<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &TextSubstr,
     ) -> io::Result<()> {

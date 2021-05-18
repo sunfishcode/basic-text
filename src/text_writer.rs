@@ -175,8 +175,8 @@ impl<Inner: WriteStr + WriteLayered> WriteStr for TextWriter<Inner> {
 
 impl<Inner: WriteStr + WriteLayered> WriteText for TextWriter<Inner> {
     #[inline]
-    fn write_text(&mut self, s: &TextSubstr) -> io::Result<()> {
-        TextOutput::write_text(self, s)
+    fn write_text_substr(&mut self, s: &TextSubstr) -> io::Result<()> {
+        TextOutput::write_text_substr(self, s)
     }
 }
 

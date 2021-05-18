@@ -170,7 +170,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn read_text<Inner: ReadStrLayered>(
+    pub(crate) fn read_text_substr<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<usize> {
@@ -180,7 +180,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn read_exact_text<Inner: ReadStrLayered>(
+    pub(crate) fn read_exact_text_substr<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<()> {
@@ -190,7 +190,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn read_text_with_status<Inner: ReadStrLayered>(
+    pub(crate) fn read_text_substr_with_status<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<(usize, Status)> {
@@ -200,7 +200,7 @@ impl TextInput {
     }
 
     #[inline]
-    pub(crate) fn read_exact_text_using_status<Inner: ReadStrLayered>(
+    pub(crate) fn read_exact_text_substr_using_status<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
         buf: &mut TextSubstr,
     ) -> io::Result<Status> {

@@ -16,13 +16,13 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
 
     let mut written = 0;
     loop {
-        let len = match reader.read_text(&mut buf) {
+        let len = match reader.read_text_substr(&mut buf) {
             Ok(0) => break,
             Ok(nread) => nread,
             Err(err) if err.kind() == io::ErrorKind::Interrupted => continue,
             Err(err) => return Err(err),
         };
-        writer.write_text(&buf[..len])?;
+        writer.write_text_substr(&buf[..len])?;
         written += len as u64;
     }
     Ok(written)
@@ -31,7 +31,7 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
 /// Like `std::io::copy`, but for streams that can operate directly on text
 /// strings, so we can avoid re-validating them as text.
 ///
-/// Also, like `copy_text`, but uses `read_text_with_status` to avoid performing
+/// Also, like `copy_text`, but uses `read_text_substr_with_status` to avoid performing
 /// an extra `read` at the end.
 pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Bufferable + ?Sized>(
     reader: &mut R,
@@ -45,8 +45,8 @@ pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Buffer
 
     let mut written = 0;
     loop {
-        let (len, status) = reader.read_text_with_status(&mut buf)?;
-        writer.write_text(&buf[..len])?;
+        let (len, status) = reader.read_text_substr_with_status(&mut buf)?;
+        writer.write_text_substr(&buf[..len])?;
         written += len as u64;
         if status.is_end() {
             return Ok(written);

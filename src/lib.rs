@@ -16,25 +16,44 @@
 //!
 //! # Examples
 //!
-//! ```rust
-//! use basic_text::text;
-//!
-//! let greeting = text!("Hello, World!");
-//! ```
+//! Working with `TextString` and company is overall similar to working with
+//! `String` and company, but with a little more syntax in some places:
 //!
 //! ```rust
-//! use basic_text::{text_substr, TextWriter, WriteText};
-//! use std::io::{stdout, Write};
+//! use basic_text::{text, text_substr, ReadText, TextReader, TextString, TextWriter, WriteText};
+//! use std::io::{stdin, stdout, Write};
 //!
 //! // Wrap stdout in an output stream that ensures that the output is
 //! // Basic Text.
 //! let mut stream = TextWriter::new(stdout());
 //!
-//! // Write Basic Text directly.
-//! stream.write_text(text_substr!("Hello, World!")).unwrap();
+//! // Construct Basic Text literals.
+//! let greeting = text!("Hello, World!");
 //!
-//! // Invalid text is diagnosed as an error.
+//! // Write Basic Text directly.
+//! stream.write_text(greeting).unwrap();
+//!
+//! // `TextString` can't be split at arbitrary boundaries, so this crate has
+//! // substring types, so you can work with Basic Text content incrementally.
+//! // The following code prints the "Service Dog" ZWJ Sequence "🐕‍🦺" in
+//! // parts, where splitting it would not be valid in Basic Text.
+//! stream
+//!     .write_text_substr(text_substr!("🐕\u{200d}"))
+//!     .unwrap();
+//! stream.write_text_substr(text_substr!("🦺")).unwrap();
+//!
+//! // Regular strings with Basic Text content can be written.
+//! writeln!(stream, "Valid!").unwrap();
+//!
+//! // But invalid content is diagnosed as an error.
 //! writeln!(stream, "\u{c}Invalid!\u{7}").unwrap_err();
+//!
+//! // A Basic Text reader, on the other hand, always succeeds, by replacing
+//! // invalid sequences with `�`s.
+//! let mut s = TextString::new();
+//! TextReader::new(stdin())
+//!     .read_to_text_string(&mut s)
+//!     .unwrap();
 //! ```
 //!
 //! [Basic Text]: https://github.com/sunfishcode/basic-text/blob/main/docs/BasicText.md#basic-text
@@ -63,10 +82,10 @@ mod write_text;
 pub use basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE;
 pub use basic_text_literals::{text, text_substr};
 pub use copy::{copy_text, copy_text_using_status};
-pub use read_text::{default_read_exact_text, ReadText, ReadTextLayered};
+pub use read_text::{default_read_exact_text_substr, ReadText, ReadTextLayered};
 pub use text_duplexer::TextDuplexer;
 pub use text_reader::TextReader;
 pub use text_string::{default_read_to_text_string, FromTextError, TextError, TextStr, TextString};
 pub use text_substring::{TextSubstr, TextSubstring};
 pub use text_writer::TextWriter;
-pub use write_text::{default_write_text, WriteText};
+pub use write_text::{default_write_text_substr, WriteText};
