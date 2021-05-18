@@ -9,10 +9,7 @@ use layered_io::Bufferable;
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
 #[cfg(pattern)]
-use std::str::{
-    pattern::{Pattern, ReverseSearcher},
-    MatchIndices, Matches, RMatchIndices, RMatches,
-};
+use std::str::pattern::{Pattern, ReverseSearcher};
 use std::{
     borrow::{Borrow, BorrowMut, Cow},
     cmp::Ordering,
@@ -23,7 +20,10 @@ use std::{
     net::{SocketAddr, ToSocketAddrs},
     ops::{Deref, DerefMut, Index, Range, RangeFrom, RangeTo},
     path::Path,
-    str::{self, Bytes, CharIndices, Chars, EncodeUtf16, FromStr, Lines},
+    str::{
+        self, Bytes, CharIndices, Chars, EncodeUtf16, FromStr, Lines, MatchIndices, Matches,
+        RMatchIndices, RMatches,
+    },
     vec,
 };
 use utf8_io::WriteStr;
@@ -739,6 +739,16 @@ impl TextSubstr {
         self.0.contains(pat)
     }
 
+    /// Returns `true` if the given pattern matches a sub-slice of this
+    /// text string slice.
+    ///
+    /// Returns `false` if it does not.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn contains<'a>(&'a self, pat: &str) -> bool {
+        self.0.contains(pat)
+    }
+
     /// Returns `true` if the given pattern matches a prefix of this
     /// text string slice.
     ///
@@ -749,6 +759,16 @@ impl TextSubstr {
     where
         P: Pattern<'a>,
     {
+        self.0.starts_with(pat)
+    }
+
+    /// Returns `true` if the given pattern matches a prefix of this
+    /// text string slice.
+    ///
+    /// Returns `false` if it does not.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn starts_with<'a, P>(&'a self, pat: &str) -> bool {
         self.0.starts_with(pat)
     }
 
@@ -766,6 +786,16 @@ impl TextSubstr {
         self.0.ends_with(pat)
     }
 
+    /// Returns `true` if the given pattern matches a suffix of this
+    /// text string slice.
+    ///
+    /// Returns `false` if it does not.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn ends_with<'a>(&'a self, pat: &str) -> bool {
+        self.0.ends_with(pat)
+    }
+
     /// Returns the byte index of the first character of this text string slice
     /// that matches the pattern.
     ///
@@ -776,6 +806,16 @@ impl TextSubstr {
     where
         P: Pattern<'a>,
     {
+        self.0.find(pat)
+    }
+
+    /// Returns the byte index of the first character of this text string slice
+    /// that matches the pattern.
+    ///
+    /// Returns `None` if the pattern doesn't match.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn find<'a>(&'a self, pat: &str) -> Option<usize> {
         self.0.find(pat)
     }
 
@@ -793,6 +833,16 @@ impl TextSubstr {
         self.0.rfind(pat)
     }
 
+    /// Returns the byte index for the first character of the rightmost match of
+    /// the pattern in this text string slice.
+    ///
+    /// Returns `None` if the pattern doesn't match.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn rfind<'a>(&'a self, pat: &str) -> Option<usize> {
+        self.0.rfind(pat)
+    }
+
     // TODO: *split*?
 
     /// An iterator over the disjoint matches of a pattern within the given
@@ -803,6 +853,14 @@ impl TextSubstr {
     where
         P: Pattern<'a>,
     {
+        self.0.matches(pat)
+    }
+
+    /// An iterator over the disjoint matches of a pattern within the given
+    /// text string slice.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn matches<'a>(&'a self, pat: &'a str) -> Matches<'a, &str> {
         self.0.matches(pat)
     }
 
@@ -819,6 +877,14 @@ impl TextSubstr {
     }
 
     /// An iterator over the disjoint matches of a pattern within this
+    /// text string slice, yielded in reverse order.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn rmatches<'a>(&'a self, pat: &'a str) -> RMatches<'a, &str> {
+        self.0.rmatches(pat)
+    }
+
+    /// An iterator over the disjoint matches of a pattern within this
     /// text string slice as well as the index that the match starts at.
     #[cfg(pattern)]
     #[inline]
@@ -826,6 +892,14 @@ impl TextSubstr {
     where
         P: Pattern<'a>,
     {
+        self.0.match_indices(pat)
+    }
+
+    /// An iterator over the disjoint matches of a pattern within this
+    /// text string slice as well as the index that the match starts at.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn match_indices<'a>(&'a self, pat: &'a str) -> MatchIndices<'a, &str> {
         self.0.match_indices(pat)
     }
 
@@ -838,6 +912,14 @@ impl TextSubstr {
         P: Pattern<'a>,
         <P as Pattern<'a>>::Searcher: ReverseSearcher<'a>,
     {
+        self.0.rmatch_indices(pat)
+    }
+
+    /// An iterator over the disjoint matches of a pattern within `self`,
+    /// yielded in reverse order along with the index of the match.
+    #[cfg(not(pattern))]
+    #[inline]
+    pub fn rmatch_indices<'a>(&'a self, pat: &'a str) -> RMatchIndices<'a, &str> {
         self.0.rmatch_indices(pat)
     }
 
