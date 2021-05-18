@@ -253,11 +253,8 @@ impl TextInput {
                     (State::Ground(_), '\r') => self.state = State::Cr,
                     (State::Ground(_), ESC) => self.state = State::Esc,
                     (State::Ground(_), mut c) => {
-                        if self.expect_starter {
-                            self.expect_starter = false;
-                            if !is_basic_text_start(c) {
-                                c = REPL;
-                            }
+                        if take(&mut self.expect_starter) && !is_basic_text_start(c) {
+                            c = REPL;
                         }
                         replace(c, &mut self.queue);
                         self.state = State::Ground(false);
