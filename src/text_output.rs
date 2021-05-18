@@ -316,12 +316,12 @@ impl TextOutput {
         error: &Rc<RefCell<Option<BasicTextError>>>,
     ) -> Result<(), BasicTextError> {
         // Slow path: Compute Stream-Safe and NFC.
-        for c in Categorize::new(s.chars(), Rc::clone(&error))
+        for c in Categorize::new(s.chars(), Rc::clone(error))
             .cjk_compat_variants()
             .stream_safe()
             .nfc()
         {
-            Self::state_machine_char(internals, c, &error)?;
+            Self::state_machine_char(internals, c, error)?;
         }
 
         Ok(())
