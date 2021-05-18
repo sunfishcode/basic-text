@@ -715,6 +715,8 @@ impl TextSubstr {
     // TODO: split*?
 
     /// An iterator over the lines of a text string, as text string slices.
+    ///
+    /// TODO: There should be a `TextLines` which yields `&TextSubstr`s.
     #[inline]
     pub fn lines(&self) -> Lines {
         self.0.lines()
@@ -847,6 +849,8 @@ impl TextSubstr {
 
     /// An iterator over the disjoint matches of a pattern within the given
     /// text string slice.
+    ///
+    /// TODO: There should be a `TextMatches` which yields `&TextSubstr`s.
     #[cfg(pattern)]
     #[inline]
     pub fn matches<'a, P>(&'a self, pat: P) -> Matches<'a, P>
@@ -866,6 +870,8 @@ impl TextSubstr {
 
     /// An iterator over the disjoint matches of a pattern within this
     /// text string slice, yielded in reverse order.
+    ///
+    /// TODO: There should be a `TextRMatches` which yields `&TextSubstr`s.
     #[cfg(pattern)]
     #[inline]
     pub fn rmatches<'a, P>(&'a self, pat: P) -> RMatches<'a, P>
@@ -886,6 +892,8 @@ impl TextSubstr {
 
     /// An iterator over the disjoint matches of a pattern within this
     /// text string slice as well as the index that the match starts at.
+    ///
+    /// TODO: There should be a `TextMatchIndices` which yields `&TextSubstr`s.
     #[cfg(pattern)]
     #[inline]
     pub fn match_indices<'a, P>(&'a self, pat: P) -> MatchIndices<'a, P>
@@ -905,6 +913,8 @@ impl TextSubstr {
 
     /// An iterator over the disjoint matches of a pattern within `self`,
     /// yielded in reverse order along with the index of the match.
+    ///
+    /// TODO: There should be a `TextRMatchIndices` which yields `&TextSubstr`s.
     #[cfg(pattern)]
     #[inline]
     pub fn rmatch_indices<'a, P>(&'a self, pat: P) -> RMatchIndices<'a, P>
