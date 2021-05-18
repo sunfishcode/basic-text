@@ -336,9 +336,8 @@ impl TextInput {
                 None => break,
             }
             if buf.len() - nread < MAX_UTF8_SIZE {
-                // We may have overwritten part of a codepoint; overwrite the rest
-                // of the buffer.
-                buf[nread..].fill(b'\0');
+                // Write out single-byte codepoints to preserve UTF-8 validity.
+                clear_to_char_boundary(&mut buf[nread..]);
                 return Ok((nread, Status::active()));
             }
         }
@@ -346,9 +345,8 @@ impl TextInput {
             internals.impl_().pending_status = Status::active();
             internals.impl_().expect_starter = true;
 
-            // We may have overwritten part of a codepoint; overwrite the rest
-            // of the buffer.
-            buf[nread..].fill(b'\0');
+            // Write out single-byte codepoints to preserve UTF-8 validity.
+            clear_to_char_boundary(&mut buf[nread..]);
 
             return Ok((nread, internals.impl_().pending_status));
         }
@@ -411,9 +409,8 @@ impl TextInput {
             }
         }
 
-        // We may have overwritten part of a codepoint; overwrite the rest
-        // of the buffer.
-        buf[nread..].fill(b'\0');
+        // Write out single-byte codepoints to preserve UTF-8 validity.
+        clear_to_char_boundary(&mut buf[nread..]);
 
         Ok((
             nread,
@@ -475,6 +472,40 @@ impl TextInput {
         // Safety: This is a UTF-8 stream so we can read into a `String`.
         internals.read_to_end(unsafe { buf.as_mut_vec() })
     }
+}
+
+#[inline]
+fn clear_to_char_boundary(buf: &mut [u8]) {
+    for b in buf {
+        if is_char_boundary(*b) {
+            break;
+        }
+        *b = b'\0';
+    }
+}
+
+#[test]
+fn test_clear_to_char_boundary() {
+    let mut buf = vec![7, 7, 0x80, 0x80, 7];
+    clear_to_char_boundary(&mut buf[2..]);
+    assert_eq!(buf, vec![7, 7, 0, 0, 7]);
+}
+
+#[inline]
+const fn is_char_boundary(b: u8) -> bool {
+    b as i8 >= -0x40
+}
+
+#[test]
+fn test_is_char_boundary() {
+    assert!(is_char_boundary(b'\0'));
+    assert!(is_char_boundary(b'A'));
+    assert!(is_char_boundary(0x7f));
+    assert!(!is_char_boundary(0x80));
+    assert!(!is_char_boundary(0xbf));
+    assert!(is_char_boundary(0xc0));
+    assert!(is_char_boundary(0xcf));
+    assert!(is_char_boundary(0xff));
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
