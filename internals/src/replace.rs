@@ -115,8 +115,8 @@ pub fn replace(c: char, queue: &mut VecDeque<char>) {
         // Bidirectional Format Characters
         '\u{202a}' | '\u{202b}' | '\u{202c}' | '\u{202d}' | '\u{202e}' |
         '\u{2066}' | '\u{2067}' | '\u{2068}' | '\u{2069}' |
-        // Tag Characters
-        '\u{e0000}'..='\u{e007f}' |
+        // Language Tag
+        '\u{e0001}' |
         // Noncharacters
         '\u{fffe}' ..= '\u{ffff}' |
         '\u{1fffe}' ..= '\u{1ffff}' |

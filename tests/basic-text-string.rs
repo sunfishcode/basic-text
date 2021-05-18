@@ -44,22 +44,22 @@ fn basic_text_string_basics() {
         "A\u{34f}\u{200c}\u{200d}\u{2060}"
     );
     assert_eq!(
-        TextString::from_text("\u{200e}\u{200f}\u{61c}".to_owned())
-            .unwrap()
-            .as_str(),
+        TextString::from_text("\u{200e}\u{200f}\u{61c}".to_owned()).unwrap(),
         "\u{200e}\u{200f}\u{61c}"
     );
     assert_eq!(
-        TextString::from_text("\u{fffd}".to_owned())
-            .unwrap()
-            .as_str(),
+        TextString::from_text("\u{fffd}".to_owned()).unwrap(),
         "\u{fffd}"
     );
     assert_eq!(
-        TextString::from_text("\u{10fffd}\u{fdfa}\u{2800}".to_owned())
+        TextString::from_text("\u{10fffd}\u{fdfa}\u{2800}".to_owned()).unwrap(),
+        "\u{10fffd}\u{fdfa}\u{2800}"
+    );
+    assert_eq!(
+        TextString::from_text("\u{e0000}\u{e0002}".to_owned())
             .unwrap()
             .as_str(),
-        "\u{10fffd}\u{fdfa}\u{2800}"
+        "\u{e0000}\u{e0002}"
     );
 }
 
