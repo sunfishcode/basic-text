@@ -64,6 +64,19 @@ impl<Inner: HalfDuplex> TextDuplexer<Utf8Duplexer<LayeredDuplexer<Inner>>> {
     pub fn with_crlf_compatibility(inner: Inner) -> Self {
         Self::from_utf8_with_crlf_compatibility(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
     }
+
+    /// Like `new`, but replaces U+85 (NEL) with U+A instead of U+20.
+    #[inline]
+    pub fn with_nel_compatibility(inner: Inner) -> io::Result<Self> {
+        Self::from_utf8_with_nel_compatibility(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
+    }
+
+    /// Like `new`, but replaces U+2028 (LS) and U+2029 (PS) with U+A instead
+    /// of U+20.
+    #[inline]
+    pub fn with_lsps_compatibility(inner: Inner) -> io::Result<Self> {
+        Self::from_utf8_with_lsps_compatibility(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
+    }
 }
 
 impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + WriteLayered>
@@ -109,6 +122,31 @@ impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + Wri
             input: TextInput::new(),
             output: TextOutput::with_crlf_compatibility(),
         }
+    }
+
+    /// Like `from_utf8`, but replaces U+85 (NEL) with U+A instead of U+20.
+    #[inline]
+    pub fn from_utf8_with_nel_compatibility(inner: Inner) -> io::Result<Self> {
+        let input = TextInput::with_nel_compatibility();
+        let output = TextOutput::new();
+        Ok(Self {
+            inner,
+            input,
+            output,
+        })
+    }
+
+    /// Like `from_utf8`, but replaces U+2028 (LS) and U+2029 (PS) with U+A
+    /// instead of U+20.
+    #[inline]
+    pub fn from_utf8_with_lsps_compatibility(inner: Inner) -> io::Result<Self> {
+        let input = TextInput::with_lsps_compatibility();
+        let output = TextOutput::new();
+        Ok(Self {
+            inner,
+            input,
+            output,
+        })
     }
 
     /// Flush and close the underlying stream and return the underlying

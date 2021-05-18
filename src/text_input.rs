@@ -4,7 +4,9 @@
 use crate::{TextDuplexer, TextReader, TextSubstr};
 use basic_text_internals::{
     is_basic_text_end, is_basic_text_start, replace,
-    unicode::{BEL, BOM, CAN, CGJ, DEL, ESC, MAX_UTF8_SIZE, NORMALIZATION_BUFFER_SIZE, REPL},
+    unicode::{
+        BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS, REPL,
+    },
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
@@ -94,6 +96,12 @@ pub(crate) struct TextInput {
     /// For ignoring BOM at the start of a stream.
     at_start: bool,
 
+    /// NEL compatibility mode.
+    nel_compatibility: bool,
+
+    /// LSPS compatibility mode.
+    lsps_compatibility: bool,
+
     /// Control-code and escape-sequence state machine.
     state: State,
 }
@@ -115,8 +123,26 @@ impl TextInput {
             pending_status: Status::active(),
             expect_starter: true,
             at_start: true,
+            nel_compatibility: false,
+            lsps_compatibility: false,
             state: State::Ground(true),
         }
+    }
+
+    /// Construct a new instance of `TextInput` in NEL compatibility mode.
+    #[inline]
+    pub(crate) fn with_nel_compatibility() -> Self {
+        let mut result = Self::new();
+        result.nel_compatibility = true;
+        result
+    }
+
+    /// Construct a new instance of `TextInput` in LSPS compatibility mode.
+    #[inline]
+    pub(crate) fn with_lsps_compatibility() -> Self {
+        let mut result = Self::new();
+        result.lsps_compatibility = true;
+        result
     }
 
     /// Like `read_with_status` but produces the result in a `str`. Be sure to
@@ -259,11 +285,16 @@ impl TextInput {
                         '\r' => self.state = State::Cr,
                         ESC => self.state = State::Esc,
                         mut c => {
+                            self.state = State::Ground(false);
                             if take(&mut self.expect_starter) && !is_basic_text_start(c) {
                                 c = REPL;
+                            } else if (self.nel_compatibility && c == NEL)
+                                || (self.lsps_compatibility && matches!(c, LS | PS))
+                            {
+                                c = '\n';
+                                self.state = State::Ground(true);
                             }
                             replace(c, &mut self.queue);
-                            self.state = State::Ground(false);
                         }
                     },
 

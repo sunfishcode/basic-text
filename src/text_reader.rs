@@ -42,6 +42,19 @@ impl<Inner: Read> TextReader<Utf8Reader<LayeredReader<Inner>>> {
     pub fn new(inner: Inner) -> Self {
         Self::from_utf8(Utf8Reader::new(LayeredReader::new(inner)))
     }
+
+    /// Like `new`, but replaces U+85 (NEL) with U+A instead of U+20.
+    #[inline]
+    pub fn with_nel_compatibility(inner: Inner) -> io::Result<Self> {
+        Self::from_utf8_with_nel_compatibility(Utf8Reader::new(LayeredReader::new(inner)))
+    }
+
+    /// Like `new`, but replaces U+2028 (LS) and U+2029 (PS) with U+A instead
+    /// of U+20.
+    #[inline]
+    pub fn with_lsps_compatibility(inner: Inner) -> io::Result<Self> {
+        Self::from_utf8_with_lsps_compatibility(Utf8Reader::new(LayeredReader::new(inner)))
+    }
 }
 
 impl<Inner: ReadStrLayered> TextReader<Inner> {
@@ -54,6 +67,21 @@ impl<Inner: ReadStrLayered> TextReader<Inner> {
             inner,
             input: TextInput::new(),
         }
+    }
+
+    /// Like `from_utf8`, but replaces U+85 (NEL) with U+A instead of U+20.
+    #[inline]
+    pub fn from_utf8_with_nel_compatibility(inner: Inner) -> io::Result<Self> {
+        let input = TextInput::with_nel_compatibility();
+        Ok(Self { inner, input })
+    }
+
+    /// Like `from_utf8`, but replaces U+2028 (LS) and U+2029 (PS) with U+A
+    /// instead of U+20.
+    #[inline]
+    pub fn from_utf8_with_lsps_compatibility(inner: Inner) -> io::Result<Self> {
+        let input = TextInput::with_lsps_compatibility();
+        Ok(Self { inner, input })
     }
 }
 

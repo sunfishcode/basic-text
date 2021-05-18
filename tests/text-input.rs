@@ -2,13 +2,62 @@ mod disallowed_scalar_values;
 
 use basic_text::TextReader;
 use disallowed_scalar_values::DISALLOWED_SCALAR_VALUES;
-use std::io::Read;
+use std::io::{self, Cursor, Read};
 
 fn to_text(input: &str) -> String {
     let mut reader = TextReader::new(input.as_bytes());
     let mut s = String::new();
     reader.read_to_string(&mut s).unwrap();
     s
+}
+
+fn to_text_with_nel_compatibility(input: &str) -> io::Result<String> {
+    let mut reader = TextReader::with_nel_compatibility(Cursor::new(input)).unwrap();
+    let mut buf = String::new();
+    reader.read_to_string(&mut buf)?;
+    Ok(buf)
+}
+
+fn to_text_with_lsps_compatibility(input: &str) -> io::Result<String> {
+    let mut reader = TextReader::with_lsps_compatibility(Cursor::new(input)).unwrap();
+    let mut buf = String::new();
+    reader.read_to_string(&mut buf)?;
+    Ok(buf)
+}
+
+#[test]
+fn test_nel_compatibility() {
+    // As an option (NEL compatibility), off by default, replace U+85 with U+A.
+    assert_eq!(
+        to_text_with_nel_compatibility("hello\u{85}world").unwrap(),
+        "hello\nworld\n"
+    );
+    assert_eq!(
+        to_text_with_nel_compatibility("\u{85}hello world\u{85}").unwrap(),
+        "\nhello world\n"
+    );
+}
+
+#[test]
+fn test_lsps_compatibility() {
+    // As an option (LSPS compatibility), off by default, replace U+2028 and
+    // U+2029 with U+A.
+    assert_eq!(
+        to_text_with_lsps_compatibility("hello\u{2028}world").unwrap(),
+        "hello\nworld\n"
+    );
+    assert_eq!(
+        to_text_with_lsps_compatibility("hello\u{2029}world").unwrap(),
+        "hello\nworld\n"
+    );
+    assert_eq!(
+        to_text_with_lsps_compatibility("\u{2028}hello world\u{2028}").unwrap(),
+        "\nhello world\n"
+    );
+    assert_eq!(
+        to_text_with_lsps_compatibility("\u{2029}hello world\u{2029}").unwrap(),
+        "\nhello world\n"
+    );
 }
 
 #[test]

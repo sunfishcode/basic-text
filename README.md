@@ -38,9 +38,8 @@ providing several utilities:
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
    stream using Basic Text.
 
-The code here is usable, but not very mature or optimized yet. At this point it
-implements everything in the Basic Text spec, except for some of the non-default
-options.
+The code here is usable, and implements everything in the [Basic Text] spec,
+but is not very mature or optimized yet.
 
 [`TextString`]: https://docs.rs/basic-text/latest/basic_text/struct.TextString.html
 [`TextStr`]: https://docs.rs/basic-text/latest/basic_text/struct.TextStr.html
