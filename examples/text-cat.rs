@@ -1,10 +1,10 @@
-use basic_text::{copy_text, TextReader, TextWriter};
-use layered_io::WriteLayered;
+use basic_text::TextReader;
+use std::io::{copy, stdin, stdout, Write};
 
 fn main() -> anyhow::Result<()> {
-    let mut reader = TextReader::new(std::io::stdin());
-    let mut writer = TextWriter::new(std::io::stdout());
-    copy_text(&mut reader, &mut writer)?;
-    writer.close()?;
+    let mut reader = TextReader::new(stdin());
+    let mut writer = stdout();
+    copy(&mut reader, &mut writer)?;
+    writer.flush()?;
     Ok(())
 }

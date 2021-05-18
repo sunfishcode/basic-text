@@ -1,10 +1,10 @@
-use std::io::{BufRead, BufReader, Write};
+use std::io::{stdin, stdout, BufRead, BufReader, Write};
 use unicode_normalization::{is_nfc_quick, IsNormalized, UnicodeNormalization};
 use utf8_io::Utf8Reader;
 
 fn main() -> anyhow::Result<()> {
-    let stdin = std::io::stdin();
-    let stdout = std::io::stdout();
+    let stdin = stdin();
+    let stdout = stdout();
     let lock = BufReader::new(Utf8Reader::new(stdin.lock()));
     let mut out = stdout.lock();
     for line in lock.lines() {
