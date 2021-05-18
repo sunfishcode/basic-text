@@ -15,6 +15,10 @@ pub trait BufReadText: BufRead {
     ///
     /// Basic Text streams always end with a newline, so the returned string
     /// will always have a trailing newline.
+    ///
+    /// This function is blocking and should be used carefully: it is possible
+    /// for an attacker to continuously send bytes without ever sending a
+    /// newline or ending the stream.
     fn read_text_line(&mut self, buf: &mut TextString) -> io::Result<usize> {
         let len = self.read_line(&mut buf.0)?;
 
@@ -35,6 +39,10 @@ pub trait BufReadText: BufRead {
     ///
     /// Basic Text streams always end with a newline, so the returned string
     /// will always have a trailing newline.
+    ///
+    /// This function is blocking and should be used carefully: it is possible
+    /// for an attacker to continuously send bytes without ever sending a
+    /// newline or ending the stream.
     fn read_text_line_lossy(&mut self, buf: &mut TextString) -> io::Result<usize> {
         let len = self.read_line(&mut buf.0)?;
 
