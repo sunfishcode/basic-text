@@ -1,6 +1,5 @@
 use basic_text::{text, TextStr, TextString};
-use std::fs::File;
-use std::io::Read;
+use std::{fs::File, io::Read};
 
 #[test]
 fn basic_text_example() {
