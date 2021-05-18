@@ -11,7 +11,7 @@ edition = "2018"
 publish = false
 
 [build-dependencies]
-rustc_version = "0.3.2"
+rustc_version = "0.3.3"
 
 [dependencies]
 basic-text = { path = "..", version = "^0.2.6-alpha.0"}
@@ -20,9 +20,6 @@ layered-io = "0.4.0"
 unicode-normalization = "0.1.17"
 unsafe-io = "0.6.2"
 utf8-io = { version = "0.4.0", features = ["layered-io"] }
-
-[dev-dependencies]
-anyhow = "1.0.37"
 
 [badges]
 maintenance = { status = "actively-developed" }
