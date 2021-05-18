@@ -1,6 +1,6 @@
 [package]
 name = "restricted-text"
-version = "0.0.1-alpha.0"
+version = "0.3.0"
 description = "Restricted Text strings and I/O streams"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
