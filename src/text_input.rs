@@ -240,11 +240,16 @@ impl TextInput {
     }
 
     fn process_raw_string(&mut self) {
-        for c in self.raw_string.chars() {
-            let at_start = take(&mut self.at_start);
+        let mut chars = self.raw_string.chars();
+
+        // If we're at the start of a stream, skip over a leading BOM.
+        if take(&mut self.at_start) && self.raw_string.starts_with(BOM) {
+            chars.next();
+        }
+
+        for c in chars {
             loop {
                 match (self.state, c) {
-                    (State::Ground(_), BOM) if at_start => (),
                     (State::Ground(_), '\n') => {
                         self.queue.push_back('\n');
                         self.expect_starter = false;
