@@ -482,7 +482,7 @@ const fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
             ))
 }
 
-/// General_Category = Spacing_Mark
+/// `General_Category = Spacing_Mark`
 const fn is_general_category_spacing_mark(c: char) -> bool {
     // Unicode 13.0.0, DerivedGeneralCategory.txt
     matches!(
