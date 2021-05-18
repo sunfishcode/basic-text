@@ -9,6 +9,7 @@ repository = "https://github.com/sunfishcode/basic-text"
 
 [dependencies]
 unicode-normalization = "0.1.17"
+thiserror = "1.0.24"
 
 [badges]
 maintenance = { status = "actively-developed" }

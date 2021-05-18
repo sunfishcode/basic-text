@@ -1,5 +1,6 @@
 use crate::{
-    text_input::TextInput, text_output::TextOutput, ReadText, ReadTextLayered, TextStr, WriteText,
+    text_input::TextInput, text_output::TextOutput, ReadText, ReadTextLayered, TextSubstr,
+    WriteText,
 };
 use duplex::{Duplex, HalfDuplex};
 use layered_io::{
@@ -255,12 +256,12 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadStrLayered for Te
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDuplexer<Inner> {
     #[inline]
-    fn read_text(&mut self, buf: &mut str) -> io::Result<usize> {
+    fn read_text(&mut self, buf: &mut TextSubstr) -> io::Result<usize> {
         TextInput::read_text(self, buf)
     }
 
     #[inline]
-    fn read_exact_text(&mut self, buf: &mut str) -> io::Result<()> {
+    fn read_exact_text(&mut self, buf: &mut TextSubstr) -> io::Result<()> {
         TextInput::read_exact_text(self, buf)?;
 
         // If the input ended with a newline, don't require the output to have
@@ -276,12 +277,12 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadText for TextDupl
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> ReadTextLayered for TextDuplexer<Inner> {
     #[inline]
-    fn read_text_with_status(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
+    fn read_text_with_status(&mut self, buf: &mut TextSubstr) -> io::Result<(usize, Status)> {
         TextInput::read_text_with_status(self, buf)
     }
 
     #[inline]
-    fn read_exact_text_using_status(&mut self, buf: &mut str) -> io::Result<Status> {
+    fn read_exact_text_using_status(&mut self, buf: &mut TextSubstr) -> io::Result<Status> {
         TextInput::read_exact_text_using_status(self, buf)
     }
 }
@@ -319,7 +320,7 @@ impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteStr for TextDupl
 
 impl<Inner: HalfDuplexLayered + ReadStrLayered + WriteStr> WriteText for TextDuplexer<Inner> {
     #[inline]
-    fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
+    fn write_text(&mut self, s: &TextSubstr) -> io::Result<()> {
         TextOutput::write_text(self, s)
     }
 }

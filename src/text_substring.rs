@@ -1,8 +1,8 @@
-//! The `TextString` and `TextStr` types.
+//! The `TextSubstring` and `TextSubstr` types.
 
-use crate::{ReadText, TextReader, TextSubstr, TextWriter};
+use crate::{FromTextError, TextError, TextReader, TextWriter};
 use basic_text_internals::{
-    is_basic_text, is_basic_text_start,
+    is_basic_text_substr,
     unicode::{BOM, WJ},
 };
 use layered_io::Bufferable;
@@ -16,138 +16,101 @@ use std::str::{
 use std::{
     borrow::{Borrow, BorrowMut, Cow},
     cmp::Ordering,
-    error::Error,
     ffi::OsStr,
     fmt::{self, Debug, Display, Formatter},
     hash::Hash,
     io::{self, Read, Write},
     net::{SocketAddr, ToSocketAddrs},
-    ops::{Add, AddAssign, Deref, DerefMut, Index, Range, RangeFrom, RangeTo},
+    ops::{Deref, DerefMut, Index, Range, RangeFrom, RangeTo},
     path::Path,
-    str::{self, Bytes, CharIndices, Chars, EncodeUtf16, FromStr, Lines, Utf8Error},
-    string::FromUtf8Error,
+    str::{self, Bytes, CharIndices, Chars, EncodeUtf16, FromStr, Lines},
     vec,
 };
 use utf8_io::WriteStr;
 
-/// A Basic Text encoded, growable string.
+/// A substring of a Basic Text string or stream.
 ///
-/// This is an owning string similar to [`String`], but ensures the contents
-/// are Basic Text rather than just UTF-8. It's accompanied by a borrowing
-/// [`TextStr`], which plays an analogous role to [`prim@str`].
+/// This does not enforce the Basic Text requirements on the beginning or end
+/// of a stream, so it can represent substrings of Basic Text.
+///
+/// This is an owning string similar to [`TextString`], but doesn't enforce the
+/// starting and ending requirements, so it can represent substrings. It's
+/// accompanied by a borrowing [`TextSubstr`], which plays an analogous role to
+/// [`TextStr`].
 ///
 /// # Examples
 ///
-/// You can create a `TextString` from a literal text string with `TextString::from`:
+/// You can create a `TextSubstring` from a literal text string with `TextSubstring::from`:
 ///
 /// ```rust
-/// use basic_text::{text, TextString};
+/// use basic_text::{text_substr, TextSubstring};
 ///
-/// let hello = TextString::from(text!("Hello, world!"));
-/// ```
-///
-/// You can append a `&TextStr` with the `push_text` method:
-///
-/// ```rust
-/// use basic_text::{text, TextString};
-///
-/// let mut hello = TextString::from(text!("Hello, "));
-///
-/// hello.push_text(text!("world!"));
+/// let hello = TextSubstring::from(text_substr!("Hello, world!"));
 /// ```
 ///
 /// If you have a `String` containing a Basic Text string, you can create a
-/// `TextString` from it with the `from_text` method:
+/// `TextSubstring` from it with the `from_text` method:
 ///
 /// ```rust
-/// use basic_text::{text, TextString};
+/// use basic_text::{text_substr, TextSubstring};
 ///
 /// // a `String`
 /// let sparkle_heart = "💖".to_owned();
 ///
 /// // We know this string is valid, so we'll use `unwrap()`.
-/// let sparkle_heart = TextString::from_text(sparkle_heart).unwrap();
+/// let sparkle_heart = TextSubstring::from_text(sparkle_heart).unwrap();
 ///
-/// assert_eq!(text!("💖"), &sparkle_heart);
+/// assert_eq!(text_substr!("💖"), &sparkle_heart);
 /// ```
 ///
 /// If you have a vector of Basic Text bytes, you can create a `String` from it
 /// with the `from_text_vec` method:
 ///
 /// ```rust
-/// use basic_text::{text, TextString};
+/// use basic_text::{text_substr, TextSubstring};
 ///
 /// // some bytes, in a vector
 /// let sparkle_heart = vec![240, 159, 146, 150];
 ///
 /// // We know these bytes are valid, so we'll use `unwrap()`.
-/// let sparkle_heart = TextString::from_text_vec(sparkle_heart).unwrap();
+/// let sparkle_heart = TextSubstring::from_text_vec(sparkle_heart).unwrap();
 ///
-/// assert_eq!(text!("💖"), &sparkle_heart);
+/// assert_eq!(text_substr!("💖"), &sparkle_heart);
 /// ```
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
-pub struct TextString(String);
+pub struct TextSubstring(String);
 
 /// Text slices.
 ///
-/// `TextStr` is to `TextString` as [`prim@str`] is to `String`. It is usually
-/// used for borrowing, in the form of `&TextStr`.
-///
-/// # Examples
-///
-/// Text literals are text slices:
-///
-/// ```rust
-/// use basic_text::{text, TextStr};
-///
-/// let hello = text!("Hello, world!");
-///
-/// // with an explicit type annotation
-/// let hello: &'static TextStr = text!("Hello, world!");
-/// ```
-///
-/// They are 'static because they’re stored directly in the final binary, and so
-/// will be valid for the 'static duration.
+/// `TextSubstr` is to `TextSubstring` as [`TextStr`] is to `TextString`. It is
+/// usually used for borrowing, in the form of `&TextSubstr`.
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
-pub struct TextStr(str);
+pub struct TextSubstr(str);
 
-/// `TextError` is to `TextString` as `Utf8Error` is to `String`.
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub struct TextError {
-    pub(crate) valid_up_to: usize,
-}
-
-/// `FromTextError` is to `TextString` as `FromUtf8Error` is to `String`.
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct FromTextError {
-    pub(crate) bytes: Vec<u8>,
-    pub(crate) error: TextError,
-}
-
-impl TextString {
-    /// Creates a new empty `TextString`.
+impl TextSubstring {
+    /// Creates a new empty `TextSubstring`.
     #[inline]
     #[must_use]
     pub const fn new() -> Self {
         Self(String::new())
     }
 
-    /// Creates a new empty `TextString` with a particular capacity.
+    /// Creates a new empty `TextSubstring` with a particular capacity.
     #[inline]
     #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
         Self(String::with_capacity(capacity))
     }
 
-    /// Converts a vector of bytes to a `TextString`.
+    /// Converts a vector of bytes to a `TextSubstring`.
     #[inline]
     pub fn from_text_vec(vec: Vec<u8>) -> Result<Self, FromTextError> {
         Self::from_text(String::from_utf8(vec)?)
     }
 
-    /// Converts a `String` to a `TextString`.
+    /// Converts a `String` to a `TextSubstring`.
     #[inline]
     pub fn from_text(s: String) -> Result<Self, FromTextError> {
         let bytes: Vec<u8> = Vec::new();
@@ -179,7 +142,7 @@ impl TextString {
     /// Converts a slice of bytes to Basic Text, including invalid characters.
     #[inline]
     #[must_use]
-    pub fn from_text_bytes_lossy(v: &[u8]) -> Cow<TextStr> {
+    pub fn from_text_bytes_lossy(v: &[u8]) -> Cow<TextSubstr> {
         // TODO: optimize away the temporary String here
         Cow::Owned(Self::from_text_lossy(&String::from_utf8_lossy(v)).into_owned())
     }
@@ -187,7 +150,7 @@ impl TextString {
     /// Converts a string to Basic Text, including invalid characters.
     #[inline]
     #[must_use]
-    pub fn from_text_lossy(mut v: &str) -> Cow<TextStr> {
+    pub fn from_text_lossy(mut v: &str) -> Cow<TextSubstr> {
         // TODO: If `v` is already valid, fast-path to `Cow::Borrowed(v)`.
         // TODO: Also, this currently redoes UTF-8 validation for `v`.
         let mut reader = TextReader::new(v.as_bytes());
@@ -213,14 +176,14 @@ impl TextString {
 
     // TODO: from_raw_parts, from_utf16*
 
-    /// Converts a vector of bytes to a `TextString` without checking that the
+    /// Converts a vector of bytes to a `TextSubstring` without checking that the
     /// string contains valid Basic Text.
     ///
     /// # Safety
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     #[must_use]
@@ -228,14 +191,14 @@ impl TextString {
         Self::from_text_unchecked(String::from_utf8_unchecked(vec))
     }
 
-    /// Converts a `String` to a `TextString` without checking that the string
+    /// Converts a `String` to a `TextSubstring` without checking that the string
     /// contains valid Basic Text.
     ///
     /// # Safety
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     #[must_use]
@@ -243,7 +206,7 @@ impl TextString {
         Self(s)
     }
 
-    /// Converts a `TextString` into a `String`.
+    /// Converts a `TextSubstring` into a `String`.
     #[inline]
     #[must_use]
     pub fn into_string(self) -> String {
@@ -257,52 +220,42 @@ impl TextString {
         self.0.into_bytes()
     }
 
-    /// Extracts a UTF-8 string slice containing the entire `TextString`.
+    /// Extracts a UTF-8 string slice containing the entire `TextSubstring`.
     #[inline]
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
     }
 
-    /// Extracts a Basic Text string slice containing the entire `TextString`.
+    /// Extracts a Basic Text string slice containing the entire `TextSubstring`.
     #[inline]
     #[must_use]
-    pub fn as_text(&self) -> &TextStr {
+    pub fn as_text(&self) -> &TextSubstr {
         self
     }
 
-    /// Converts a `TextString` into a mutable Basic Text string slice.
+    /// Converts a `TextSubstring` into a mutable Basic Text substring slice.
     #[inline]
     #[must_use]
-    pub fn as_mut_text(&mut self) -> &mut TextStr {
+    pub fn as_mut_text(&mut self) -> &mut TextSubstr {
         self
     }
 
-    /// Appends a given string slice onto the end of this `TextString`.
-    ///
-    /// But wait, isn't NFC closed under concatenation? This is true, but
-    /// Basic Text has additional restrictions, including that strings start
-    /// with non-combining codepoints, so it *is* closed under concatenation.
-    #[inline]
-    pub fn push_text(&mut self, s: &TextStr) {
-        self.0.push_str(&s.0);
-    }
-
-    /// Returns this `TextString`'s capacity, in bytes.
+    /// Returns this `TextSubstring`'s capacity, in bytes.
     #[inline]
     #[must_use]
     pub fn capacity(&self) -> usize {
         self.0.capacity()
     }
 
-    /// Ensures that this `TextString`'s capacity is at least `additional`
+    /// Ensures that this `TextSubstring`'s capacity is at least `additional`
     /// bytes larger than its length.
     #[inline]
     pub fn reserve(&mut self, additional: usize) {
         self.0.reserve(additional);
     }
 
-    /// Ensures that this `TextString`'s capacity is `additional` bytes larger
+    /// Ensures that this `TextSubstring`'s capacity is `additional` bytes larger
     /// than its length.
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
@@ -310,7 +263,7 @@ impl TextString {
     }
 
     /// Tries to reserve capacity for at least `additional` more elements to
-    /// be inserted in the given `TextString`.
+    /// be inserted in the given `TextSubstring`.
     #[cfg(try_reserve)]
     #[inline]
     pub fn try_reserve(&mut self, additional: usize) -> Result<(), TryReserveError> {
@@ -318,14 +271,14 @@ impl TextString {
     }
 
     /// Tries to reserves the minimum capacity for exactly `additional` more
-    /// elements to be inserted in the given `TextString`.
+    /// elements to be inserted in the given `TextSubstring`.
     #[cfg(try_reserve)]
     #[inline]
     pub fn try_reserve_exact(&mut self, additional: usize) -> Result<(), TryReserveError> {
         self.0.try_reserve_exact(additional)
     }
 
-    /// Shrinks the capacity of this `TextString` to match its length.
+    /// Shrinks the capacity of this `TextSubstring` to match its length.
     #[inline]
     pub fn shrink_to_fit(&mut self) {
         self.0.shrink_to_fit();
@@ -340,7 +293,7 @@ impl TextString {
 
     // TODO: push? But think about how to maintain NFC and other guarantees
 
-    /// Returns a byte slice of this `TextString`'s contents.
+    /// Returns a byte slice of this `TextSubstring`'s contents.
     #[inline]
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
@@ -349,40 +302,40 @@ impl TextString {
     // TODO: truncate, pop, remove, retain, insert? ditto
     // TODO: insert_str? We could do CGJ's where needed there?
 
-    /// Returns a mutable reference to the contents of this `TextString`.
+    /// Returns a mutable reference to the contents of this `TextSubstring`.
     ///
     /// # Safety
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, it may
     /// cause memory unsafety issues with future users of the String, as the
-    /// rest of this crate assumes that `TextString`s are valid Basic Text.
+    /// rest of this crate assumes that `TextSubstring`s are valid Basic Text.
     #[inline]
     pub unsafe fn as_mut_vec(&mut self) -> &mut Vec<u8> {
         self.0.as_mut_vec()
     }
 
-    /// Returns a mutable reference to the contents of this `TextString`.
+    /// Returns a mutable reference to the contents of this `TextSubstring`.
     ///
     /// # Safety
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, it may
     /// cause memory unsafety issues with future users of the String, as the
-    /// rest of this crate assumes that `TextString`s are valid Basic Text.
+    /// rest of this crate assumes that `TextSubstring`s are valid Basic Text.
     #[inline]
     pub unsafe fn as_mut_string(&mut self) -> &mut String {
         &mut self.0
     }
 
-    /// Returns the length of this `TextString`, in bytes, not `char`s or
+    /// Returns the length of this `TextSubstring`, in bytes, not `char`s or
     /// graphemes.
     #[inline]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
-    /// Returns `true` if this `TextString` has a length of zero, and `false`
+    /// Returns `true` if this `TextSubstring` has a length of zero, and `false`
     /// otherwise.
     #[inline]
     pub fn is_empty(&self) -> bool {
@@ -399,17 +352,17 @@ impl TextString {
 
     // TODO: drain, replace_range?
 
-    /// Converts this `TextString` into a `Box<str>`.
+    /// Converts this `TextSubstring` into a `Box<str>`.
     #[inline]
     pub fn into_boxed_str(self) -> Box<str> {
         self.0.into_boxed_str()
     }
 
-    /// Converts this `TextString` into a `Box<TextStr>`.
+    /// Converts this `TextSubstring` into a `Box<TextSubstr>`.
     #[inline]
-    pub fn into_boxed_text(self) -> Box<TextStr> {
+    pub fn into_boxed_text(self) -> Box<TextSubstr> {
         let slice = self.into_boxed_str();
-        unsafe { TextStr::from_boxed_text_unchecked(slice) }
+        unsafe { TextSubstr::from_boxed_text_unchecked(slice) }
     }
 }
 
@@ -436,7 +389,7 @@ fn compute_valid_up_to(s: &str) -> usize {
             }
         }
         let substr = &s[..mid];
-        if is_basic_text(substr) {
+        if is_basic_text_substr(substr) {
             begin = mid;
         } else {
             end = mid;
@@ -445,14 +398,14 @@ fn compute_valid_up_to(s: &str) -> usize {
     begin
 }
 
-impl AsRef<[u8]> for TextString {
+impl AsRef<[u8]> for TextSubstring {
     #[inline]
     fn as_ref(&self) -> &[u8] {
         self.as_bytes()
     }
 }
 
-impl AsRef<OsStr> for TextString {
+impl AsRef<OsStr> for TextSubstring {
     #[inline]
     fn as_ref(&self) -> &OsStr {
         let s: &str = self.as_ref();
@@ -460,7 +413,7 @@ impl AsRef<OsStr> for TextString {
     }
 }
 
-impl AsRef<Path> for TextString {
+impl AsRef<Path> for TextSubstring {
     #[inline]
     fn as_ref(&self) -> &Path {
         let s: &str = self.as_ref();
@@ -468,245 +421,228 @@ impl AsRef<Path> for TextString {
     }
 }
 
-impl AsRef<str> for TextString {
+impl AsRef<str> for TextSubstring {
     #[inline]
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl AsRef<TextStr> for TextString {
+impl AsRef<TextSubstr> for TextSubstring {
     #[inline]
-    fn as_ref(&self) -> &TextStr {
+    fn as_ref(&self) -> &TextSubstr {
         self
     }
 }
 
-impl Clone for TextString {
+impl Clone for TextSubstring {
     #[inline]
     fn clone(&self) -> Self {
         Self(self.0.clone())
     }
 }
 
-impl Default for TextString {
+impl Default for TextSubstring {
     #[inline]
     fn default() -> Self {
         Self(String::default())
     }
 }
 
-impl Deref for TextString {
-    type Target = TextStr;
+impl Deref for TextSubstring {
+    type Target = TextSubstr;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
-        unsafe { TextStr::from_text_unchecked(&*self.0) }
+        unsafe { TextSubstr::from_text_unchecked(&*self.0) }
     }
 }
 
-impl DerefMut for TextString {
+impl DerefMut for TextSubstring {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { TextStr::from_text_unchecked_mut(&mut *self.0) }
+        unsafe { TextSubstr::from_text_unchecked_mut(&mut *self.0) }
     }
 }
 
-impl Borrow<TextStr> for TextString {
+impl Borrow<TextSubstr> for TextSubstring {
     #[inline]
-    fn borrow(&self) -> &TextStr {
+    fn borrow(&self) -> &TextSubstr {
         self
     }
 }
 
-impl BorrowMut<TextStr> for TextString {
+impl BorrowMut<TextSubstr> for TextSubstring {
     #[inline]
-    fn borrow_mut(&mut self) -> &mut TextStr {
+    fn borrow_mut(&mut self) -> &mut TextSubstr {
         self
     }
 }
 
-impl AsMut<TextStr> for TextString {
+impl AsMut<TextSubstr> for TextSubstring {
     #[inline]
-    fn as_mut(&mut self) -> &mut TextStr {
+    fn as_mut(&mut self) -> &mut TextSubstr {
         self
     }
 }
 
-impl Add<&TextStr> for TextString {
-    type Output = Self;
-
+impl PartialEq<TextSubstr> for str {
     #[inline]
-    fn add(mut self, other: &TextStr) -> Self::Output {
-        self.push_text(other);
-        self
-    }
-}
-
-impl AddAssign<&TextStr> for TextString {
-    #[inline]
-    fn add_assign(&mut self, other: &TextStr) {
-        self.push_text(other);
-    }
-}
-
-impl PartialEq<TextStr> for str {
-    #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
+    fn eq(&self, other: &TextSubstr) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<&'a TextStr> for String {
+impl<'a> PartialEq<&'a TextSubstr> for String {
     #[inline]
-    fn eq(&self, other: &&'a TextStr) -> bool {
+    fn eq(&self, other: &&'a TextSubstr) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<&'a str> for TextString {
+impl<'a> PartialEq<&'a str> for TextSubstring {
     #[inline]
     fn eq(&self, other: &&'a str) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<&'a TextStr> for TextString {
+impl<'a> PartialEq<&'a TextSubstr> for TextSubstring {
     #[inline]
-    fn eq(&self, other: &&'a TextStr) -> bool {
+    fn eq(&self, other: &&'a TextSubstr) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<Cow<'a, TextStr>> for TextString {
+impl<'a> PartialEq<Cow<'a, TextSubstr>> for TextSubstring {
     #[inline]
-    fn eq(&self, other: &Cow<'a, TextStr>) -> bool {
+    fn eq(&self, other: &Cow<'a, TextSubstr>) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<Cow<'a, str>> for TextString {
+impl<'a> PartialEq<Cow<'a, str>> for TextSubstring {
     #[inline]
     fn eq(&self, other: &Cow<'a, str>) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a, 'b> PartialEq<Cow<'a, str>> for &'b TextStr {
+impl<'a, 'b> PartialEq<Cow<'a, str>> for &'b TextSubstr {
     #[inline]
     fn eq(&self, other: &Cow<'a, str>) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<TextString> for Cow<'a, TextStr> {
+impl<'a> PartialEq<TextSubstring> for Cow<'a, TextSubstr> {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<TextString> for Cow<'a, str> {
+impl<'a> PartialEq<TextSubstring> for Cow<'a, str> {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<TextStr> for Cow<'a, TextStr> {
+impl<'a> PartialEq<TextSubstr> for Cow<'a, TextSubstr> {
     #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
+    fn eq(&self, other: &TextSubstr) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a, 'b> PartialEq<&'b TextStr> for Cow<'a, str> {
+impl<'a, 'b> PartialEq<&'b TextSubstr> for Cow<'a, str> {
     #[inline]
-    fn eq(&self, other: &&TextStr) -> bool {
+    fn eq(&self, other: &&TextSubstr) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a, 'b> PartialEq<&'b TextStr> for Cow<'a, TextStr> {
+impl<'a, 'b> PartialEq<&'b TextSubstr> for Cow<'a, TextSubstr> {
     #[inline]
-    fn eq(&self, other: &&TextStr) -> bool {
+    fn eq(&self, other: &&TextSubstr) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl PartialEq<str> for TextString {
+impl PartialEq<str> for TextSubstring {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.0.eq(other)
     }
 }
 
-impl PartialEq<String> for TextString {
+impl PartialEq<String> for TextSubstring {
     #[inline]
     fn eq(&self, other: &String) -> bool {
         self.0.eq(other)
     }
 }
 
-impl<'a> PartialEq<TextStr> for Cow<'a, str> {
+impl<'a> PartialEq<TextSubstr> for Cow<'a, str> {
     #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
+    fn eq(&self, other: &TextSubstr) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl PartialEq<TextString> for String {
+impl PartialEq<TextSubstring> for String {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<TextString> for &'a str {
+impl<'a> PartialEq<TextSubstring> for &'a str {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<TextString> for &'a TextStr {
+impl<'a> PartialEq<TextSubstring> for &'a TextSubstr {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<String> for &'a TextStr {
+impl<'a> PartialEq<String> for &'a TextSubstr {
     #[inline]
     fn eq(&self, other: &String) -> bool {
         self.eq(&other)
     }
 }
 
-impl PartialEq<TextString> for str {
+impl PartialEq<TextSubstring> for str {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl PartialEq<TextStr> for TextString {
+impl PartialEq<TextSubstr> for TextSubstring {
     #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
+    fn eq(&self, other: &TextSubstr) -> bool {
         self.0.eq(other)
     }
 }
 
-impl PartialEq<TextString> for TextStr {
+impl PartialEq<TextSubstring> for TextSubstr {
     #[inline]
-    fn eq(&self, other: &TextString) -> bool {
+    fn eq(&self, other: &TextSubstring) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-// TODO: impl Extend for TextString?
+// TODO: impl Extend for TextSubstring?
 
-impl TextStr {
+impl TextSubstr {
     /// Converts a slice of bytes to a text string slice.
     #[inline]
     pub fn from_text_bytes(b: &[u8]) -> Result<&Self, TextError> {
@@ -716,7 +652,7 @@ impl TextStr {
     /// Converts a string slice to a text string slice.
     #[inline]
     pub fn from_text(s: &str) -> Result<&Self, TextError> {
-        if !is_basic_text(s) {
+        if !is_basic_text_substr(s) {
             let valid_up_to = compute_valid_up_to(s);
             return Err(TextError { valid_up_to });
         }
@@ -733,7 +669,7 @@ impl TextStr {
     /// Converts a mutable string slice to a mutable text string slice.
     #[inline]
     pub fn from_text_mut(s: &mut str) -> Result<&mut Self, TextError> {
-        if !is_basic_text(s) {
+        if !is_basic_text_substr(s) {
             let valid_up_to = compute_valid_up_to(s);
             return Err(TextError { valid_up_to });
         }
@@ -748,7 +684,7 @@ impl TextStr {
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_text_bytes_unchecked(b: &[u8]) -> &Self {
@@ -762,7 +698,7 @@ impl TextStr {
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_text_unchecked(s: &str) -> &Self {
@@ -777,7 +713,7 @@ impl TextStr {
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_text_bytes_unchecked_mut(b: &mut [u8]) -> &mut Self {
@@ -792,7 +728,7 @@ impl TextStr {
     /// This function is unsafe because it does not check that the string
     /// passed to it is valid Basic Text. If this constraint is violated,
     /// undefined behavior results, as the rest of this crate assumes that
-    /// `&TextStr`s are valid Basic Text.
+    /// `&TextSubstr`s are valid Basic Text.
     #[inline]
     pub unsafe fn from_text_unchecked_mut(s: &mut str) -> &mut Self {
         let ptr: *mut str = s;
@@ -806,7 +742,7 @@ impl TextStr {
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_boxed_text_bytes_unchecked(v: Box<[u8]>) -> Box<Self> {
@@ -821,7 +757,7 @@ impl TextStr {
     ///
     /// This function is unsafe because it does not check that the bytes passed
     /// to it are valid Basic Text. If this constraint is violated, undefined
-    /// behavior results, as the rest of this crate assumes that `&TextStr`s
+    /// behavior results, as the rest of this crate assumes that `&TextSubstr`s
     /// are valid Basic Text.
     #[inline]
     pub unsafe fn from_boxed_text_unchecked(v: Box<str>) -> Box<Self> {
@@ -854,9 +790,9 @@ impl TextStr {
     /// # Safety
     ///
     /// The caller must ensure that the content of the slice is valid
-    /// Basic Text before the borrow ends and the underlying `TextStr` is used.
+    /// Basic Text before the borrow ends and the underlying `TextSubstr` is used.
     ///
-    /// Use of a `TextStr` whose contents are not valid Basic Text is undefined
+    /// Use of a `TextSubstr` whose contents are not valid Basic Text is undefined
     /// behavior.
     #[inline]
     pub unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
@@ -875,7 +811,7 @@ impl TextStr {
         self.0.as_mut_ptr()
     }
 
-    /// Extracts a UTF-8 string slice containing the entire `TextStr`.
+    /// Extracts a UTF-8 string slice containing the entire `TextSubstr`.
     #[inline]
     pub fn as_str(&self) -> &str {
         &self.0
@@ -1079,8 +1015,8 @@ impl TextStr {
     where
         F: FromStr,
     {
-        // TODO: Is there a way we could use `TryFrom<&TextStr>` to allow
-        // parsers to work from a `TextStr` instead of just a `str`?
+        // TODO: Is there a way we could use `TryFrom<&TextSubstr>` to allow
+        // parsers to work from a `TextSubstr` instead of just a `str`?
         self.0.parse()
     }
 
@@ -1097,37 +1033,37 @@ impl TextStr {
         self.0.eq_ignore_ascii_case(&other.0)
     }
 
-    /// Converts a `Box<TextStr`> into a `Box<[u8]>` without copying or
+    /// Converts a `Box<TextSubstr`> into a `Box<[u8]>` without copying or
     /// allocating.
     #[inline]
     pub fn into_boxed_bytes(self: Box<Self>) -> Box<[u8]> {
         self.into_boxed_text().into_boxed_bytes()
     }
 
-    /// Converts a `Box<TextStr>` into a `Box<str>` without copying or
+    /// Converts a `Box<TextSubstr>` into a `Box<str>` without copying or
     /// allocating.
     #[inline]
     pub fn into_boxed_text(self: Box<Self>) -> Box<str> {
         self.into()
     }
 
-    /// Converts a `Box<TextStr>` into a `String` without copying or allocating.
+    /// Converts a `Box<TextSubstr>` into a `String` without copying or allocating.
     #[inline]
     pub fn into_string(self: Box<Self>) -> String {
         let slice = Box::<[u8]>::from(self);
         unsafe { String::from_utf8_unchecked(slice.into_vec()) }
     }
 
-    /// Converts a `Box<TextStr>` into a `TextString` without copying or
+    /// Converts a `Box<TextSubstr>` into a `TextSubstring` without copying or
     /// allocating.
     #[inline]
-    pub fn into_text_string(self: Box<Self>) -> TextString {
-        unsafe { TextString::from_text_unchecked(Self::into_string(self)) }
+    pub fn into_text_string(self: Box<Self>) -> TextSubstring {
+        unsafe { TextSubstring::from_text_unchecked(Self::into_string(self)) }
     }
 
-    /// Creates a new [`TextString`] by repeating a string `n` times.
-    pub fn repeat(&self, n: usize) -> TextString {
-        unsafe { TextString::from_text_vec_unchecked(self.as_bytes().repeat(n)) }
+    /// Creates a new [`TextSubstring`] by repeating a string `n` times.
+    pub fn repeat(&self, n: usize) -> TextSubstring {
+        unsafe { TextSubstring::from_text_vec_unchecked(self.as_bytes().repeat(n)) }
     }
 
     // TODO: make_ascii_uppercase, make_ascii_lowercase, escape_debug,
@@ -1136,136 +1072,136 @@ impl TextStr {
     // whether these can be done without breaking NFC.
 }
 
-impl AsRef<[u8]> for TextStr {
+impl AsRef<[u8]> for TextSubstr {
     #[inline]
     fn as_ref(&self) -> &[u8] {
         self.0.as_ref()
     }
 }
 
-impl AsRef<OsStr> for TextStr {
+impl AsRef<OsStr> for TextSubstr {
     #[inline]
     fn as_ref(&self) -> &OsStr {
         self.0.as_ref()
     }
 }
 
-impl AsRef<Path> for TextStr {
+impl AsRef<Path> for TextSubstr {
     #[inline]
     fn as_ref(&self) -> &Path {
         self.0.as_ref()
     }
 }
 
-impl AsRef<str> for TextStr {
+impl AsRef<str> for TextSubstr {
     #[inline]
     fn as_ref(&self) -> &str {
         self.0.as_ref()
     }
 }
 
-impl AsRef<Self> for TextStr {
+impl AsRef<Self> for TextSubstr {
     #[inline]
     fn as_ref(&self) -> &Self {
         self
     }
 }
 
-impl Default for &TextStr {
+impl Default for &TextSubstr {
     #[inline]
     fn default() -> Self {
-        unsafe { TextStr::from_text_unchecked("") }
+        unsafe { TextSubstr::from_text_unchecked("") }
     }
 }
 
-impl Default for &mut TextStr {
+impl Default for &mut TextSubstr {
     #[inline]
     fn default() -> Self {
-        unsafe { TextStr::from_text_bytes_unchecked_mut(&mut []) }
+        unsafe { TextSubstr::from_text_bytes_unchecked_mut(&mut []) }
     }
 }
 
-impl Display for TextStr {
+impl Display for TextSubstr {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
         Display::fmt(&self.0, f)
     }
 }
 
-impl Ord for TextStr {
+impl Ord for TextSubstr {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.cmp(&other.0)
     }
 }
 
-impl<'a> PartialEq<Cow<'a, Self>> for TextStr {
+impl<'a> PartialEq<Cow<'a, Self>> for TextSubstr {
     #[inline]
     fn eq(&self, other: &Cow<'a, Self>) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a, 'b> PartialEq<Cow<'a, TextStr>> for &'b TextStr {
+impl<'a, 'b> PartialEq<Cow<'a, TextSubstr>> for &'b TextSubstr {
     #[inline]
-    fn eq(&self, other: &Cow<'a, TextStr>) -> bool {
+    fn eq(&self, other: &Cow<'a, TextSubstr>) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<'a> PartialEq<Cow<'a, str>> for TextStr {
+impl<'a> PartialEq<Cow<'a, str>> for TextSubstr {
     #[inline]
     fn eq(&self, other: &Cow<'a, str>) -> bool {
         self.0.eq(other)
     }
 }
 
-impl PartialEq<str> for TextStr {
+impl PartialEq<str> for TextSubstr {
     #[inline]
     fn eq(&self, other: &str) -> bool {
         self.0.eq(other)
     }
 }
 
-impl PartialEq<String> for TextStr {
+impl PartialEq<String> for TextSubstr {
     #[inline]
     fn eq(&self, other: &String) -> bool {
         self.0.eq(other)
     }
 }
 
-impl PartialEq<TextStr> for String {
+impl PartialEq<TextSubstr> for String {
     #[inline]
-    fn eq(&self, other: &TextStr) -> bool {
+    fn eq(&self, other: &TextSubstr) -> bool {
         self.eq(&other.0)
     }
 }
 
-impl PartialOrd<Self> for TextStr {
+impl PartialOrd<Self> for TextSubstr {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
     }
 }
 
-impl PartialOrd<Self> for TextString {
+impl PartialOrd<Self> for TextSubstring {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
     }
 }
 
-// TODO: Pattern for TextStr
+// TODO: Pattern for TextSubstr
 
-impl ToOwned for TextStr {
-    type Owned = TextString;
+impl ToOwned for TextSubstr {
+    type Owned = TextSubstring;
 
     #[inline]
     fn to_owned(&self) -> Self::Owned {
-        TextString(self.0.to_owned())
+        TextSubstring(self.0.to_owned())
     }
 }
 
-impl ToSocketAddrs for TextStr {
+impl ToSocketAddrs for TextSubstr {
     type Iter = vec::IntoIter<SocketAddr>;
 
     #[inline]
@@ -1274,115 +1210,53 @@ impl ToSocketAddrs for TextStr {
     }
 }
 
-impl TextError {
-    /// Returns the index in the given string up to which valid Basic Text was
-    /// verified.
-    pub fn valid_up_to(&self) -> usize {
-        self.valid_up_to
-    }
-}
-
-impl From<Utf8Error> for TextError {
-    fn from(err: Utf8Error) -> Self {
-        Self {
-            valid_up_to: err.valid_up_to(),
-        }
-    }
-}
-
-impl Display for TextError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
-        write!(f, "TODO: Display for TextError: {:?}", self)
-    }
-}
-
-impl Error for TextError {}
-
-impl FromTextError {
-    /// Returns a slice of `u8`s bytes that were attempted to convert to a
-    /// `TextString`.
+impl From<Box<TextSubstr>> for Box<[u8]> {
     #[inline]
-    pub fn as_bytes(&self) -> &[u8] {
-        &self.bytes
-    }
-
-    /// Returns the bytes that were attempted to convert to a `TextString`.
-    #[inline]
-    pub fn into_bytes(self) -> Vec<u8> {
-        self.bytes
-    }
-
-    /// Fetch a `TextError` to get more details about the conversion failure.
-    #[inline]
-    pub fn text_error(&self) -> TextError {
-        self.error
-    }
-}
-
-impl From<FromUtf8Error> for FromTextError {
-    #[inline]
-    fn from(err: FromUtf8Error) -> Self {
-        let error = err.utf8_error().into();
-        let bytes = err.into_bytes();
-        Self { bytes, error }
-    }
-}
-
-impl Display for FromTextError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
-        write!(f, "TODO: Display for FromTextError: {:?}", self)
-    }
-}
-
-impl Error for FromTextError {}
-
-impl From<Box<TextStr>> for Box<[u8]> {
-    #[inline]
-    fn from(s: Box<TextStr>) -> Self {
+    fn from(s: Box<TextSubstr>) -> Self {
         let ptr = Box::into_raw(s);
         unsafe { Self::from_raw(ptr as *mut [u8]) }
     }
 }
 
-impl From<Box<TextStr>> for Box<str> {
+impl From<Box<TextSubstr>> for Box<str> {
     #[inline]
-    fn from(s: Box<TextStr>) -> Self {
+    fn from(s: Box<TextSubstr>) -> Self {
         let ptr = Box::into_raw(s);
         unsafe { Self::from_raw(ptr as *mut str) }
     }
 }
 
-impl From<Box<TextStr>> for TextString {
+impl From<Box<TextSubstr>> for TextSubstring {
     #[inline]
-    fn from(s: Box<TextStr>) -> Self {
+    fn from(s: Box<TextSubstr>) -> Self {
         s.into_text_string()
     }
 }
 
-impl From<&'_ Self> for TextString {
+impl From<&'_ Self> for TextSubstring {
     #[inline]
     fn from(s: &Self) -> Self {
         s.clone()
     }
 }
 
-impl From<&'_ mut TextStr> for TextString {
+impl From<&'_ mut TextSubstr> for TextSubstring {
     #[inline]
-    fn from(s: &mut TextStr) -> Self {
+    fn from(s: &mut TextSubstr) -> Self {
         s.to_owned()
     }
 }
 
-impl From<&'_ TextStr> for TextString {
+impl From<&'_ TextSubstr> for TextSubstring {
     #[inline]
-    fn from(s: &TextStr) -> Self {
+    fn from(s: &TextSubstr) -> Self {
         s.to_owned()
     }
 }
 
-impl From<Cow<'_, TextStr>> for Box<TextStr> {
+impl From<Cow<'_, TextSubstr>> for Box<TextSubstr> {
     #[inline]
-    fn from(cow: Cow<'_, TextStr>) -> Self {
+    fn from(cow: Cow<'_, TextSubstr>) -> Self {
         match cow {
             Cow::Borrowed(s) => Self::from(s),
             Cow::Owned(s) => Self::from(s),
@@ -1390,40 +1264,40 @@ impl From<Cow<'_, TextStr>> for Box<TextStr> {
     }
 }
 
-impl From<TextString> for Box<TextStr> {
+impl From<TextSubstring> for Box<TextSubstr> {
     #[inline]
-    fn from(s: TextString) -> Self {
+    fn from(s: TextSubstring) -> Self {
         s.into_boxed_text()
     }
 }
 
-impl Clone for Box<TextStr> {
+impl Clone for Box<TextSubstr> {
     #[inline]
     fn clone(&self) -> Self {
         let buf: Box<[u8]> = self.as_bytes().into();
-        unsafe { TextStr::from_boxed_text_bytes_unchecked(buf) }
+        unsafe { TextSubstr::from_boxed_text_bytes_unchecked(buf) }
     }
 }
 
-impl Default for Box<TextStr> {
+impl Default for Box<TextSubstr> {
     #[inline]
     fn default() -> Self {
-        unsafe { TextStr::from_boxed_text_bytes_unchecked(Box::default()) }
+        unsafe { TextSubstr::from_boxed_text_bytes_unchecked(Box::default()) }
     }
 }
 
-impl From<&TextStr> for Box<TextStr> {
+impl From<&TextSubstr> for Box<TextSubstr> {
     #[inline]
-    fn from(s: &TextStr) -> Self {
-        unsafe { TextStr::from_boxed_text_bytes_unchecked(Box::from(s.as_bytes())) }
+    fn from(s: &TextSubstr) -> Self {
+        unsafe { TextSubstr::from_boxed_text_bytes_unchecked(Box::from(s.as_bytes())) }
     }
 }
 
 #[cfg(feature = "arbitrary")]
-impl<'a> arbitrary::Arbitrary<'a> for &'a TextStr {
+impl<'a> arbitrary::Arbitrary<'a> for &'a TextSubstr {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let size = u.arbitrary_len::<u8>()?;
-        match TextStr::from_text_bytes(&u.peek_bytes(size).unwrap()) {
+        match TextSubstr::from_text_bytes(&u.peek_bytes(size).unwrap()) {
             Ok(s) => {
                 u.bytes(size).unwrap();
                 Ok(s)
@@ -1432,8 +1306,8 @@ impl<'a> arbitrary::Arbitrary<'a> for &'a TextStr {
                 let i = e.valid_up_to();
                 let valid = u.bytes(i).unwrap();
                 let s = unsafe {
-                    debug_assert!(TextStr::from_text_bytes(valid).is_ok());
-                    TextStr::from_text_bytes_unchecked(valid)
+                    debug_assert!(TextSubstr::from_text_bytes(valid).is_ok());
+                    TextSubstr::from_text_bytes_unchecked(valid)
                 };
                 Ok(s)
             }
@@ -1442,7 +1316,7 @@ impl<'a> arbitrary::Arbitrary<'a> for &'a TextStr {
 
     fn arbitrary_take_rest(u: arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let bytes = u.take_rest();
-        TextStr::from_text_bytes(bytes)
+        TextSubstr::from_text_bytes(bytes)
             .map_err(|_| arbitrary::Error::IncorrectFormat)
             .map(Into::into)
     }
@@ -1454,22 +1328,22 @@ impl<'a> arbitrary::Arbitrary<'a> for &'a TextStr {
 }
 
 #[cfg(feature = "arbitrary")]
-impl<'a> arbitrary::Arbitrary<'a> for TextString {
+impl<'a> arbitrary::Arbitrary<'a> for TextSubstring {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        <&TextStr as arbitrary::Arbitrary>::arbitrary(u).map(Into::into)
+        <&TextSubstr as arbitrary::Arbitrary>::arbitrary(u).map(Into::into)
     }
 
     fn arbitrary_take_rest(u: arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        <&TextStr as arbitrary::Arbitrary>::arbitrary_take_rest(u).map(Into::into)
+        <&TextSubstr as arbitrary::Arbitrary>::arbitrary_take_rest(u).map(Into::into)
     }
 
     #[inline]
     fn size_hint(depth: usize) -> (usize, Option<usize>) {
-        <&TextStr as arbitrary::Arbitrary>::size_hint(depth)
+        <&TextSubstr as arbitrary::Arbitrary>::size_hint(depth)
     }
 }
 
-impl Index<Range<usize>> for TextString {
+impl Index<Range<usize>> for TextSubstring {
     type Output = TextSubstr;
 
     #[inline]
@@ -1478,7 +1352,7 @@ impl Index<Range<usize>> for TextString {
     }
 }
 
-impl Index<Range<usize>> for TextStr {
+impl Index<Range<usize>> for TextSubstr {
     type Output = TextSubstr;
 
     #[inline]
@@ -1487,7 +1361,7 @@ impl Index<Range<usize>> for TextStr {
     }
 }
 
-impl Index<RangeTo<usize>> for TextString {
+impl Index<RangeTo<usize>> for TextSubstring {
     type Output = TextSubstr;
 
     #[inline]
@@ -1496,7 +1370,7 @@ impl Index<RangeTo<usize>> for TextString {
     }
 }
 
-impl Index<RangeTo<usize>> for TextStr {
+impl Index<RangeTo<usize>> for TextSubstr {
     type Output = TextSubstr;
 
     #[inline]
@@ -1505,7 +1379,7 @@ impl Index<RangeTo<usize>> for TextStr {
     }
 }
 
-impl Index<RangeFrom<usize>> for TextString {
+impl Index<RangeFrom<usize>> for TextSubstring {
     type Output = TextSubstr;
 
     #[inline]
@@ -1514,7 +1388,7 @@ impl Index<RangeFrom<usize>> for TextString {
     }
 }
 
-impl Index<RangeFrom<usize>> for TextStr {
+impl Index<RangeFrom<usize>> for TextSubstr {
     type Output = TextSubstr;
 
     #[inline]
@@ -1523,23 +1397,13 @@ impl Index<RangeFrom<usize>> for TextStr {
     }
 }
 
-/// Default implementation of [`ReadText::read_to_text_string`].
-pub fn default_read_to_text_string<Inner: ReadText + ?Sized>(
+/// Default implementation of [`ReadText::read_to_text_substring`].
+pub fn default_read_to_text_substring<Inner: ReadText + ?Sized>(
     inner: &mut Inner,
-    buf: &mut TextString,
+    buf: &mut TextSubstring,
 ) -> io::Result<usize> {
     // Read directly into the inner `String`.
-    let start = buf.0.len();
-    let n = inner.read_to_string(&mut buf.0)?;
-    if let Some(c) = buf.0[start..].chars().next() {
-        if !is_basic_text_start(c) {
-            return Err(io::Error::new(
-                io::ErrorKind::Other,
-                "read_to_text_string requires a starter",
-            ));
-        }
-    }
-    Ok(n)
+    inner.read_to_string(&mut buf.0)
 }
 
 #[test]
@@ -1547,47 +1411,54 @@ fn normalize_string() {
     let ring = "\u{30a}";
     let unnormal = "A\u{30a}";
     let unnormal_nl = "A\u{30a}\n";
-    let composed = TextStr::from_text("\u{c5}").unwrap();
-    let composed_nl = TextStr::from_text("\u{c5}\n").unwrap();
+    let composed = TextSubstr::from_text("\u{c5}").unwrap();
+    let composed_nl = TextSubstr::from_text("\u{c5}\n").unwrap();
 
-    assert_eq!(TextStr::from_text(unnormal).unwrap_err().valid_up_to(), 1);
-    assert_eq!(TextStr::from_text(ring).unwrap_err().valid_up_to(), 0);
-    assert_eq!(composed, &TextString::from_text_lossy(unnormal));
-    assert_eq!(composed_nl, &TextString::from_text_lossy(unnormal_nl));
+    assert_eq!(
+        TextSubstr::from_text(unnormal).unwrap_err().valid_up_to(),
+        1
+    );
+    TextSubstr::from_text(ring).unwrap();
+    assert_eq!(composed, &TextSubstring::from_text_lossy(unnormal));
+    assert_eq!(composed_nl, &TextSubstring::from_text_lossy(unnormal_nl));
 }
 
 #[test]
 fn validate_string() {
-    assert!(TextStr::from_text_bytes(b"").is_ok());
+    assert!(TextSubstr::from_text_bytes(b"").is_ok());
     assert_eq!(
-        TextStr::from_text_bytes(b"\xff").unwrap_err().valid_up_to(),
+        TextSubstr::from_text_bytes(b"\xff")
+            .unwrap_err()
+            .valid_up_to(),
         0
     );
 }
 
 #[test]
 fn split_escape() {
-    //assert_eq!(TextStr::from_text_bytes(b"\x1b[!p").unwrap_err().valid_up_to(), 0);
+    //assert_eq!(TextSubstr::from_text_bytes(b"\x1b[!p").unwrap_err().valid_up_to(), 0);
     assert_eq!(
-        TextStr::from_text_bytes(b"\x1b[p")
+        TextSubstr::from_text_bytes(b"\x1b[p")
             .unwrap_err()
             .valid_up_to(),
         0
     );
     assert_eq!(
-        TextStr::from_text_bytes(b"\x1b[!")
+        TextSubstr::from_text_bytes(b"\x1b[!")
             .unwrap_err()
             .valid_up_to(),
         0
     );
     assert_eq!(
-        TextStr::from_text_bytes(b"\x1b[")
+        TextSubstr::from_text_bytes(b"\x1b[")
             .unwrap_err()
             .valid_up_to(),
         0
     );
     assert_eq!(
-        TextStr::from_text_bytes(b"\x1b").unwrap_err().valid_up_to(),
+        TextSubstr::from_text_bytes(b"\x1b")
+            .unwrap_err()
+            .valid_up_to(),
         0
     );
 }

@@ -1,11 +1,11 @@
 //! Shared implementation for `TextWriter` and the writer half of
 //! `TextDuplexer`.
 
-use crate::{TextDuplexer, TextStr, TextWriter};
+use crate::{TextDuplexer, TextSubstr, TextWriter};
 use basic_text_internals::{
     is_basic_text_end, is_basic_text_start,
     unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
-    Categorize,
+    BasicTextError, Categorize,
 };
 #[cfg(can_vector)]
 use layered_io::default_is_write_vectored;
@@ -180,7 +180,7 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
-        Self::state_machine(internals, s)?;
+        Self::state_machine(internals, s).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
 
         // Write to the underlying stream.
         Self::write_buffer(internals)
@@ -201,7 +201,8 @@ impl TextOutput {
                 impl_.buffer.push_str("\r\n");
             }
 
-            Self::state_machine(internals, slice)?;
+            Self::state_machine(internals, slice)
+                .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
         }
 
         // Write to the underlying stream.
@@ -210,7 +211,7 @@ impl TextOutput {
 
     fn normal_write_text<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
-        s: &TextStr,
+        s: &TextSubstr,
     ) -> io::Result<()> {
         let impl_ = internals.impl_();
         let s = s.as_ref(); // TODO: Avoid doing this.
@@ -229,7 +230,7 @@ impl TextOutput {
 
     fn crlf_write_text<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
-        s: &TextStr,
+        s: &TextSubstr,
     ) -> io::Result<()> {
         let s: &str = s.as_ref(); // TODO: Avoid doing this.
 
@@ -292,7 +293,7 @@ impl TextOutput {
     fn state_machine<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
-    ) -> io::Result<()> {
+    ) -> Result<(), BasicTextError> {
         let error = Rc::new(RefCell::new(None));
 
         if is_nfc_stream_safe_quick(s.chars()) == IsNormalized::Yes {
@@ -312,8 +313,8 @@ impl TextOutput {
     fn state_machine_slow_path<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
-        error: &Rc<RefCell<Option<io::Error>>>,
-    ) -> io::Result<()> {
+        error: &Rc<RefCell<Option<BasicTextError>>>,
+    ) -> Result<(), BasicTextError> {
         // Slow path: Compute Stream-Safe and NFC.
         for c in Categorize::new(s.chars(), Rc::clone(&error))
             .cjk_compat_variants()
@@ -329,8 +330,8 @@ impl TextOutput {
     fn state_machine_char<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
         c: char,
-        error: &Rc<RefCell<Option<io::Error>>>,
-    ) -> io::Result<()> {
+        error: &Rc<RefCell<Option<BasicTextError>>>,
+    ) -> Result<(), BasicTextError> {
         let impl_ = internals.impl_();
         match (&impl_.state, c) {
             // Recognize ANSI-style color escape sequences.
@@ -357,7 +358,7 @@ impl TextOutput {
 
             (State::Ground(_), SUB) => {
                 // SUB indicates an error sent through the NFC iterator
-                // chain, and the Rc<RefCell<Option<io::Error>>> holds the
+                // chain, and the Rc<RefCell<Option<BasicTextError>>> holds the
                 // actual error.
                 Self::reset_state(internals);
                 return Err(take(&mut *error.borrow_mut()).unwrap());
@@ -365,7 +366,7 @@ impl TextOutput {
 
             (State::Ground(_), ESC) => {
                 Self::reset_state(internals);
-                return Err(io::Error::new(io::ErrorKind::Other, "escape control code"));
+                return Err(BasicTextError::Escape);
             }
 
             // Common case: in ground state and reading a normal char.
@@ -380,12 +381,9 @@ impl TextOutput {
             }
 
             // Escape sequence not recognized.
-            (State::Esc, c) | (State::Csi, c) => {
+            (State::Esc, _) | (State::Csi, _) => {
                 Self::reset_state(internals);
-                return Err(io::Error::new(
-                    io::ErrorKind::Other,
-                    format!("unrecognized escape sequence, ending in {:?}", c),
-                ));
+                return Err(BasicTextError::UnrecognizedEscape);
             }
         }
         Ok(())
@@ -444,7 +442,7 @@ impl TextOutput {
 
     pub(crate) fn write_text<Inner: WriteStr + WriteLayered>(
         internals: &mut impl TextWriterInternals<Inner>,
-        s: &TextStr,
+        s: &TextSubstr,
     ) -> io::Result<()> {
         if internals.impl_().crlf_compatibility {
             Self::crlf_write_text(internals, s)

@@ -1,4 +1,4 @@
-use crate::{text_input::TextInput, ReadText, ReadTextLayered};
+use crate::{text_input::TextInput, ReadText, ReadTextLayered, TextSubstr};
 use layered_io::{default_read_to_end, Bufferable, LayeredReader, ReadLayered, Status};
 use std::{
     fmt::{self, Debug, Formatter},
@@ -123,24 +123,24 @@ impl<Inner: ReadStrLayered> ReadStrLayered for TextReader<Inner> {
 
 impl<Inner: ReadStrLayered> ReadText for TextReader<Inner> {
     #[inline]
-    fn read_text(&mut self, buf: &mut str) -> io::Result<usize> {
+    fn read_text(&mut self, buf: &mut TextSubstr) -> io::Result<usize> {
         TextInput::read_text(self, buf)
     }
 
     #[inline]
-    fn read_exact_text(&mut self, buf: &mut str) -> io::Result<()> {
+    fn read_exact_text(&mut self, buf: &mut TextSubstr) -> io::Result<()> {
         TextInput::read_exact_text(self, buf)
     }
 }
 
 impl<Inner: ReadStrLayered> ReadTextLayered for TextReader<Inner> {
     #[inline]
-    fn read_text_with_status(&mut self, buf: &mut str) -> io::Result<(usize, Status)> {
+    fn read_text_with_status(&mut self, buf: &mut TextSubstr) -> io::Result<(usize, Status)> {
         TextInput::read_text_with_status(self, buf)
     }
 
     #[inline]
-    fn read_exact_text_using_status(&mut self, buf: &mut str) -> io::Result<Status> {
+    fn read_exact_text_using_status(&mut self, buf: &mut TextSubstr) -> io::Result<Status> {
         TextInput::read_exact_text_using_status(self, buf)
     }
 }

@@ -10,12 +10,12 @@ use crate::{
     unicode::{is_normalization_form_starter, ESC, SUB, ZWJ},
 };
 use std::{cell::RefCell, rc::Rc};
-use unicode_normalization::is_nfc_stream_safe;
+use unicode_normalization::{is_nfc_stream_safe, is_nfc_stream_safe_quick, IsNormalized};
 
 /// Test whether `c` is a valid start value for a string in Basic Text.
 #[inline]
 pub fn is_basic_text_start(c: char) -> bool {
-    is_normalization_form_starter(c) &&
+    is_starter(c) &&
     // https://unicode.org/reports/tr29/tr29-37.html#Grapheme_Cluster_Break_Property_Values
     // ZWJ
     c != ZWJ &&
@@ -52,8 +52,36 @@ pub fn is_basic_text(s: &str) -> bool {
         }
     }
 
+    is_basic_text_substr(s)
+}
+
+/// Test whether `s` is a valid string in Basic Text.
+#[inline]
+pub fn is_basic_text_substr(s: &str) -> bool {
     !Categorize::new(s.chars(), Rc::new(RefCell::new(None))).any(|c| matches!(c, SUB | ESC))
         && is_nfc_stream_safe(s)
+}
+
+/// Test whether `s` is a valid string in Basic Text quickly, in a way that
+/// may return `None` if it can't be determined quickly.
+#[inline]
+pub fn is_basic_text_substr_quick(s: &str) -> Option<bool> {
+    if !Categorize::new(s.chars(), Rc::new(RefCell::new(None))).any(|c| matches!(c, SUB | ESC)) {
+        return Some(false);
+    }
+
+    match is_nfc_stream_safe_quick(s.chars()) {
+        IsNormalized::Yes => Some(true),
+        IsNormalized::No => Some(false),
+        IsNormalized::Maybe => None,
+    }
+}
+
+#[inline]
+fn is_starter(c: char) -> bool {
+    // All ASCII values are starters and many of them are common, so
+    // add a fast-path optimization for this case.
+    c.is_ascii() || is_normalization_form_starter(c)
 }
 
 /// Grapheme_Extend = Yes

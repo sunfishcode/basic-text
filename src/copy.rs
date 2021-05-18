@@ -1,4 +1,4 @@
-use crate::{ReadText, ReadTextLayered, WriteText};
+use crate::{ReadText, ReadTextLayered, TextSubstr, WriteText};
 use layered_io::Bufferable;
 use std::{cmp::max, io};
 
@@ -9,7 +9,7 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
     writer: &mut W,
 ) -> io::Result<u64> {
     // TODO: Avoid unnecessary zero-initialization.
-    let mut buf = " ".repeat(max(
+    let mut buf = unsafe { TextSubstr::from_text_unchecked(" ") }.repeat(max(
         reader.suggested_buffer_size(),
         writer.suggested_buffer_size(),
     ));
@@ -22,9 +22,7 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
             Err(err) if err.kind() == io::ErrorKind::Interrupted => continue,
             Err(err) => return Err(err),
         };
-        // Use `write_str` here instead of `write_text` because we may split
-        // strings at non-starters.
-        writer.write_str(&buf[..len])?;
+        writer.write_text(&buf[..len])?;
         written += len as u64;
     }
     Ok(written)
@@ -40,7 +38,7 @@ pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Buffer
     writer: &mut W,
 ) -> io::Result<u64> {
     // TODO: Avoid unnecessary zero-initialization.
-    let mut buf = " ".repeat(max(
+    let mut buf = unsafe { TextSubstr::from_text_unchecked(" ") }.repeat(max(
         reader.suggested_buffer_size(),
         writer.suggested_buffer_size(),
     ));
@@ -48,9 +46,7 @@ pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Buffer
     let mut written = 0;
     loop {
         let (len, status) = reader.read_text_with_status(&mut buf)?;
-        // Use `write_str` here instead of `write_text` because we may split
-        // strings at non-starters.
-        writer.write_str(&buf[..len])?;
+        writer.write_text(&buf[..len])?;
         written += len as u64;
         if status.is_end() {
             return Ok(written);

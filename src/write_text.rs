@@ -1,12 +1,12 @@
-use crate::TextStr;
+use crate::TextSubstr;
 use std::io;
 use utf8_io::WriteStr;
 
 /// Add a convenience method for reading into `TextStr`.
 pub trait WriteText: WriteStr {
-    /// Like `WriteStr::write_str` but writes from a `TextStr`.
+    /// Like `WriteStr::write_str` but writes from a `TextSubstr`.
     #[inline]
-    fn write_text(&mut self, buf: &TextStr) -> io::Result<()> {
+    fn write_text(&mut self, buf: &TextSubstr) -> io::Result<()> {
         default_write_text(self, buf)
     }
 }
@@ -18,7 +18,7 @@ pub trait WriteText: WriteStr {
 #[inline]
 pub fn default_write_text<Inner: WriteStr + ?Sized>(
     inner: &mut Inner,
-    buf: &TextStr,
+    buf: &TextSubstr,
 ) -> io::Result<()> {
     inner.write_str(buf.as_ref())
 }

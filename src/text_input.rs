@@ -1,13 +1,10 @@
 //! Shared implementation for `TextReader` and the reader half of
 //! `TextDuplexer`.
 
-use crate::{TextDuplexer, TextReader};
+use crate::{TextDuplexer, TextReader, TextSubstr};
 use basic_text_internals::{
-    is_basic_text_end, is_basic_text_start,
-    unicode::{
-        BEL, BOM, CAN, CGJ, DEL, ESC, FF, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, REPL,
-    },
-    ReplaceSelected,
+    is_basic_text_end, is_basic_text_start, replace,
+    unicode::{BEL, BOM, CAN, CGJ, DEL, ESC, MAX_UTF8_SIZE, NORMALIZATION_BUFFER_SIZE, REPL},
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
@@ -175,7 +172,7 @@ impl TextInput {
     #[inline]
     pub(crate) fn read_text<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
-        buf: &mut str,
+        buf: &mut TextSubstr,
     ) -> io::Result<usize> {
         // Safety: This is a UTF-8 stream so we can read directly into a `str`.
         internals.read(unsafe { buf.as_bytes_mut() })
@@ -184,7 +181,7 @@ impl TextInput {
     #[inline]
     pub(crate) fn read_exact_text<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
-        buf: &mut str,
+        buf: &mut TextSubstr,
     ) -> io::Result<()> {
         // Safety: This is a Text stream so we can read directly into a `str`.
         internals.read_exact(unsafe { buf.as_bytes_mut() })
@@ -193,7 +190,7 @@ impl TextInput {
     #[inline]
     pub(crate) fn read_text_with_status<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
-        buf: &mut str,
+        buf: &mut TextSubstr,
     ) -> io::Result<(usize, Status)> {
         // Safety: This is a text stream so we can read directly into a `str`.
         let (size, status) = internals.read_with_status(unsafe { buf.as_bytes_mut() })?;
@@ -207,7 +204,7 @@ impl TextInput {
     #[inline]
     pub(crate) fn read_exact_text_using_status<Inner: ReadStrLayered>(
         internals: &mut impl TextReaderInternals<Inner>,
-        buf: &mut str,
+        buf: &mut TextSubstr,
     ) -> io::Result<Status> {
         // Safety: This is a text stream so we can read directly into a `str`.
         internals.read_exact_using_status(unsafe { buf.as_bytes_mut() })
@@ -254,25 +251,8 @@ impl TextInput {
                         self.expect_starter = false;
                         self.state = State::Ground(true);
                     }
-                    (State::Ground(_), '\t') => {
-                        self.queue.push_back('\t');
-                        self.expect_starter = false;
-                        self.state = State::Ground(false);
-                    }
-                    (State::Ground(_), FF) | (State::Ground(_), NEL) => {
-                        self.queue.push_back(' ');
-                        self.expect_starter = false;
-                        self.state = State::Ground(false);
-                    }
                     (State::Ground(_), '\r') => self.state = State::Cr,
                     (State::Ground(_), ESC) => self.state = State::Esc,
-                    (State::Ground(_), c)
-                        if c.is_control() || matches!(c, '\u{2329}' | '\u{232a}') =>
-                    {
-                        self.queue.push_back(REPL);
-                        self.expect_starter = false;
-                        self.state = State::Ground(false);
-                    }
                     (State::Ground(_), mut c) => {
                         if self.expect_starter {
                             self.expect_starter = false;
@@ -280,7 +260,7 @@ impl TextInput {
                                 c = REPL;
                             }
                         }
-                        self.queue.extend(ReplaceSelected::new([c].iter().copied()));
+                        replace(c, &mut self.queue);
                         self.state = State::Ground(false);
                     }
 

@@ -1,4 +1,4 @@
-use crate::{text_output::TextOutput, TextStr, WriteText};
+use crate::{text_output::TextOutput, TextSubstr, WriteText};
 use layered_io::{Bufferable, LayeredWriter, WriteLayered};
 use std::{
     fmt::{self, Debug, Formatter},
@@ -175,7 +175,7 @@ impl<Inner: WriteStr + WriteLayered> WriteStr for TextWriter<Inner> {
 
 impl<Inner: WriteStr + WriteLayered> WriteText for TextWriter<Inner> {
     #[inline]
-    fn write_text(&mut self, s: &TextStr) -> io::Result<()> {
+    fn write_text(&mut self, s: &TextSubstr) -> io::Result<()> {
         TextOutput::write_text(self, s)
     }
 }
