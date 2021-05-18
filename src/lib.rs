@@ -11,6 +11,10 @@
 //!    lossy with respect to the original bytestream. Output uses the "strict"
 //!    conversion method, in which invalid content is diagnosed with errors.
 //!
+//!  - [`BufReadText`], an extension trait that adds `read_text_lines()` and
+//!    `read_lines_text_lossy()` to [`BufRead`] implementations for reading lines
+//!    from an input stream as `BasicText` strings.
+//!
 //!  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
 //!    stream using Basic Text.
 //!
@@ -59,6 +63,7 @@
 //! [Basic Text]: https://github.com/sunfishcode/basic-text/blob/main/docs/BasicText.md#basic-text
 //! [`text!("...")` macro]: crate::text
 //! [`Duplex`]: https://docs.rs/duplex/latest/duplex/trait.Duplex.html
+//! [`BufRead`]: https://doc.rust-lang.org/std/io/trait.BufRead.html
 
 #![deny(missing_docs)]
 #![cfg_attr(can_vector, feature(can_vector))]
@@ -67,6 +72,7 @@
 #![cfg_attr(pattern, feature(pattern))]
 #![cfg_attr(shrink_to, feature(shrink_to))]
 
+mod buf_read_text;
 mod copy;
 mod partial_eq;
 mod read_text;
@@ -81,6 +87,7 @@ mod write_text;
 
 pub use basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE;
 pub use basic_text_literals::{text, text_substr};
+pub use buf_read_text::{BufReadText, TextLines, TextLinesLossy};
 pub use copy::{copy_text, copy_text_using_status};
 pub use read_text::{default_read_exact_text_substr, ReadText, ReadTextLayered};
 pub use text_duplexer::TextDuplexer;

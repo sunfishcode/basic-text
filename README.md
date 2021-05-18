@@ -31,6 +31,10 @@ providing several utilities:
    lossy with respect to the original bytestream. Output uses the "strict"
    conversion method, in which invalid content is diagnosed with errors.
 
+ - [`BufReadText`], an extension trait that adds `read_text_lines()` and
+   `read_lines_text_lossy()` to [`BufRead`] implementations for reading lines
+   from an input stream as `BasicText` strings.
+
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
    stream using Basic Text.
 
@@ -43,9 +47,11 @@ options.
 [`TextReader`]: https://docs.rs/basic-text/latest/basic_text/struct.TextReader.html
 [`TextWriter`]: https://docs.rs/basic-text/latest/basic_text/struct.TextWriter.html
 [`TextDuplexer`]: https://docs.rs/basic-text/latest/basic_text/struct.TextDuplexer.html
+[`BufReadText`]: https://docs.rs/basic-text/latest/basic_text/trait.BufReadText.html
 [macro]: https://docs.rs/basic-text/latest/basic_text/macro.text.html
 [`str`]: https://doc.rust-lang.org/std/primitive.str.html
 [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
+[`BufRead`]: https://doc.rust-lang.org/std/io/trait.BufRead.html
 [`Duplex`]: https://docs.rs/duplex/latest/duplex/trait.Duplex.html
 [Basic Text]: docs/BasicText.md
 [Book]: https://basic-text.sunfishcode.online
