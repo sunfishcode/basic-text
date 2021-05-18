@@ -24,7 +24,7 @@ pub fn text(input: TokenStream) -> TokenStream {
     .into()
 }
 
-/// `TextSubstr` literal support: `text_substr!("string literal")`.
+/// `TextSubstr` literal support: `text_substr!("string literal\u{200e}")`.
 ///
 /// Returns a `'static &TextSubstr` containing the provided string literal.
 #[proc_macro]
