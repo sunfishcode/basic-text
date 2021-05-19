@@ -1202,7 +1202,11 @@ impl From<Utf8Error> for TextError {
 
 impl Display for TextError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "TODO: Display for TextError: {:?}", self)
+        write!(
+            f,
+            "invalid Basic Text byte sequence from index {}",
+            self.valid_up_to
+        )
     }
 }
 
@@ -1240,7 +1244,7 @@ impl From<FromUtf8Error> for FromTextError {
 
 impl Display for FromTextError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "TODO: Display for FromTextError: {:?}", self)
+        fmt::Display::fmt(&self.error, f)
     }
 }
 
