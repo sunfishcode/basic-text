@@ -1,5 +1,5 @@
 use crate::TextString;
-use basic_text_internals::{is_basic_text, is_basic_text_end, unicode::REPL};
+use basic_text_internals::{is_basic_text, is_basic_text_end, unicode::CGJ};
 use std::{
     borrow::Cow,
     io::{self, BufRead},
@@ -141,8 +141,7 @@ impl<B: BufReadText> Iterator for TextLinesLossy<B> {
                 // an invalid end.
                 if let Some(c) = buf.0.chars().next_back() {
                     if !is_basic_text_end(c) {
-                        buf.0.pop();
-                        buf.0.push(REPL);
+                        buf.0.push(CGJ);
                     }
                 }
 

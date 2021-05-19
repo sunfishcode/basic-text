@@ -1,4 +1,4 @@
-� (Basic Text must not start with a non-starter
+͏̈ (Basic Text must not start with a non-starter
 
 This file contains invalid Basic Text.
 
@@ -85,4 +85,4 @@ Deprecated and discouraged values are replaced:
 
 And BOM⁠s are replaced with plain non-breaking whitespace.
 
-(Basic Text must not end with a ZWJ, and must have a trailing newline).‍�
+(Basic Text must not end with a ZWJ, and must have a trailing newline).‍͏

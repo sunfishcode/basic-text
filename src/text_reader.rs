@@ -369,7 +369,7 @@ fn test_nfc() {
 
 #[test]
 fn test_leading_nonstarters() {
-    test("\u{30a}".as_bytes(), "\u{fffd}\n");
+    test("\u{30a}".as_bytes(), "\u{34f}\u{30a}\n");
 }
 
 #[test]
@@ -416,8 +416,8 @@ fn test_unassigned() {
 fn test_dddha() {
     test("\u{11099}\u{110ba}".as_bytes(), "\u{1109a}\n");
     test("\u{1109a}".as_bytes(), "\u{1109a}\n");
-    test("\u{110ba}".as_bytes(), "\u{fffd}\n");
-    test("\u{110ba}\n".as_bytes(), "\u{fffd}\n");
+    test("\u{110ba}".as_bytes(), "\u{34f}\u{110ba}\n");
+    test("\u{110ba}\n".as_bytes(), "\u{34f}\u{110ba}\n");
     test("\u{11099}\u{110ba}\n".as_bytes(), "\u{1109a}\n");
     test("\u{1109a}\n".as_bytes(), "\u{1109a}\n");
 }

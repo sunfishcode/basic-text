@@ -61,6 +61,14 @@ fn basic_text_string_basics() {
             .as_str(),
         "\u{e0000}\u{e0002}"
     );
+    assert_eq!(
+        TextString::from_text_lossy("\u{34f}\u{200c}\u{200d}\u{2060}").as_str(),
+        "\u{34f}\u{200c}\u{200d}\u{2060}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{200c}\u{200d}\u{2060}").as_str(),
+        "\u{34f}\u{200c}\u{200d}\u{2060}"
+    );
 }
 
 /// Test that text strings are in Stream-Safe NFC form.
@@ -109,7 +117,7 @@ fn basic_text_string_start() {
     // non-starter
     assert_eq!(
         TextString::from_text_lossy("\u{327}hello").as_str(),
-        "\u{fffd}hello"
+        "\u{34f}\u{327}hello"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{327}world").as_str(),
@@ -117,12 +125,8 @@ fn basic_text_string_start() {
     );
     // Grapheme_Cluster_Break = ZWJ.
     assert_eq!(
-        TextString::from_text_lossy("\u{34f}\u{200c}\u{200d}\u{2060}").as_str(),
-        "\u{fffd}\u{200c}\u{200d}\u{2060}"
-    );
-    assert_eq!(
         TextString::from_text_lossy("\u{200d}hello").as_str(),
-        "\u{fffd}hello"
+        "\u{34f}\u{200d}hello"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{200d}world").as_str(),
@@ -131,7 +135,7 @@ fn basic_text_string_start() {
     // Grapheme_Cluster_Break = SpacingMark.
     assert_eq!(
         TextString::from_text_lossy("\u{903}hello").as_str(),
-        "\u{fffd}hello"
+        "\u{34f}\u{903}hello"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{903}world").as_str(),
@@ -140,7 +144,7 @@ fn basic_text_string_start() {
     // Grapheme_Cluster_Break = Extend.
     assert_eq!(
         TextString::from_text_lossy("\u{9be}hello").as_str(),
-        "\u{fffd}hello"
+        "\u{34f}\u{9be}hello"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{9be}world").as_str(),
@@ -155,7 +159,7 @@ fn basic_text_string_end() {
     // Grapheme_Cluster_Break = ZWJ.
     assert_eq!(
         TextString::from_text_lossy("hello\u{200d}").as_str(),
-        "hello\u{200d}\u{fffd}"
+        "hello\u{200d}\u{34f}"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{200d}world").as_str(),
@@ -164,7 +168,7 @@ fn basic_text_string_end() {
     // Grapheme_Cluster_Break = Prepend.
     assert_eq!(
         TextString::from_text_lossy("hello\u{110bd}").as_str(),
-        "hello\u{110bd}\u{fffd}"
+        "hello\u{110bd}\u{34f}"
     );
     assert_eq!(
         TextString::from_text_lossy("hello\u{110bd}world").as_str(),
@@ -440,12 +444,18 @@ fn basic_text_string_main_table() {
         TextString::from_text_lossy("\u{673}").as_str(),
         "\u{627}\u{65f}"
     );
-    assert_eq!(TextString::from_text_lossy("\u{f77}").as_str(), "\u{fffd}");
+    assert_eq!(
+        TextString::from_text_lossy("\u{f77}").as_str(),
+        "\u{34f}\u{fb2}\u{f71}\u{f80}"
+    );
     assert_eq!(
         TextString::from_text_lossy("A\u{f77}").as_str(),
         "A\u{fb2}\u{f71}\u{f80}"
     );
-    assert_eq!(TextString::from_text_lossy("\u{f79}").as_str(), "\u{fffd}");
+    assert_eq!(
+        TextString::from_text_lossy("\u{f79}").as_str(),
+        "\u{34f}\u{fb3}\u{f71}\u{f80}"
+    );
     assert_eq!(
         TextString::from_text_lossy("A\u{f79}").as_str(),
         "A\u{fb3}\u{f71}\u{f80}"
@@ -476,7 +486,10 @@ fn basic_text_string_main_table() {
     assert_eq!(TextString::from_text_lossy("\u{206d}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{206e}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{206f}").as_str(), "\u{fffd}");
-    assert_eq!(TextString::from_text_lossy("\u{2df5}").as_str(), "\u{fffd}");
+    assert_eq!(
+        TextString::from_text_lossy("\u{2df5}").as_str(),
+        "\u{34f}\u{2ded}\u{2dee}"
+    );
     assert_eq!(
         TextString::from_text_lossy("A\u{2df5}").as_str(),
         "A\u{2ded}\u{2dee}"

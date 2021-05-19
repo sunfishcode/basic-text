@@ -40,11 +40,11 @@ fn buf_read_test_lossy() {
     let mut lines = reader.text_lines_lossy();
     assert_eq!(
         lines.next().map(Result::unwrap),
-        Some(text!("�ed�").to_owned())
+        Some(text!("�ed\u{200d}\u{34f}").to_owned())
     );
     assert_eq!(
         lines.next().map(Result::unwrap),
-        Some(text!("�oran�e").to_owned())
+        Some(text!("\u{34f}\u{200d}oran�e").to_owned())
     );
     assert_eq!(
         lines.next().map(Result::unwrap),

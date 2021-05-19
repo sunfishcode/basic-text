@@ -286,15 +286,26 @@ impl TextInput {
                         ESC => self.state = State::Esc,
                         mut c => {
                             self.state = State::Ground(false);
-                            if take(&mut self.expect_starter) && !is_basic_text_start(c) {
-                                c = REPL;
-                            } else if (self.nel_compatibility && c == NEL)
+                            if (self.nel_compatibility && c == NEL)
                                 || (self.lsps_compatibility && matches!(c, LS | PS))
                             {
                                 c = '\n';
                                 self.state = State::Ground(true);
                             }
+                            let pos = self.queue.len();
                             replace(c, &mut self.queue);
+
+                            // Prepend a CGJ if needed to guard a non-starter.
+                            if take(&mut self.expect_starter)
+                                && !self
+                                    .queue
+                                    .get(pos)
+                                    .copied()
+                                    .map(is_basic_text_start)
+                                    .unwrap_or(true)
+                            {
+                                self.queue.insert(pos, CGJ);
+                            }
                         }
                     },
 
@@ -410,10 +421,10 @@ impl TextInput {
                 }
             }
 
-            // If the stream ends in a non-ending char, append a REPL.
+            // If the stream ends in a non-ending char, append a CGJ.
             if let Some(last) = internals.impl_().queue.back() {
                 if !is_basic_text_end(*last) {
-                    internals.impl_().queue.push_back(REPL);
+                    internals.impl_().queue.push_back(CGJ);
                 }
             }
 

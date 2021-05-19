@@ -20,7 +20,7 @@ pub fn is_basic_text_start(c: char) -> bool {
     // ZWJ
     c != ZWJ &&
     // Extend
-    !is_grapheme_extend(c) &&
+    !is_grapheme_extend_not_cgj(c) &&
     !is_emoji_modifier(c) &&
     // SpacingMark (plus some Extend, which is redundant here)
     !is_grapheme_cluster_break_spacing_mark_plus(c)
@@ -84,12 +84,13 @@ fn is_starter(c: char) -> bool {
     c.is_ascii() || is_normalization_form_starter(c)
 }
 
-/// `Grapheme_Extend = Yes`
-const fn is_grapheme_extend(c: char) -> bool {
+/// `Grapheme_Extend = Yes`, except CGJ
+const fn is_grapheme_extend_not_cgj(c: char) -> bool {
     // Unicode 13.0.0, DerivedCoreProperties.txt
     matches!(
         c,
-        '\u{300}'..='\u{36f}'
+        '\u{300}'..='\u{34e}' // exclude U+34F (CGJ)
+        | '\u{350}'..='\u{36f}'
         | '\u{483}'..='\u{487}'
         | '\u{488}'..='\u{489}'
         | '\u{591}'..='\u{5bd}'
