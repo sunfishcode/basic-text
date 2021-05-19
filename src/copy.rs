@@ -2,7 +2,7 @@ use crate::{ReadText, ReadTextLayered, TextSubstr, WriteText};
 use layered_io::Bufferable;
 use std::{cmp::max, io};
 
-/// Like `std::io::copy`, but for streams that can operate directly on text
+/// Like [`std::io::copy`], but for streams that can operate directly on text
 /// strings, so we can avoid re-validating them as text.
 pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + ?Sized>(
     reader: &mut R,
@@ -28,7 +28,7 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
     Ok(written)
 }
 
-/// Like `std::io::copy`, but for streams that can operate directly on text
+/// Like [`std::io::copy`], but for streams that can operate directly on text
 /// strings, so we can avoid re-validating them as text.
 ///
 /// Also, like `copy_text`, but uses `read_text_substr_with_status` to avoid performing
