@@ -12,3 +12,12 @@ fn text_string_extend() {
     a.extend(vec![text!("ghi"), text!("jkl"), text!("mno")].into_iter());
     assert_eq!(a, "abcdefghijklmno");
 }
+
+#[test]
+fn text_string_escape_default() {
+    use basic_text::text;
+    assert_eq!(
+        text!("abc\tdef\n").escape_default().collect::<String>(),
+        "abc\\tdef\\n".to_owned()
+    );
+}

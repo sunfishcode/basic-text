@@ -22,8 +22,8 @@ use std::{
     ops::{Add, AddAssign, Deref, DerefMut, Index, Range, RangeFrom, RangeTo},
     path::Path,
     str::{
-        self, Bytes, CharIndices, Chars, EncodeUtf16, FromStr, Lines, MatchIndices, Matches,
-        RMatchIndices, RMatches, Utf8Error,
+        self, Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode,
+        FromStr, Lines, MatchIndices, Matches, RMatchIndices, RMatches, Utf8Error,
     },
     string::FromUtf8Error,
     vec,
@@ -1109,10 +1109,31 @@ impl TextStr {
         unsafe { TextString::from_text_vec_unchecked(self.as_bytes().repeat(n)) }
     }
 
-    // TODO: make_ascii_uppercase, make_ascii_lowercase, escape_debug,
-    // escape_default, escape_unicode, replace*, to_lowercase, to_uppercase,
-    // into_string, to_ascii_uppercase, to_ascii_lowercase; determine
-    // whether these can be done without breaking NFC.
+    /// Return an iterator that escapes each `char` in `self` with
+    /// [`char::escape_debug`].
+    #[inline]
+    pub fn escape_debug(&self) -> EscapeDebug<'_> {
+        self.0.escape_debug()
+    }
+
+    /// Return an iterator that escapes each `char` in `self` with
+    /// [`char::escape_default`].
+    #[inline]
+    pub fn escape_default(&self) -> EscapeDefault<'_> {
+        self.0.escape_default()
+    }
+
+    /// Return an iterator that escapes each `char` in `self` with
+    /// [`char::escape_unicode`].
+    #[inline]
+    pub fn escape_unicode(&self) -> EscapeUnicode {
+        self.0.escape_unicode()
+    }
+
+    // TODO: make_ascii_uppercase, make_ascii_lowercase, replace*,
+    // to_lowercase, to_uppercase, into_string, to_ascii_uppercase,
+    // to_ascii_lowercase; determine whether these can be done without
+    // breaking NFC.
 }
 
 impl AsRef<[u8]> for TextStr {
