@@ -1,6 +1,6 @@
 [package]
 name = "restricted-text"
-version = "0.3.2"
+version = "0.3.3-alpha.0"
 description = "Restricted Text strings and I/O streams"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
@@ -14,7 +14,7 @@ publish = false
 rustc_version = "0.3.3"
 
 [dependencies]
-basic-text = { path = "..", version = "^0.3.2-alpha.0"}
+basic-text = { path = "..", version = "^0.3.3-alpha.0"}
 duplex = "0.3.0"
 layered-io = "0.4.0"
 unicode-normalization = "0.1.17"
