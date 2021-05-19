@@ -74,6 +74,7 @@
 #![cfg_attr(try_reserve, feature(try_reserve))]
 #![cfg_attr(pattern, feature(pattern))]
 #![cfg_attr(shrink_to, feature(shrink_to))]
+#![cfg_attr(extend_one, feature(extend_one))]
 
 mod buf_read_text;
 mod copy;

@@ -492,8 +492,6 @@ impl AsMut<TextSubstr> for TextSubstring {
     }
 }
 
-// TODO: impl Extend for TextSubstring?
-
 impl TextSubstr {
     /// Converts a slice of bytes to a text string slice.
     #[inline]

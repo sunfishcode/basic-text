@@ -557,7 +557,41 @@ impl AddAssign<&TextStr> for TextString {
     }
 }
 
-// TODO: impl Extend for TextString?
+impl Extend<TextString> for TextString {
+    fn extend<I: IntoIterator<Item = TextString>>(&mut self, iter: I) {
+        iter.into_iter().for_each(move |s| self.push_text(&s));
+    }
+
+    #[cfg(extend_one)]
+    #[inline]
+    fn extend_one(&mut self, s: TextString) {
+        self.push_text(&s);
+    }
+}
+
+impl<'a> Extend<&'a TextStr> for TextString {
+    fn extend<I: IntoIterator<Item = &'a TextStr>>(&mut self, iter: I) {
+        iter.into_iter().for_each(move |s| self.push_text(s));
+    }
+
+    #[cfg(extend_one)]
+    #[inline]
+    fn extend_one(&mut self, s: &'a TextStr) {
+        self.push_text(s);
+    }
+}
+
+impl<'a> Extend<Cow<'a, TextStr>> for TextString {
+    fn extend<I: IntoIterator<Item = Cow<'a, TextStr>>>(&mut self, iter: I) {
+        iter.into_iter().for_each(move |s| self.push_text(&s));
+    }
+
+    #[cfg(extend_one)]
+    #[inline]
+    fn extend_one(&mut self, s: Cow<'a, TextStr>) {
+        self.push_text(&s);
+    }
+}
 
 impl TextStr {
     /// Converts a slice of bytes to a text string slice.
