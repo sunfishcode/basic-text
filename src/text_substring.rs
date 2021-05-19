@@ -1030,9 +1030,8 @@ impl TextSubstr {
     }
 
     // TODO: make_ascii_uppercase, make_ascii_lowercase, replace*,
-    // to_lowercase, to_uppercase, into_string, to_ascii_uppercase,
-    // to_ascii_lowercase; determine whether these can be done without
-    // breaking NFC.
+    // to_lowercase, to_uppercase, to_ascii_uppercase, to_ascii_lowercase;
+    // determine whether these can be done without breaking NFC.
 }
 
 impl AsRef<[u8]> for TextSubstr {
