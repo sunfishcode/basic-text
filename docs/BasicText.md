@@ -25,7 +25,7 @@ A stream is in Basic Text form iff:
  - it is empty or ends with U+A.
 
 A buffered stream is in Basic Text form iff:
- - the stream is in Basic Text form, and
+ - it is in Basic Text form, and
  - substrings of the string separated by buffer flushes are all in Basic Text
    form.
 
