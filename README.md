@@ -22,8 +22,8 @@ the [Book] for more information.
 It also includes a Rust crate which aims to implement the Basic Text format,
 providing several utilities:
 
- - [`TextString`] and [`TextStr`] are similar to the standard library's [`String`]
-   and [`str`], but use the Basic Text string format, along with a
+ - [`TextString`] and [`TextStr`] are similar to the standard library's
+   [`String`] and [`str`], but use the Basic Text string format, along with a
    [`text!("...")` macro] for Basic Text string literals.
 
  - [`TextReader`] and [`TextWriter`] are input and output streams which use the
@@ -31,8 +31,8 @@ providing several utilities:
    lossy with respect to the original bytestream. Output uses the "strict"
    conversion method, in which invalid content is diagnosed with errors.
 
- - [`BufReadText`], an extension trait that adds `read_text_lines()` and
-   `read_lines_text_lossy()` to [`BufRead`] implementations for reading lines
+ - [`BufReadText`], an extension trait that adds [`text_lines`] and
+   [`text_lines_lossy`] to [`BufRead`] implementations for reading lines
    from an input stream as `BasicText` strings.
 
  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
@@ -48,6 +48,8 @@ but is not very mature or optimized yet.
 [`TextDuplexer`]: https://docs.rs/basic-text/latest/basic_text/struct.TextDuplexer.html
 [`BufReadText`]: https://docs.rs/basic-text/latest/basic_text/trait.BufReadText.html
 [`text!("...")` macro]: https://docs.rs/basic-text/latest/basic_text/macro.text.html
+[`text_lines`]: https://docs.rs/basic-text/latest/basic_text/trait.BufReadText.html#method.text_lines
+[`text_lines_lossy`]: https://docs.rs/basic-text/latest/basic_text/trait.BufReadText.html#method.text_lines_lossy
 [`str`]: https://doc.rust-lang.org/std/primitive.str.html
 [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
 [`BufRead`]: https://doc.rust-lang.org/std/io/trait.BufRead.html
