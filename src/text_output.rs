@@ -180,7 +180,8 @@ impl TextOutput {
         internals: &mut impl TextWriterInternals<Inner>,
         s: &str,
     ) -> io::Result<()> {
-        Self::state_machine(internals, s).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+        Self::state_machine(internals, s)
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
 
         // Write to the underlying stream.
         Self::write_buffer(internals)
@@ -202,7 +203,7 @@ impl TextOutput {
             }
 
             Self::state_machine(internals, slice)
-                .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+                .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
         }
 
         // Write to the underlying stream.
@@ -267,7 +268,7 @@ impl TextOutput {
                 if !is_basic_text_start(c) {
                     Self::reset_state(internals);
                     return Err(io::Error::new(
-                        io::ErrorKind::Other,
+                        io::ErrorKind::InvalidData,
                         "write data must begin with a Unicode Normalization Form starter",
                     ));
                 }
@@ -397,21 +398,21 @@ impl TextOutput {
             State::Ground(Ground::ZwjOrPrepend) => {
                 Self::reset_state(internals);
                 Err(io::Error::new(
-                    io::ErrorKind::Other,
+                    io::ErrorKind::InvalidData,
                     "output text stream closed after a ZWJ or Prepend",
                 ))
             }
             State::Ground(Ground::Other) => {
                 Self::reset_state(internals);
                 Err(io::Error::new(
-                    io::ErrorKind::Other,
+                    io::ErrorKind::InvalidData,
                     "output text stream must end with newline",
                 ))
             }
             State::Esc | State::Csi => {
                 Self::reset_state(internals);
                 Err(io::Error::new(
-                    io::ErrorKind::Other,
+                    io::ErrorKind::InvalidData,
                     "incomplete escape sequence at end of output text stream",
                 ))
             }
@@ -476,7 +477,7 @@ impl TextOutput {
             .map(|()| error.valid_up_to()),
             Err(error) => {
                 Self::reset_state(internals);
-                Err(io::Error::new(io::ErrorKind::Other, error))
+                Err(io::Error::new(io::ErrorKind::InvalidData, error))
             }
         }
     }
@@ -489,14 +490,14 @@ impl TextOutput {
             State::Ground(Ground::ZwjOrPrepend) => {
                 Self::reset_state(internals);
                 return Err(io::Error::new(
-                    io::ErrorKind::Other,
+                    io::ErrorKind::InvalidData,
                     "output text stream flushed after a ZWJ or Prepend",
                 ));
             }
             State::Ground(_) => (),
             State::Esc | State::Csi => {
                 return Err(io::Error::new(
-                    io::ErrorKind::Other,
+                    io::ErrorKind::InvalidData,
                     "output text stream flushed while an escape sequence was in progress",
                 ))
             }

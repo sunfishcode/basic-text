@@ -56,7 +56,7 @@ fn test_crlf_compatibility() {
     assert_eq!(to_text_with_crlf_compatibility("\n\n").unwrap(), "\r\n\r\n");
     assert_eq!(
         to_text_with_crlf_compatibility("\r\n").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
     assert_eq!(
         to_text_with_crlf_compatibility("hello\n").unwrap(),
@@ -74,7 +74,7 @@ fn test_text_output_rules() {
     for c in &DISALLOWED_SCALAR_VALUES {
         assert_eq!(
             to_text(&format!("{}\n", c)).unwrap_err().kind(),
-            io::ErrorKind::Other,
+            io::ErrorKind::InvalidData,
             "disallowed scalar value {:?} was not rejected",
             c,
         );
@@ -83,7 +83,7 @@ fn test_text_output_rules() {
     // Fail at U+FEFF (not at the beginning of the stream).
     assert_eq!(
         to_text("hello\u{feff}\n").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
 
     // Fail at specific scalar values.
@@ -94,7 +94,7 @@ fn test_text_output_rules() {
     ] {
         assert_eq!(
             to_text(&format!("{}\n", c)).unwrap_err().kind(),
-            io::ErrorKind::Other,
+            io::ErrorKind::InvalidData,
             "specific scalar value {:?} was not rejected",
             c,
         );
@@ -107,24 +107,30 @@ fn test_text_output_rules() {
     assert_eq!(to_text("hello\n").unwrap(), "hello\n");
     assert_eq!(to_text("hello\nworld\n").unwrap(), "hello\nworld\n");
 
-    assert_eq!(to_text("hello").unwrap_err().kind(), io::ErrorKind::Other);
+    assert_eq!(
+        to_text("hello").unwrap_err().kind(),
+        io::ErrorKind::InvalidData
+    );
     assert_eq!(
         to_text("hello\nworld").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
 
-    assert_eq!(to_text("\r\n").unwrap_err().kind(), io::ErrorKind::Other);
+    assert_eq!(
+        to_text("\r\n").unwrap_err().kind(),
+        io::ErrorKind::InvalidData
+    );
     assert_eq!(
         to_text("hello\r\n").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
     assert_eq!(
         to_text("hello\r\nworld").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
     assert_eq!(
         to_text("hello\r\nworld\r\n").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
 }
 
@@ -133,14 +139,14 @@ fn test_text_output_cyrillic_es_te() {
     // Replace U+2DF5 with U+2DED U+2DEE.
     assert_eq!(
         to_text("\u{2df5}hello").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
     assert_eq!(
         to_text("hello\u{2df5}").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
     assert_eq!(
         to_text("hello\u{2df5}world").unwrap_err().kind(),
-        io::ErrorKind::Other
+        io::ErrorKind::InvalidData
     );
 }

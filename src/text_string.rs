@@ -1444,7 +1444,7 @@ pub fn default_read_to_text_string<Inner: ReadText + ?Sized>(
     if let Some(c) = buf.0[start..].chars().next() {
         if !is_basic_text_start(c) {
             return Err(io::Error::new(
-                io::ErrorKind::Other,
+                io::ErrorKind::InvalidData,
                 "read_to_text_string requires a starter",
             ));
         }
