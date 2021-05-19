@@ -790,7 +790,7 @@ impl TextStr {
         )
     }
 
-    // TODO: get*, slice*
+    // TODO: get*
 
     /// Returns an iterator over the `char`s of a text string slice.
     #[inline]
