@@ -87,6 +87,17 @@ fn test_text_input_cr() {
 }
 
 #[test]
+fn test_text_input_cyrillic_es_te() {
+    // Replace U+2DF5 with U+2DED U+2DEE.
+    assert_eq!(to_text("\u{2df5}hello"), "\u{34f}\u{2ded}\u{2dee}hello\n");
+    assert_eq!(to_text("hello\u{2df5}"), "hello\u{2ded}\u{2dee}\n");
+    assert_eq!(
+        to_text("hello\u{2df5}world"),
+        "hello\u{2ded}\u{2dee}world\n"
+    );
+}
+
+#[test]
 fn test_text_input_disallowed_scalars() {
     // *Disallowed scalar values* with U+FFFD (REPLACEMENT CHARACTER)
     for c in &DISALLOWED_SCALAR_VALUES {

@@ -127,3 +127,20 @@ fn test_text_output_rules() {
         io::ErrorKind::Other
     );
 }
+
+#[test]
+fn test_text_output_cyrillic_es_te() {
+    // Replace U+2DF5 with U+2DED U+2DEE.
+    assert_eq!(
+        to_text("\u{2df5}hello").unwrap_err().kind(),
+        io::ErrorKind::Other
+    );
+    assert_eq!(
+        to_text("hello\u{2df5}").unwrap_err().kind(),
+        io::ErrorKind::Other
+    );
+    assert_eq!(
+        to_text("hello\u{2df5}world").unwrap_err().kind(),
+        io::ErrorKind::Other
+    );
+}
