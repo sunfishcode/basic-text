@@ -116,8 +116,8 @@ A buffered stream is in Basic Text form iff:
 | \[U+80–U+84,U+86–U+9F\] | C1 | U+FFFD          | "Control code not valid in text"          |
 | U+149               | `ʼn` | U+2BC U+6E        | "Use U+2BC U+6E instead of U+149"         |
 | U+673               | `ا ٟ` | U+627 U+65F       | "Use U+627 U+65F instead of U+673"        |
-| U+F77               | `◌ྲ◌ཱྀ` | U+FB2 U+F81       | "Use U+FB2 U+F81 instead of U+F77"        |
-| U+F79               | `◌ླ◌ཱྀ` | U+FB3 U+F81       | "Use U+FB3 U+F81 instead of U+F79"        |
+| U+F77               | `◌ྲ◌ཱྀ` | U+FB2 U+F71 U+F80 | "Use U+FB2 U+F71 U+F80 instead of U+F77"  |
+| U+F79               | `◌ླ◌ཱྀ` | U+FB3 U+F71 U+F80 | "Use U+FB3 U+F71 U+F80 instead of U+F79"  |
 | U+17A3              | `អ`  | U+17A2            | "Use U+17A2 instead of U+17A3"            |
 | U+17A4              | `អា` | U+17A2 U+17B6     | "Use U+17A2 U+17B6 instead of U+17A4"     |
 | U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
