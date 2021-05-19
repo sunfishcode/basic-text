@@ -1066,7 +1066,7 @@ impl Default for &mut TextSubstr {
 }
 
 impl Display for TextSubstr {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(&self.0, f)
     }
 }

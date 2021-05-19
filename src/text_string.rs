@@ -1138,7 +1138,7 @@ impl Default for &mut TextStr {
 }
 
 impl Display for TextStr {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(&self.0, f)
     }
 }
@@ -1201,7 +1201,7 @@ impl From<Utf8Error> for TextError {
 }
 
 impl Display for TextError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "TODO: Display for TextError: {:?}", self)
     }
 }
@@ -1239,7 +1239,7 @@ impl From<FromUtf8Error> for FromTextError {
 }
 
 impl Display for FromTextError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "TODO: Display for FromTextError: {:?}", self)
     }
 }
