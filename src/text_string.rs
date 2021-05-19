@@ -3,7 +3,7 @@
 use crate::{ReadText, TextReader, TextSubstr, TextWriter};
 use basic_text_internals::{
     is_basic_text, is_basic_text_start,
-    unicode::{BOM, WJ},
+    unicode::{BOM, CGJ, WJ},
 };
 use layered_io::Bufferable;
 #[cfg(try_reserve)]
@@ -285,6 +285,12 @@ impl TextString {
     /// with non-combining codepoints, so it *is* closed under concatenation.
     #[inline]
     pub fn push_text(&mut self, s: &TextStr) {
+        if let Some(rest) = s.0.strip_prefix(CGJ) {
+            if self.0.ends_with(CGJ) {
+                self.0.push_str(rest);
+                return;
+            }
+        }
         self.0.push_str(&s.0);
     }
 
