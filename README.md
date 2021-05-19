@@ -23,8 +23,8 @@ It also includes a Rust crate which aims to implement the Basic Text format,
 providing several utilities:
 
  - [`TextString`] and [`TextStr`] are similar to the standard library's [`String`]
-   and [`str`], but use the Basic Text string format, along with a `text!("...")`
-   [macro] for Basic Text string literals.
+   and [`str`], but use the Basic Text string format, along with a
+   [`text!("...")` macro] for Basic Text string literals.
 
  - [`TextReader`] and [`TextWriter`] are input and output streams which use the
    Basic Text stream format. On input, content is converted in a way which is
@@ -47,7 +47,7 @@ but is not very mature or optimized yet.
 [`TextWriter`]: https://docs.rs/basic-text/latest/basic_text/struct.TextWriter.html
 [`TextDuplexer`]: https://docs.rs/basic-text/latest/basic_text/struct.TextDuplexer.html
 [`BufReadText`]: https://docs.rs/basic-text/latest/basic_text/trait.BufReadText.html
-[macro]: https://docs.rs/basic-text/latest/basic_text/macro.text.html
+[`text!("...")` macro]: https://docs.rs/basic-text/latest/basic_text/macro.text.html
 [`str`]: https://doc.rust-lang.org/std/primitive.str.html
 [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
 [`BufRead`]: https://doc.rust-lang.org/std/io/trait.BufRead.html
