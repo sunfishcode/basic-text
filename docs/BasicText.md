@@ -164,7 +164,7 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | \[U+EFFFE,U+EFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+FFFFE,U+FFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+10FFFE,U+10FFFF\] |    | U+FFFD            | "Noncharacters are intended for internal use only" |
-| [CJK Compatibility Ideographs] | | [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
+| \[U+F900–U+FA0D,U+FA10,U+FA12,U+FA15–U+FA1E,U+FA20,U+FA22,U+FA25–U+FA26,U+FA2A–U+FA6D,U+FA70–U+FAD9,U+2F800–U+2FA1D\] | | CJK compatibility ideograph [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 
 ## Conversion
 
@@ -284,4 +284,3 @@ otherwise fails if the content is not valid Basic Text:
 [Normalization Process for Stabilized Strings]: https://unicode.org/reports/tr15/#Normalization_Process_for_Stabilized_Strings
 [Restricted Text]: RestrictedText.md
 [Unicode]: Unicode.md
-[CJK Compatibility Ideographs]: http://www.unicode.org/versions/latest/ch23.pdf#G19053

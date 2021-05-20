@@ -38,11 +38,13 @@ considered to be semantically lossy.
 
 ### CJK Compatibility Ideographs
 
-Unicode includes 1002 CJK Compatibility Ideograph scalar values which were
+Unicode includes [1002 CJK Compatibility Ideograph scalar values] which were
 originally intended only for use in preserving round-trip compatibility with
 other character set standards. However, many of them are associated with
 slightly different appearances, and this has led to a lot of confusion and some
 dispute.
+
+[1002 CJK Compatibility Ideograph scalar values]: http://www.unicode.org/versions/latest/ch23.pdf#G19053
 
 For example, the scalar value U+2F8A6 canonically decomposes to U+6148. This
 means that Unicode considers these two scalar values to be canonically
