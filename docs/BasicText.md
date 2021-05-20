@@ -40,7 +40,7 @@ A Unicode scalar value is a Basic Text non-starter iff:
    isn't U+34F.
 
 #### Basic Text non-ender
-[Basic Text non-starter]: #basic-text-non-ender
+[Basic Text non-ender]: #basic-text-non-ender
 
 A Unicode scalar value is a Basic Text non-ender iff:
  - its `Grapheme_Cluster_Break` is `ZWJ` or `Prepend`.
