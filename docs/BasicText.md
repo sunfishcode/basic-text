@@ -110,6 +110,7 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+2329              | `⟨`  | U+FFFD            | "Use U+27E8 instead of U+2329"  |
 | U+232A              | `⟩`  | U+FFFD            | "Use U+27E9 instead of U+232A"  |
 | U+2DF5              | ` ⷭⷮ`  | U+2DED U+2DEE     | "Use U+2DED U+2DEE instead of U+2DF5"     |
+| \[U+F900–U+FA0D,U+FA10,U+FA12,U+FA15–U+FA1E,U+FA20,U+FA22,U+FA25–U+FA26,U+FA2A–U+FA6D,U+FA70–U+FAD9\] | | CJK compatibility ideograph [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 | U+FB00              | `ff` | U+66 U+66         | "Use U+66 U+66 instead of U+FB00" |
 | U+FB01              | `fi` | U+66 U+69         | "Use U+66 U+69 instead of U+FB01" |
 | U+FB02              | `fl` | U+66 U+6C         | "Use U+66 U+6C instead of U+FB02" |
@@ -148,6 +149,7 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+1D551             | `ℤ`  | U+FFFD            | "Use U+2124 instead of U+1D551" |
 | \[U+1FFFE,U+1FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | U+111C4             | `𑆏𑆀`  | U+1118F U+11180   | "Use U+1118F U+11180 instead of U+111C4"  |
+| \[U+2F800–U+2FA1D\] |      | CJK compatibility ideograph [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 | \[U+2FFFE,U+2FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+3FFFE,U+3FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+4FFFE,U+4FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
@@ -164,7 +166,6 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | \[U+EFFFE,U+EFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+FFFFE,U+FFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+10FFFE,U+10FFFF\] |    | U+FFFD            | "Noncharacters are intended for internal use only" |
-| \[U+F900–U+FA0D,U+FA10,U+FA12,U+FA15–U+FA1E,U+FA20,U+FA22,U+FA25–U+FA26,U+FA2A–U+FA6D,U+FA70–U+FAD9,U+2F800–U+2FA1D\] | | CJK compatibility ideograph [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 
 ## Conversion
 
