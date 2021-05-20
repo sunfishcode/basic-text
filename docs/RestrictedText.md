@@ -20,7 +20,7 @@ A string is in Restricted Text form iff:
  - it is in [Basic Text] form, and
  - it is in [NFKC] form, and
  - it is [Moderately Restricted] text, and
- - it does not contain any of the sequences listed in the [Tables].
+ - it does not contain any of the sequences listed in the [Sequence Table].
 
 A stream is in Restricted Text form iff:
  - it is a stream in [Basic Text] form, and
@@ -35,11 +35,7 @@ Note that even though this excludes U+34F (COMBINING GRAPHEME JOINER), the
 [Stream Safe Text Format] is still required; content must simply avoid using
 excessively long sequences of non-starters.
 
-[Tables]: #tables
-
-## Tables
-
-### Main Table
+## Sequence Table
 
 | Sequence            | Error                                                 |
 | ------------------- | ----------------------------------------------------- |
@@ -59,9 +55,12 @@ never loses information but may fail:
  - If performing `toNFKC` with the
    [Normalization Process for Stabilized Strings] would alter the contents,
    error with "Restricted Text must be in NFKC form".
- - Perform the Error actions from the [Main Table].
+ - If [Restriction Level Detection] classifies the string as less than
+   Moderately Restricted, error with "Restricted Text must be Moderately
+   Restricted".
+ - Perform the Error actions from the [Sequence Table].
 
-[Main Table]: #main-table
+[Sequence Table]: #sequence-table
 
 ### From Basic Text stream to Restricted Text stream
 
@@ -95,6 +94,7 @@ TODO: [Implicit Directional Marks] have no display.
 
 [NFKC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Moderately Restricted]: https://www.unicode.org/reports/tr39/#Restriction_Level_Detection
+[Restriction Level Detection]: https://www.unicode.org/reports/tr39/#Restriction_Level_Detection
 [Stream Safe Text Format]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
 [Old Hangul Jamo]: https://tools.ietf.org/html/rfc5892#section-2.9
 [Default Ignorable Code Points]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G7730

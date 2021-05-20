@@ -111,7 +111,7 @@ fn test_text_input_disallowed_scalars() {
 }
 
 #[test]
-fn test_text_input_pre_nfc() {
+fn test_text_input_sequence_table() {
     // Replace U+2329 with U+FFFD (before NFC).
     assert_eq!(to_text("\u{2329}"), "\u{fffd}\n");
 

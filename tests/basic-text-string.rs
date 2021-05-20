@@ -176,12 +176,9 @@ fn basic_text_string_end() {
     );
 }
 
-/// Test that text strings do not contain any of the sequences listed in the
-/// Pre-NFC Table, except CJK Compatibility Ideographs, which are tested
-/// separately below.
+/// Unassigned characters with replacements.
 #[test]
-fn basic_text_string_pre_nfc_table() {
-    // Unassigned characters with replacements.
+fn basic_text_string_unassigned() {
     assert_eq!(TextString::from_text_lossy("\u{9e4}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{9e5}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{a64}").as_str(), "\u{fffd}");
@@ -198,9 +195,12 @@ fn basic_text_string_pre_nfc_table() {
     assert_eq!(TextString::from_text_lossy("\u{ce5}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{d64}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{d65}").as_str(), "\u{fffd}");
-    // Unassigned characters with replacements.
     assert_eq!(TextString::from_text_lossy("\u{2072}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{2073}").as_str(), "\u{fffd}");
+}
+
+#[test]
+fn basic_text_string_deprecated_discouraged() {
     // `Ω`
     assert_eq!(TextString::from_text_lossy("\u{2126}").as_str(), "\u{3a9}");
     // `K`
@@ -219,7 +219,11 @@ fn basic_text_string_pre_nfc_table() {
     assert_eq!(TextString::from_text_lossy("\u{fb04}").as_str(), "ffl");
     assert_eq!(TextString::from_text_lossy("\u{fb05}").as_str(), "ſt");
     assert_eq!(TextString::from_text_lossy("\u{fb06}").as_str(), "st");
-    // Unassigned alphanumeric mathematical symbols.
+}
+
+/// Unassigned alphanumeric mathematical symbols.
+#[test]
+fn basic_text_string_unassigned_alphanumeric_math() {
     assert_eq!(
         TextString::from_text_lossy("\u{1d455}").as_str(),
         "\u{fffd}"
@@ -318,10 +322,10 @@ fn basic_text_string_pre_nfc_table() {
     );
 }
 
-/// Test that text strings do not contain any of the sequences listed in the
-/// Main Table.
+/// Test that text strings do not contain sequences listed in the
+/// Sequence Table.
 #[test]
-fn basic_text_string_main_table() {
+fn basic_text_string_sequence_table_misc() {
     // CRLF
     assert_eq!(TextString::from_text_lossy("\r\n").as_str(), "\n");
 

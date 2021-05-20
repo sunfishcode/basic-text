@@ -18,7 +18,7 @@ A string is in Basic Text form iff:
  - it is a [Unicode] string in [Stream-Safe] [NFC] form, and
  - it doesn't start with a [Basic Text non-starter], and
  - it doesn't end with a [Basic Text non-ender], and
- - it doesn't contain any of the sequences listed in the [Tables].
+ - it doesn't contain any of the sequences listed in the [Sequence Table].
 
 A stream is in Basic Text form iff:
  - it consists entirely of a string in Basic Text form, and
@@ -45,16 +45,28 @@ A Unicode scalar value is a Basic Text non-starter iff:
 A Unicode scalar value is a Basic Text non-ender iff:
  - its `Grapheme_Cluster_Break` is `ZWJ` or `Prepend`.
 
-[Tables]: #tables
 [normalization-form non-starter]: https://unicode.org/reports/tr15/#Description_Norm
 [`Grapheme_Cluster_Break`]: https://unicode.org/reports/tr29/#Grapheme_Cluster_Break_Property_Values
 
-## Tables
+## Sequence Table
 
-### Pre-NFC Table
-
-| Sequence            | aka  | Replacement       | Error                           |
-| ------------------- | ---- | ----------------- | ------------------------------- |
+| Sequence            | aka  | Replacement       | Error                                     |
+| ------------------- | ---- | ----------------- | ----------------------------------------- |
+| U+D U+A             | CRLF | U+A               | "Use U+A to terminate a line"             |
+| U+D                 | CR   | U+A               | "Use U+A to terminate a line"             |
+| U+C                 | FF   | U+20              | "Control code not valid in text"          |
+| U+1B U+5B \[U+20–U+3F\]\* U+6D                     | SGR | | "Color escape sequences are not enabled" |
+| \[U+1B\]+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence" |
+| \[U+1B\]+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence" |
+| \[U+1B\]+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence" |
+| \[U+1B\]+ \[U+40–U+7E\]                            | ESC | | "Unrecognized escape sequence" |
+| \[U+1B\]+           | ESC  | U+FFFD            | "Escape code not valid in text"           |
+| \[U+0–U+8,U+B,U+E–U+1F\] | C0 | U+FFFD         | "Control code not valid in text"          |
+| U+7F                | DEL  | U+FFFD            | "Control code not valid in text"          |
+| U+85                | NEL  | U+20              | "Control code not valid in text"          |
+| \[U+80–U+84,U+86–U+9F\] | C1 | U+FFFD          | "Control code not valid in text"          |
+| U+149               | `ʼn` | U+2BC U+6E        | "Use U+2BC U+6E instead of U+149"         |
+| U+673               | `ا ٟ` | U+627 U+65F       | "Use U+627 U+65F instead of U+673"        |
 | U+9E4               | `।`  | U+FFFD            | "Use U+964 instead of U+9E4"    |
 | U+9E5               | `॥`  | U+FFFD            | "Use U+965 instead of U+9E5"    |
 | U+A64               | `।`  | U+FFFD            | "Use U+964 instead of U+A64"    |
@@ -71,6 +83,25 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+CE5               | `॥`  | U+FFFD            | "Use U+965 instead of U+CE5"    |
 | U+D64               | `।`  | U+FFFD            | "Use U+964 instead of U+D64"    |
 | U+D65               | `॥`  | U+FFFD            | "Use U+965 instead of U+D65"    |
+| U+F77               | `◌ྲ◌ཱྀ` | U+FB2 U+F71 U+F80 | "Use U+FB2 U+F71 U+F80 instead of U+F77"  |
+| U+F79               | `◌ླ◌ཱྀ` | U+FB3 U+F71 U+F80 | "Use U+FB3 U+F71 U+F80 instead of U+F79"  |
+| U+17A3              | `អ`  | U+17A2            | "Use U+17A2 instead of U+17A3"            |
+| U+17A4              | `អា` | U+17A2 U+17B6     | "Use U+17A2 U+17B6 instead of U+17A4"     |
+| U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
+| U+17B5              |      | U+FFFD            | "Unicode discourages use of U+17B5"       |
+| U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
+| U+2028              | LS   | U+20              | "Line separation is a rich-text function" |
+| U+2029              | PS   | U+20              | "Paragraph separation is a rich-text function" |
+| U+202A              | LRE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202B              | RLE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202C              | PDF  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202D              | LRO  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+202E              | RLO  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2066              | LRI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2067              | RLI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2068              | FSI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| U+2069              | PDI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
+| \[U+206A–U+206F\]   |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
 | U+2072              | `²`  | U+FFFD            | "Use U+B2 instead of U+2072"    |
 | U+2073              | `³`  | U+FFFD            | "Use U+B3 instead of U+2073"    |
 | U+2126              | `Ω`  | U+3A9             | "Use U+3A9 instead of U+2126"   |
@@ -78,6 +109,7 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+212B              | `Å`  | U+C5              | "Use U+C5 instead of U+212B"    |
 | U+2329              | `⟨`  | U+FFFD            | "Use U+27E8 instead of U+2329"  |
 | U+232A              | `⟩`  | U+FFFD            | "Use U+27E9 instead of U+232A"  |
+| U+2DF5              | ` ⷭⷮ`  | U+2DED U+2DEE     | "Use U+2DED U+2DEE instead of U+2DF5"     |
 | U+FB00              | `ff` | U+66 U+66         | "Use U+66 U+66 instead of U+FB00" |
 | U+FB01              | `fi` | U+66 U+69         | "Use U+66 U+69 instead of U+FB01" |
 | U+FB02              | `fl` | U+66 U+6C         | "Use U+66 U+6C instead of U+FB02" |
@@ -85,6 +117,11 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+FB04              | `ffl`| U+66 U+66 U+6C    | "Use U+66 U+66 U+6C instead of U+FB04" |
 | U+FB05              | `ſt` | U+17F U+74        | "Use U+17F U+74 instead of U+FB05" |
 | U+FB06              | `st` | U+73 U+74         | "Use U+73 U+74 instead of U+FB06" |
+| \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
+| U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in Basic Text"   |
+| \[U+FFF9–U+FFFB\]   |      | U+FFFD            | "Interlinear Annotations depend on out-of-band information" |
+| U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
+| \[U+FFFE,U+FFFF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | U+1D455             | `ℎ`  | U+FFFD            | "Use U+210E instead of U+1D455" |
 | U+1D49D             | `ℬ`  | U+FFFD            | "Use U+212C instead of U+1D49D" |
 | U+1D4A0             | `ℰ`  | U+FFFD            | "Use U+2130 instead of U+1D4A0" |
@@ -109,52 +146,6 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+1D548             | `ℚ`  | U+FFFD            | "Use U+211A instead of U+1D548" |
 | U+1D549             | `ℝ`  | U+FFFD            | "Use U+211D instead of U+1D549" |
 | U+1D551             | `ℤ`  | U+FFFD            | "Use U+2124 instead of U+1D551" |
-| [CJK Compatibility Ideographs] | | [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
-
-### Main Table
-
-| Sequence            | aka  | Replacement       | Error                                     |
-| ------------------- | ---- | ----------------- | ----------------------------------------- |
-| U+D U+A             | CRLF | U+A               | "Use U+A to terminate a line"             |
-| U+D                 | CR   | U+A               | "Use U+A to terminate a line"             |
-| U+C                 | FF   | U+20              | "Control code not valid in text"          |
-| U+1B U+5B \[U+20–U+3F\]\* U+6D                     | SGR | | "Color escape sequences are not enabled" |
-| \[U+1B\]+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence" |
-| \[U+1B\]+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence" |
-| \[U+1B\]+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence" |
-| \[U+1B\]+ \[U+40–U+7E\]                            | ESC | | "Unrecognized escape sequence" |
-| \[U+1B\]+           | ESC  | U+FFFD            | "Escape code not valid in text"           |
-| \[U+0–U+8,U+B,U+E–U+1F\] | C0 | U+FFFD         | "Control code not valid in text"          |
-| U+7F                | DEL  | U+FFFD            | "Control code not valid in text"          |
-| U+85                | NEL  | U+20              | "Control code not valid in text"          |
-| \[U+80–U+84,U+86–U+9F\] | C1 | U+FFFD          | "Control code not valid in text"          |
-| U+149               | `ʼn` | U+2BC U+6E        | "Use U+2BC U+6E instead of U+149"         |
-| U+673               | `ا ٟ` | U+627 U+65F       | "Use U+627 U+65F instead of U+673"        |
-| U+F77               | `◌ྲ◌ཱྀ` | U+FB2 U+F71 U+F80 | "Use U+FB2 U+F71 U+F80 instead of U+F77"  |
-| U+F79               | `◌ླ◌ཱྀ` | U+FB3 U+F71 U+F80 | "Use U+FB3 U+F71 U+F80 instead of U+F79"  |
-| U+17A3              | `អ`  | U+17A2            | "Use U+17A2 instead of U+17A3"            |
-| U+17A4              | `អា` | U+17A2 U+17B6     | "Use U+17A2 U+17B6 instead of U+17A4"     |
-| U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
-| U+17B5              |      | U+FFFD            | "Unicode discourages use of U+17B5"       |
-| U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
-| U+2028              | LS   | U+20              | "Line separation is a rich-text function" |
-| U+2029              | PS   | U+20              | "Paragraph separation is a rich-text function" |
-| U+202A              | LRE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+202B              | RLE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+202C              | PDF  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+202D              | LRO  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+202E              | RLO  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+2066              | LRI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+2067              | RLI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+2068              | FSI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| U+2069              | PDI  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
-| \[U+206A–U+206F\]   |      | U+FFFD            | "Deprecated Format Characters are deprecated" |
-| U+2DF5              | ` ⷭⷮ`  | U+2DED U+2DEE     | "Use U+2DED U+2DEE instead of U+2DF5"     |
-| \[U+FDD0–U+FDEF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
-| U+FEFF              | BOM  | U+2060            | "U+FEFF is not necessary in Basic Text"   |
-| \[U+FFF9–U+FFFB\]   |      | U+FFFD            | "Interlinear Annotations depend on out-of-band information" |
-| U+FFFC              | ORC  | U+FFFD            | "U+FFFC depends on out-of-band information" |
-| \[U+FFFE,U+FFFF\]   |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+1FFFE,U+1FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | U+111C4             | `𑆏𑆀`  | U+1118F U+11180   | "Use U+1118F U+11180 instead of U+111C4"  |
 | \[U+2FFFE,U+2FFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
@@ -173,6 +164,7 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | \[U+EFFFE,U+EFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+FFFFE,U+FFFFF\] |      | U+FFFD            | "Noncharacters are intended for internal use only" |
 | \[U+10FFFE,U+10FFFF\] |    | U+FFFD            | "Noncharacters are intended for internal use only" |
+| [CJK Compatibility Ideographs] | | [Standardized Variant] | "Use Standardized Variants instead of CJK Compatibility Ideographs" |
 
 ## Conversion
 
@@ -183,13 +175,12 @@ succeeds, discarding information not usually considered meaningful or valid in
 plain text:
  - If the string starts with a [Basic Text non-starter], prepend U+34F.
  - If the string ends with a [Basic Text non-ender], append U+34F.
- - Perform the Replacement actions from the [Pre-NFC Table].
- - Perform the [Stream-Safe Text Process (UAX15-D4)].
- - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
  - When [*NEL Compatibility*] is enabled, replace any U+85 with U+A.
  - When [*LSPS Compatibility*] is enabled, replace any U+2028 or U+2029 with
    U+A.
- - Perform the Replacement actions from the [Main Table].
+ - Perform the Replacement actions from the [Sequence Table].
+ - Perform the [Stream-Safe Text Process (UAX15-D4)].
+ - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
 
 [*NEL Compatibility*]: #options
 [*LSPS Compatibility*]: #options
@@ -212,10 +203,9 @@ the content is not valid Basic Text:
    string must not begin with Basic Text non-starter".
  - If the string ends with a [Basic Text non-ender], error with "Basic Text
    string must not end with Basic Text non-ender".
- - Perform the Error actions from the [Pre-NFC Table].
+ - Perform the Error actions from the [Sequence Table].
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
- - Perform the Error actions from the [Main Table].
  - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
 
 [*CRLF Compatibility*]: #options
@@ -248,8 +238,7 @@ the content is not valid Basic Text:
  - If the stream is non-empty and doesn't end with U+A, error with
    "Basic Text stream must be empty or end with newline".
 
-[Pre-NFC Table]: #pre-nfc-table
-[Main Table]: #main-table
+[Sequence Table]: #sequence-table
 [From Unicode string to Basic Text string]: #from-unicode-string-to-basic-text-string
 [From Unicode string to Basic Text string, strict]: #from-unicode-string-to-basic-text-string-strict
 [From Unicode stream to Basic Text stream]: #from-unicode-stream-to-basic-text-stream
