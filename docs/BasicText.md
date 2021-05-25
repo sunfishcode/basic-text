@@ -87,9 +87,9 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | U+F79               | `◌ླ◌ཱྀ` | U+FB3 U+F71 U+F80 | "Use U+FB3 U+F71 U+F80 instead of U+F79"  |
 | U+17A3              | `អ`  | U+17A2            | "Use U+17A2 instead of U+17A3"            |
 | U+17A4              | `អា` | U+17A2 U+17B6     | "Use U+17A2 U+17B6 instead of U+17A4"     |
-| U+17B4              |      | U+FFFD            | "Unicode discourages use of U+17B4"       |
-| U+17B5              |      | U+FFFD            | "Unicode discourages use of U+17B5"       |
-| U+17D8              |      | U+FFFD            | "Unicode discourages use of U+17D8"       |
+| U+17B4              |      | U+FFFD            | "Omit U+17B4"                             |
+| U+17B5              |      | U+FFFD            | "Omit U+17B5"                             |
+| U+17D8              |      | U+FFFD            | "Spell beyyal with normal letters"        |
 | U+2028              | LS   | U+20              | "Line separation is a rich-text function" |
 | U+2029              | PS   | U+20              | "Paragraph separation is a rich-text function" |
 | U+202A              | LRE  | U+FFFD            | "Explicit Bidirectional Formatting Characters are unsupported" |
