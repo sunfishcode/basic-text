@@ -69,7 +69,17 @@ pub fn check_basic_text_char(c: char) -> Result<(), BasicTextError> {
         | c @ '\u{1d547}'
         | c @ '\u{1d548}'
         | c @ '\u{1d549}'
-        | c @ '\u{1d551}' => replacement(c),
+        | c @ '\u{1d551}'
+        | c @ '\u{f900}'..='\u{fa0d}'
+        | c @ '\u{fa10}'
+        | c @ '\u{fa12}'
+        | c @ '\u{fa15}'..='\u{fa1e}'
+        | c @ '\u{fa20}'
+        | c @ '\u{fa22}'
+        | c @ '\u{fa25}'..='\u{fa26}'
+        | c @ '\u{fa2a}'..='\u{fa6d}'
+        | c @ '\u{fa70}'..='\u{fad9}'
+        | c @ '\u{2f800}'..='\u{2fa1d}' => replacement(c),
         '\u{e0001}' => language_tag(),
         '\u{fff9}'..='\u{fffb}' => interlinear_annotation(),
         c @ '\u{17b4}' | c @ '\u{17b5}' | c @ '\u{17d8}' => discouraged(c),
@@ -96,16 +106,6 @@ pub fn check_basic_text_char(c: char) -> Result<(), BasicTextError> {
         | '\u{ffffe}'..='\u{fffff}'
         | '\u{10fffe}'..='\u{10ffff}'
         | '\u{fdd0}'..='\u{fdef}' => noncharacter(),
-        '\u{f900}'..='\u{fa0d}'
-        | '\u{fa10}'
-        | '\u{fa12}'
-        | '\u{fa15}'..='\u{fa1e}'
-        | '\u{fa20}'
-        | '\u{fa22}'
-        | '\u{fa25}'..='\u{fa26}'
-        | '\u{fa2a}'..='\u{fa6d}'
-        | '\u{fa70}'..='\u{fad9}'
-        | '\u{2f800}'..='\u{2fa1d}' => cjk_compat_ideograph(c),
         ORC => orc(),
         BOM => bom(),
         _ => Ok(()),
@@ -143,8 +143,6 @@ pub enum BasicTextError {
     Discouraged(char),
     #[error("Unrecognized escape sequence")]
     UnrecognizedEscape,
-    #[error("Use Standardized Variants instead of CJK Compatibility Ideographs: {0:?}")]
-    CJKCompatIdeograph(char),
     #[error("Use {yes:?} instead of {no:?}")]
     Replacement { yes: Box<[char]>, no: char },
 }
@@ -197,11 +195,6 @@ fn bidirectional_formatting_character() -> Result<(), BasicTextError> {
 #[cold]
 fn noncharacter() -> Result<(), BasicTextError> {
     Err(BasicTextError::NonChar)
-}
-
-#[cold]
-fn cjk_compat_ideograph(c: char) -> Result<(), BasicTextError> {
-    Err(BasicTextError::CJKCompatIdeograph(c))
 }
 
 #[cold]
