@@ -26,6 +26,16 @@ To convert a byte sequence into a Unicode string in a manner that always
 succeeds but potentially loses information about invalid encodings:
  - Perform [U+FFFD Substitution of Maximal Subparts].
 
+### From byte sequence buffered stream to Unicode buffered stream
+
+To convert a byte sequence buffered stream into a Unicode buffered stream in a
+manner than always succeeds, discarding information not encodable as Unicode:
+ - Perform [From byte sequence to Unicode string].
+ - At each buffer flush:
+   - Perform [From byte sequence to Unicode string] on the stream up to that
+     point.
+
+[From byte sequence to Unicode string]: #from-byte-sequence-to-unicode-string
 [Basic Text]: BasicText.md
 [Unicode Scalar Values]: https://unicode.org/glossary/#unicode_scalar_value
 [U+FFFD Substitution of Maximal Subparts]: https://www.unicode.org/versions/Unicode13.0.0/ch03.pdf#G66453
