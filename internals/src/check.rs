@@ -82,7 +82,8 @@ pub fn check_basic_text_char(c: char) -> Result<(), BasicTextError> {
         | c @ '\u{2f800}'..='\u{2fa1d}' => replacement(c),
         '\u{e0001}' => language_tag(),
         '\u{fff9}'..='\u{fffb}' => interlinear_annotation(),
-        c @ '\u{17b4}' | c @ '\u{17b5}' | c @ '\u{17d8}' => discouraged(c),
+        c @ '\u{17b4}' | c @ '\u{17b5}' => omit(c),
+        '\u{17d8}' => beyyal(),
         c @ '\u{206a}'..='\u{206f}' => deprecated_format_character(c),
         '\u{2028}' => line_separation(),
         '\u{2029}' => para_separation(),
@@ -139,8 +140,10 @@ pub enum BasicTextError {
     UnneededBOM,
     #[error("U+FFFC depends on out-of-band information")]
     OutOfBand,
-    #[error("Unicode discourages use of {0:?}")]
-    Discouraged(char),
+    #[error("Omit {0:?}")]
+    Omit(char),
+    #[error("Spell beyyal with normal letters")]
+    Beyyal,
     #[error("Unrecognized escape sequence")]
     UnrecognizedEscape,
     #[error("Use {yes:?} instead of {no:?}")]
@@ -163,8 +166,13 @@ fn replacement(c: char) -> Result<(), BasicTextError> {
 }
 
 #[cold]
-fn discouraged(c: char) -> Result<(), BasicTextError> {
-    Err(BasicTextError::Discouraged(c))
+fn omit(c: char) -> Result<(), BasicTextError> {
+    Err(BasicTextError::Omit(c))
+}
+
+#[cold]
+fn beyyal() -> Result<(), BasicTextError> {
+    Err(BasicTextError::Beyyal)
 }
 
 #[cold]
