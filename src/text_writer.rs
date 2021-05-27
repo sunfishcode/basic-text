@@ -25,10 +25,13 @@ use utf8_io::{Utf8Writer, WriteStr};
 ///
 /// ```rust
 /// use basic_text::TextWriter;
+/// use layered_io::WriteLayered;
 ///
-/// let output = TextWriter::new(std::io::stdout());
+/// let mut output = TextWriter::new(std::io::stdout());
 ///
 /// // write to `output`
+///
+/// output.close().unwrap();
 /// ```
 pub struct TextWriter<Inner> {
     /// The wrapped byte stream.

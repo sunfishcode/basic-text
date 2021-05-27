@@ -266,7 +266,7 @@ impl TextOutput {
             internals.impl_().expect_starter = false;
             if let Some(c) = internals.impl_().buffer.chars().next() {
                 if !is_basic_text_start(c) {
-                    Self::reset_state(internals);
+                    Self::prepare_failure(internals);
                     return Err(io::Error::new(
                         io::ErrorKind::InvalidData,
                         "write data must begin with a Unicode Normalization Form starter",
@@ -279,7 +279,7 @@ impl TextOutput {
         match internals.write_str(&buffer) {
             Ok(()) => (),
             Err(err) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 return Err(err);
             }
         }
@@ -361,12 +361,12 @@ impl TextOutput {
                 // SUB indicates an error sent through the NFC iterator
                 // chain, and the Rc<RefCell<Option<BasicTextError>>> holds the
                 // actual error.
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 return Err(take(&mut *error.borrow_mut()).unwrap());
             }
 
             (State::Ground(_), ESC) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 return Err(BasicTextError::Escape);
             }
 
@@ -383,7 +383,7 @@ impl TextOutput {
 
             // Escape sequence not recognized.
             (State::Esc, _) | (State::Csi, _) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 return Err(BasicTextError::UnrecognizedEscape);
             }
         }
@@ -396,21 +396,21 @@ impl TextOutput {
         match internals.impl_().state {
             State::Ground(Ground::Newline) => Ok(()),
             State::Ground(Ground::ZwjOrPrepend) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 Err(io::Error::new(
                     io::ErrorKind::InvalidData,
                     "output text stream closed after a ZWJ or Prepend",
                 ))
             }
             State::Ground(Ground::Other) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 Err(io::Error::new(
                     io::ErrorKind::InvalidData,
                     "output text stream must end with newline",
                 ))
             }
             State::Esc | State::Csi => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 Err(io::Error::new(
                     io::ErrorKind::InvalidData,
                     "incomplete escape sequence at end of output text stream",
@@ -476,7 +476,7 @@ impl TextOutput {
             })
             .map(|()| error.valid_up_to()),
             Err(error) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 Err(io::Error::new(io::ErrorKind::InvalidData, error))
             }
         }
@@ -488,7 +488,7 @@ impl TextOutput {
     ) -> io::Result<()> {
         match internals.impl_().state {
             State::Ground(Ground::ZwjOrPrepend) => {
-                Self::reset_state(internals);
+                Self::prepare_failure(internals);
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidData,
                     "output text stream flushed after a ZWJ or Prepend",
@@ -546,6 +546,13 @@ impl TextOutput {
     ) {
         // Don't enforce a trailing newline.
         internals.impl_().state = State::Ground(Ground::Newline);
+    }
+
+    fn prepare_failure<Inner: WriteStr + WriteLayered>(
+        internals: &mut impl TextWriterInternals<Inner>,
+    ) {
+        Self::reset_state(internals);
+        internals.inner_mut().abandon();
     }
 }
 

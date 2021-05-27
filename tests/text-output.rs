@@ -7,22 +7,31 @@ use std::io::{self, Write};
 fn to_text(input: &str) -> io::Result<String> {
     let mut writer = TextWriter::new(Vec::<u8>::new());
     writer.write_all(input.as_bytes())?;
-    let inner = writer.close_into_inner()?.close_into_inner()?;
-    Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
+    let inner = writer
+        .close_into_inner()?
+        .close_into_inner()?
+        .close_into_inner()?;
+    Ok(String::from_utf8(inner.to_vec()).unwrap())
 }
 
 fn to_text_with_bom_compatibility(input: &str) -> io::Result<String> {
     let mut writer = TextWriter::with_bom_compatibility(Vec::<u8>::new()).unwrap();
     writer.write_all(input.as_bytes())?;
-    let inner = writer.close_into_inner()?.close_into_inner()?;
-    Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
+    let inner = writer
+        .close_into_inner()?
+        .close_into_inner()?
+        .close_into_inner()?;
+    Ok(String::from_utf8(inner.to_vec()).unwrap())
 }
 
 fn to_text_with_crlf_compatibility(input: &str) -> io::Result<String> {
     let mut writer = TextWriter::with_crlf_compatibility(Vec::<u8>::new());
     writer.write_all(input.as_bytes())?;
-    let inner = writer.close_into_inner()?.close_into_inner()?;
-    Ok(String::from_utf8(inner.get_ref().to_vec()).unwrap())
+    let inner = writer
+        .close_into_inner()?
+        .close_into_inner()?
+        .close_into_inner()?;
+    Ok(String::from_utf8(inner.to_vec()).unwrap())
 }
 
 #[test]
