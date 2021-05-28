@@ -8,7 +8,7 @@ use basic_text_internals::{
     unicode_normalization::{
         char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization,
     },
-    BasicTextError, Categorize, IsolateUnassigned,
+    BasicTextError, PreNormalization,
 };
 #[cfg(can_vector)]
 use layered_io::default_is_write_vectored;
@@ -303,8 +303,8 @@ impl TextOutput {
             && s.chars().all(is_public_assigned)
         {
             // Fast path: Data is already Stream-Safe NFC and assigned. Just
-            // check it for errors.
-            for c in Categorize::new(s.chars(), Rc::clone(&error)) {
+            // check for errors.
+            for c in s.chars().categorize(Rc::clone(&error)) {
                 Self::state_machine_char(internals, c, &error)?;
             }
         } else {
@@ -320,8 +320,12 @@ impl TextOutput {
         s: &str,
         error: &Rc<RefCell<Option<BasicTextError>>>,
     ) -> Result<(), BasicTextError> {
-        // Slow path: Compute Stream-Safe and NFC.
-        for c in IsolateUnassigned::new(Categorize::new(s.chars(), Rc::clone(error)))
+        // Slow path: Compute Stream-Safe NFC, isolate unassigned scalar
+        // values, and check for errors.
+        for c in s
+            .chars()
+            .categorize(Rc::clone(error))
+            .isolate_unassigned()
             .cjk_compat_variants()
             .stream_safe()
             .nfc()

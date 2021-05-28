@@ -11,7 +11,7 @@ use basic_text_internals::{
         char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, Recompositions,
         Replacements, StreamSafe, UnicodeNormalization,
     },
-    IsolateUnassigned,
+    IsolateUnassigned, PreNormalization,
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
@@ -116,7 +116,9 @@ impl TextInput {
         Self {
             raw_string: String::new(),
             queue,
-            ssnfc_iter: IsolateUnassigned::new(VecDeque::<char>::new().into_iter())
+            ssnfc_iter: VecDeque::<char>::new()
+                .into_iter()
+                .isolate_unassigned()
                 .cjk_compat_variants()
                 .stream_safe()
                 .nfc(),
@@ -264,7 +266,9 @@ impl TextInput {
                         self.queue.pop_front()
                     } else {
                         let tmp = self.queue.drain(..index).collect::<VecDeque<char>>();
-                        self.ssnfc_iter = IsolateUnassigned::new(tmp.into_iter())
+                        self.ssnfc_iter = tmp
+                            .into_iter()
+                            .isolate_unassigned()
                             .cjk_compat_variants()
                             .stream_safe()
                             .nfc();
