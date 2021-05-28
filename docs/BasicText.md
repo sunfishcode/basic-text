@@ -56,7 +56,10 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | ------------------- | ---- | ----------------- | ----------------------------------------- |
 | U+D U+A             | CRLF | U+A               | "Use U+A to terminate a line"             |
 | U+D                 | CR   | U+A               | "Use U+A to terminate a line"             |
-| U+C                 | FF   | U+20              | "Control code not valid in text"          |
+| \[U+C\]+ U+D U+A    |      | U+A               | "Control code not valid in text"          |
+| \[U+C\]+ U+A        |      | U+A               | "Control code not valid in text"          |
+| \[U+C\]+ U+D        |      | U+A               | "Control code not valid in text"          |
+| \[U+C\]+            | FF   | U+20              | "Control code not valid in text"          |
 | U+1B U+5B \[U+20–U+3F\]\* U+6D                     | SGR | | "Color escape sequences are not enabled" |
 | \[U+1B\]+ U+5B U+5B \[U+–U+7F\]?                   |     | | "Unrecognized escape sequence" |
 | \[U+1B\]+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence" |

@@ -75,6 +75,60 @@ fn basic_text_string_basics() {
     );
 }
 
+/// Various testcases involving U+C (FF).
+#[test]
+fn basic_text_string_ff() {
+    assert_eq!(
+        TextString::from_text_lossy("hello\x0cworld").as_str(),
+        "hello world"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("hello\x0c\x0cworld").as_str(),
+        "hello world"
+    );
+    assert_eq!(TextString::from_text_lossy("\x0c").as_str(), " ");
+    assert_eq!(TextString::from_text_lossy("\x0c\x0c").as_str(), " ");
+    assert_eq!(TextString::from_text_lossy("\x0c\n").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\x0c\r").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\x0c\r\n").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\x0c\x0c\n").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\x0c\x0c\r").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\x0c\x0c\r\n").as_str(), "\n");
+    assert_eq!(TextString::from_text_lossy("\r\x0c\n").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\r\x0c\x0c\n").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\r\x0c\r\n").as_str(), "\n\n");
+    assert_eq!(
+        TextString::from_text_lossy("\r\x0c\x0c\r\n").as_str(),
+        "\n\n"
+    );
+    assert_eq!(TextString::from_text_lossy("\r\x0c\r").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\r\x0c\x0c\r").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\n\x0c\n").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\n\x0c\x0c\n").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\n\x0c\r\n").as_str(), "\n\n");
+    assert_eq!(
+        TextString::from_text_lossy("\n\x0c\x0c\r\n").as_str(),
+        "\n\n"
+    );
+    assert_eq!(TextString::from_text_lossy("\n\x0c\r").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\n\x0c\x0c\r").as_str(), "\n\n");
+    assert_eq!(TextString::from_text_lossy("\r\n\x0c\n").as_str(), "\n\n");
+    assert_eq!(
+        TextString::from_text_lossy("\r\n\x0c\x0c\n").as_str(),
+        "\n\n"
+    );
+    assert_eq!(TextString::from_text_lossy("\r\n\x0c\r\n").as_str(), "\n\n");
+    assert_eq!(
+        TextString::from_text_lossy("\r\n\x0c\x0c\r\n").as_str(),
+        "\n\n"
+    );
+    assert_eq!(TextString::from_text_lossy("\r\n\x0c\r").as_str(), "\n\n");
+    assert_eq!(
+        TextString::from_text_lossy("\r\n\x0c\x0c\r").as_str(),
+        "\n\n"
+    );
+}
+
 /// Unassigned codepoints are isolated from string boundaries with CGJ.
 #[test]
 fn basic_text_string_unassigned() {

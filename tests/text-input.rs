@@ -151,8 +151,8 @@ fn test_text_input_replacements() {
 
     // Replace U+C (FF) with U+20 (SP).
     assert_eq!(to_text("\u{c}"), " \n");
-    assert_eq!(to_text("\u{c}\n"), " \n");
-    assert_eq!(to_text("\n\u{c}\n"), "\n \n");
+    assert_eq!(to_text("\u{c}\n"), "\n");
+    assert_eq!(to_text("\n\u{c}\n"), "\n\n");
     assert_eq!(to_text("hello\u{c}world"), "hello world\n");
 
     // Replace U+85 (NEL) with U+20 (SP).

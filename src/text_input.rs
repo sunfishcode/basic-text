@@ -297,6 +297,7 @@ impl TextInput {
                             self.state = State::Ground(true);
                         }
                         '\r' => self.state = State::Cr,
+                        '\x0c' => self.state = State::Ff,
                         ESC => self.state = State::Esc,
                         mut c => {
                             self.state = State::Ground(false);
@@ -328,6 +329,17 @@ impl TextInput {
                         self.expect_starter = false;
                         self.state = State::Ground(true);
                         if c != '\n' {
+                            continue;
+                        }
+                    }
+
+                    (State::Ff, c) => {
+                        if c != '\x0c' {
+                            if c != '\n' && c != '\r' {
+                                self.queue.push_back(' ');
+                            }
+                            self.expect_starter = false;
+                            self.state = State::Ground(false);
                             continue;
                         }
                     }
@@ -427,6 +439,9 @@ impl TextInput {
                 }
                 State::Esc => {
                     internals.impl_().queue.push_back(REPL);
+                }
+                State::Ff => {
+                    internals.impl_().queue.push_back(' ');
                     internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(false);
                 }
@@ -572,6 +587,9 @@ enum State {
 
     // After a '\r'.
     Cr,
+
+    // After a '\x0c'.
+    Ff,
 
     // After a '\x1b'.
     Esc,
