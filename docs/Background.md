@@ -56,7 +56,7 @@ itself (after ASCII-1986 / ECMA-6:1985 at least). Basic Text uses U+A because:
    convention, [even Windows Notepad].
 
 Lossy text conversion implicitly translates plain CR and CRLF into newline,
-which is a common convention.
+which is a common convention. Python calls this behavior [Universal Newlines].
 
 By default, lossy text conversion translates NEL, LS, and PS into U+20 which,
 which for those rare formats which recognize these scalars at all, is
@@ -68,6 +68,7 @@ respectively.
 [POSIX]: http://get.posixcertified.ieee.org/
 [XML 1.1]: https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-line-ends
 [JavaScript source code]: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
+[Universal Newlines]: https://www.python.org/dev/peps/pep-0278/
 
 By default, strict text conversion rejects CRLF and other line terminator
 sequences other than U+A. As an option, strict text conversion can translate
