@@ -15,8 +15,8 @@ A stream is in Unicode form iff:
 
 A buffered stream is in Unicode form iff:
  - the stream is in Unicode form, and
- - a flush of the buffer fails if the data up to that point is not a
-   string in Unicode form.
+ - substrings of the string separated by buffer flushes are all in Unicode
+   form.
 
 ## Conversion
 
@@ -25,15 +25,6 @@ A buffered stream is in Unicode form iff:
 To convert a byte sequence into a Unicode string in a manner that always
 succeeds but potentially loses information about invalid encodings:
  - Perform [U+FFFD Substitution of Maximal Subparts].
-
-### From byte sequence buffered stream to Unicode buffered stream
-
-To convert a byte sequence buffered stream into a Unicode buffered stream in a
-manner than always succeeds, discarding information not encodable as Unicode:
- - Perform [From byte sequence to Unicode string].
- - At each buffer flush:
-   - Perform [From byte sequence to Unicode string] on the stream up to that
-     point.
 
 [From byte sequence to Unicode string]: #from-byte-sequence-to-unicode-string
 [Basic Text]: BasicText.md

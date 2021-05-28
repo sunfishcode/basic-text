@@ -264,30 +264,6 @@ The following options may be enabled:
 | ------------------ | ------- | ------- |
 | BOM Compatibility  | Boolean | `false` |
 
-### From Unicode buffered stream to Basic Text buffered stream
-
-To convert a [Unicode] buffered stream into a Basic Text buffered stream in a
-manner than always succeeds, discarding information not usually considered
-meaningful or valid in plain text:
- - Perform [From Unicode stream to Basic Text stream].
- - At each buffer flush:
-   - If the flush is preceeded by a [Basic Text non-ender], append U+34F before
-     the flush.
-   - If the flush is followed by a [Basic Text non-starter], insert U+34F after
-     the flush.
-
-### From Unicode buffered stream to Basic Text buffered stream, strict
-
-To convert a [Unicode] buffered stream into a Basic Text buffered stream in a
-manner that discards information not usually considered meaningful and
-otherwise fails if the content is not valid Basic Text:
- - Perform [From Unicode stream to Basic Text stream, strict].
- - At each buffer flush:
-   - If the flush is preceeded by a [Basic Text non-ender], error with "Basic
-     Text string must not end with a Basic Text non-ender" before the flush.
-   - If the flush is followed by a [Basic Text non-starter], error with "Basic
-     Text string must not start with a Basic Text non-starter" after the flush.
-
 [NFC]: https://unicode.org/reports/tr15/#Norm_Forms
 [Stream-Safe]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
 [Stream-Safe Text Process (UAX15-D4)]: https://unicode.org/reports/tr15/#UAX15-D4
