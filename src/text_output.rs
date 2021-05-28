@@ -569,7 +569,7 @@ impl Drop for TextOutput {
 enum Ground {
     // We just saw a '\n'.
     Newline,
-    // We just as a ZWJ or a Prepend.
+    // We just saw a ZWJ or a Prepend.
     ZwjOrPrepend,
     // Otherwise.
     Other,
