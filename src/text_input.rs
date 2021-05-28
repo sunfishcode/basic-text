@@ -7,6 +7,10 @@ use basic_text_internals::{
     unicode::{
         BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS, REPL,
     },
+    unicode_normalization::{
+        is_nfc_stream_safe_quick, IsNormalized, Recompositions, Replacements, StreamSafe,
+        UnicodeNormalization,
+    },
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
@@ -15,10 +19,6 @@ use std::{
     io,
     mem::take,
     str,
-};
-use unicode_normalization::{
-    is_nfc_stream_safe_quick, IsNormalized, Recompositions, Replacements, StreamSafe,
-    UnicodeNormalization,
 };
 use utf8_io::{ReadStrLayered, WriteStr};
 

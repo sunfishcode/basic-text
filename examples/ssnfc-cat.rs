@@ -1,5 +1,7 @@
+use basic_text_internals::unicode_normalization::{
+    is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization,
+};
 use std::io::{stdin, stdout, BufRead, BufReader, Write};
-use unicode_normalization::{is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization};
 use utf8_io::Utf8Reader;
 
 fn main() -> anyhow::Result<()> {

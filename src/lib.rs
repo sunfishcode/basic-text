@@ -89,7 +89,9 @@ mod text_substring;
 mod text_writer;
 mod write_text;
 
-pub use basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE;
+pub use basic_text_internals::{
+    unicode::NORMALIZATION_BUFFER_SIZE, unicode_normalization::UNICODE_VERSION,
+};
 pub use basic_text_literals::{text, text_substr};
 pub use buf_read_text::{BufReadText, TextLines, TextLinesLossy};
 pub use copy::{copy_text, copy_text_using_status};

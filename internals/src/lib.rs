@@ -5,6 +5,10 @@ mod check;
 mod replace;
 mod text_utils;
 
+// Re-export `unicode_normalization` so that our users can use the same version
+// we're using.
+pub use unicode_normalization;
+
 pub use categorize::Categorize;
 pub use check::{check_basic_text_char, BasicTextError};
 pub use replace::replace;

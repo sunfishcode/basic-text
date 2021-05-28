@@ -5,6 +5,7 @@ use crate::{TextDuplexer, TextSubstr, TextWriter};
 use basic_text_internals::{
     is_basic_text_end, is_basic_text_start,
     unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
+    unicode_normalization::{is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization},
     BasicTextError, Categorize,
 };
 #[cfg(can_vector)]
@@ -19,7 +20,6 @@ use std::{
     rc::Rc,
     str,
 };
-use unicode_normalization::{is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization};
 use utf8_io::{ReadStrLayered, WriteStr};
 
 /// Abstract over `TextWriter` and the writer half of `TextDuplexer`.
