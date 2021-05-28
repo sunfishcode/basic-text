@@ -205,9 +205,9 @@ the content is not valid Basic Text:
  - If the string ends with a [Basic Text non-ender], error with "Basic Text
    string must not end with Basic Text non-ender".
  - Perform the Error actions from the [Sequence Table].
+ - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
  - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
- - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
 
 [*CRLF Compatibility*]: #options
 
@@ -225,8 +225,8 @@ To convert a [Unicode] stream into a Basic Text stream in a manner than always
 succeeds, discarding information not usually considered meaningful or valid in
 plain text:
  - If the stream starts with U+FEFF, remove it.
+ - If the stream is non-empty and doesn't end with U+A or U+D, append a U+A.
  - Perform [From Unicode string to Basic Text string].
- - If the stream is non-empty and doesn't end with U+A, append a U+A.
 
 ### From Unicode stream to Basic Text stream, strict
 
@@ -235,9 +235,9 @@ discards information not usually considered meaningful and otherwise fails if
 the content is not valid Basic Text:
  - When [*BOM Compatibility*] is enabled, insert a U+FEFF at the beginning of
    the stream.
- - Perform [From Unicode string to Basic Text string, strict].
- - If the stream is non-empty and doesn't end with U+A, error with
+ - If the stream is non-empty and doesn't end with U+A or U+D, error with
    "Basic Text stream must be empty or end with newline".
+ - Perform [From Unicode string to Basic Text string, strict].
 
 [Sequence Table]: #sequence-table
 [From Unicode string to Basic Text string]: #from-unicode-string-to-basic-text-string

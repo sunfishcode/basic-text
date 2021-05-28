@@ -2,6 +2,12 @@
 
 It's a good question. The following are some notes.
 
+## Is normalization inherent?
+
+No, the Stream-Safe and NFC rules in Basic Text conversions are carefully
+designed to be performed last, so they could conceptually be split out.
+The question is, whether they should be or not.
+
 ## Which normalization form?
 
 NFC seems to be [by far the most widely used for text interchange], and mostly
