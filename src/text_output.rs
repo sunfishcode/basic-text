@@ -5,8 +5,10 @@ use crate::{TextDuplexer, TextSubstr, TextWriter};
 use basic_text_internals::{
     is_basic_text_end, is_basic_text_start,
     unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
-    unicode_normalization::{is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization},
-    BasicTextError, Categorize,
+    unicode_normalization::{
+        char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization,
+    },
+    BasicTextError, Categorize, IsolateUnassigned,
 };
 #[cfg(can_vector)]
 use layered_io::default_is_write_vectored;
@@ -297,9 +299,11 @@ impl TextOutput {
     ) -> Result<(), BasicTextError> {
         let error = Rc::new(RefCell::new(None));
 
-        if is_nfc_stream_safe_quick(s.chars()) == IsNormalized::Yes {
-            // Fast path: Data is already Stream-Safe and NFC. Just check it
-            // for errors.
+        if is_nfc_stream_safe_quick(s.chars()) == IsNormalized::Yes
+            && s.chars().all(is_public_assigned)
+        {
+            // Fast path: Data is already Stream-Safe NFC and assigned. Just
+            // check it for errors.
             for c in Categorize::new(s.chars(), Rc::clone(&error)) {
                 Self::state_machine_char(internals, c, &error)?;
             }
@@ -317,7 +321,7 @@ impl TextOutput {
         error: &Rc<RefCell<Option<BasicTextError>>>,
     ) -> Result<(), BasicTextError> {
         // Slow path: Compute Stream-Safe and NFC.
-        for c in Categorize::new(s.chars(), Rc::clone(error))
+        for c in IsolateUnassigned::new(Categorize::new(s.chars(), Rc::clone(error)))
             .cjk_compat_variants()
             .stream_safe()
             .nfc()

@@ -8,7 +8,7 @@ license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
 repository = "https://github.com/sunfishcode/basic-text"
 
 [dependencies]
-unicode-normalization = "0.1.17"
+unicode-normalization = "0.1.19"
 thiserror = "1.0.24"
 
 [badges]

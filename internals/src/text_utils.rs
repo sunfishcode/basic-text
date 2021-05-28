@@ -689,3 +689,11 @@ const fn prepended_concatenation_mark(c: char) -> bool {
         '\u{600}'..='\u{605}' | '\u{6dd}' | '\u{70f}' | '\u{8e2}' | '\u{110bd}' | '\u{110cd}',
     )
 }
+
+/// Private-Use Area
+pub(crate) const fn is_private_use_area(c: char) -> bool {
+    matches!(
+        c,
+        '\u{e000}'..='\u{f8ff}' | '\u{f0000}'..='\u{ffffd}' | '\u{100000}'..='\u{10fffd}'
+    )
+}

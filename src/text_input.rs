@@ -8,9 +8,10 @@ use basic_text_internals::{
         BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS, REPL,
     },
     unicode_normalization::{
-        is_nfc_stream_safe_quick, IsNormalized, Recompositions, Replacements, StreamSafe,
-        UnicodeNormalization,
+        char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, Recompositions,
+        Replacements, StreamSafe, UnicodeNormalization,
     },
+    IsolateUnassigned,
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
 use std::{
@@ -79,7 +80,8 @@ pub(crate) struct TextInput {
     queue: VecDeque<char>,
 
     /// An iterator over the chars in `self.queue`.
-    ssnfc_iter: Recompositions<StreamSafe<Replacements<vec_deque::IntoIter<char>>>>,
+    ssnfc_iter:
+        Recompositions<StreamSafe<Replacements<IsolateUnassigned<vec_deque::IntoIter<char>>>>>,
 
     /// The number of characters in the queue which are already verified to be
     /// Stream-Safe NFC and can skip normalization.
@@ -114,8 +116,7 @@ impl TextInput {
         Self {
             raw_string: String::new(),
             queue,
-            ssnfc_iter: VecDeque::<char>::new()
-                .into_iter()
+            ssnfc_iter: IsolateUnassigned::new(VecDeque::<char>::new().into_iter())
                 .cjk_compat_variants()
                 .stream_safe()
                 .nfc(),
@@ -252,12 +253,21 @@ impl TextInput {
                     let index = self.queue.len() - last_boundary;
                     if is_nfc_stream_safe_quick(self.queue.iter().take(index).copied())
                         == IsNormalized::Yes
+                        && self
+                            .queue
+                            .iter()
+                            .take(index)
+                            .copied()
+                            .all(is_public_assigned)
                     {
                         self.quick = index - 1;
                         self.queue.pop_front()
                     } else {
                         let tmp = self.queue.drain(..index).collect::<VecDeque<char>>();
-                        self.ssnfc_iter = tmp.into_iter().cjk_compat_variants().stream_safe().nfc();
+                        self.ssnfc_iter = IsolateUnassigned::new(tmp.into_iter())
+                            .cjk_compat_variants()
+                            .stream_safe()
+                            .nfc();
                         self.ssnfc_iter.next()
                     }
                 }

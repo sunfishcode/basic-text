@@ -59,7 +59,7 @@ fn basic_text_string_basics() {
         TextString::from_text("\u{e0000}\u{e0002}".to_owned())
             .unwrap()
             .as_str(),
-        "\u{e0000}\u{e0002}"
+        "\u{34f}\u{e0000}\u{34f}\u{e0002}\u{34f}"
     );
     assert_eq!(
         TextString::from_text_lossy("\u{34f}\u{200c}\u{200d}\u{2060}").as_str(),
@@ -68,6 +68,50 @@ fn basic_text_string_basics() {
     assert_eq!(
         TextString::from_text_lossy("\u{200c}\u{200d}\u{2060}").as_str(),
         "\u{34f}\u{200c}\u{200d}\u{2060}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{200d}").as_str(),
+        "\u{34f}\u{200d}\u{34f}"
+    );
+}
+
+/// Unassigned codepoints are isolated from string boundaries with CGJ.
+#[test]
+fn basic_text_string_unassigned() {
+    // Isolate unassigned scalar values with CGJ's.
+    assert_eq!(
+        TextString::from_text_lossy("\u{378}").as_str(),
+        "\u{34f}\u{378}\u{34f}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{378}\u{378}").as_str(),
+        "\u{34f}\u{378}\u{34f}\u{378}\u{34f}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{34f}\u{378}\u{34f}").as_str(),
+        "\u{34f}\u{378}\u{34f}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{34f}\u{378}\u{34f}\u{378}\u{34f}").as_str(),
+        "\u{34f}\u{378}\u{34f}\u{378}\u{34f}"
+    );
+
+    // Test U+FFFFF instead of U+378. It's unassigned but also replaced.
+    assert_eq!(
+        TextString::from_text_lossy("\u{fffff}").as_str(),
+        "\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{fffff}\u{fffff}").as_str(),
+        "\u{fffd}\u{fffd}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{34f}\u{fffff}\u{34f}").as_str(),
+        "\u{34f}\u{fffd}\u{34f}"
+    );
+    assert_eq!(
+        TextString::from_text_lossy("\u{34f}\u{fffff}\u{34f}\u{fffff}\u{34f}").as_str(),
+        "\u{34f}\u{fffd}\u{34f}\u{fffd}\u{34f}"
     );
 }
 
@@ -178,7 +222,7 @@ fn basic_text_string_end() {
 
 /// Unassigned characters with replacements.
 #[test]
-fn basic_text_string_unassigned() {
+fn basic_text_string_replaced_unassigned() {
     assert_eq!(TextString::from_text_lossy("\u{9e4}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{9e5}").as_str(), "\u{fffd}");
     assert_eq!(TextString::from_text_lossy("\u{a64}").as_str(), "\u{fffd}");

@@ -18,6 +18,8 @@ A string is in Basic Text form iff:
  - it is a [Unicode] string in [Stream-Safe] [NFC] form, and
  - it doesn't start with a [Basic Text non-starter], and
  - it doesn't end with a [Basic Text non-ender], and
+ - all scalar values either have a `General_Category` other than `Unassigned`
+   or are preceded and followed by U+34F.
  - it doesn't contain any of the sequences listed in the [Sequence Table].
 
 A stream is in Basic Text form iff:
@@ -180,8 +182,12 @@ plain text:
  - When [*LSPS Compatibility*] is enabled, replace any U+2028 or U+2029 with
    U+A.
  - Perform the Replacement actions from the [Sequence Table].
+ - For any scalar value with `General_Category` of `Unassigned` that
+   isn't already preceeded by U+34F, insert U+34F before it.
+ - For any scalar value with `General_Category` of `Unassigned` that
+   isn't already followed by U+34F, insert U+34F after it.
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
- - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
+ - Perform `toNFC` with the [Normalization Process].
 
 [*NEL Compatibility*]: #options
 [*LSPS Compatibility*]: #options
@@ -206,8 +212,12 @@ the content is not valid Basic Text:
    string must not end with Basic Text non-ender".
  - Perform the Error actions from the [Sequence Table].
  - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
+ - For any scalar value with `General_Category` of `Unassigned` that
+   isn't already preceeded by U+34F, insert U+34F before it.
+ - For any scalar value with `General_Category` of `Unassigned` that
+   isn't already followed by U+34F, insert U+34F after it.
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
- - Perform `toNFC` with the [Normalization Process for Stabilized Strings].
+ - Perform `toNFC` with the [Normalization Process].
 
 [*CRLF Compatibility*]: #options
 
@@ -282,6 +292,6 @@ otherwise fails if the content is not valid Basic Text:
 [Stream-Safe]: https://unicode.org/reports/tr15/#Stream_Safe_Text_Format
 [Stream-Safe Text Process (UAX15-D4)]: https://unicode.org/reports/tr15/#UAX15-D4
 [Standardized Variant]: https://www.unicode.org/Public/UNIDATA/StandardizedVariants.txt
-[Normalization Process for Stabilized Strings]: https://unicode.org/reports/tr15/#Normalization_Process_for_Stabilized_Strings
+[Normalization Process]: https://unicode.org/reports/tr15/#Description_Norm
 [Restricted Text]: RestrictedText.md
 [Unicode]: Unicode.md
