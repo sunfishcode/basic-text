@@ -407,21 +407,21 @@ impl TextOutput {
                 Self::prepare_failure(internals);
                 Err(io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "output text stream closed after a ZWJ or Prepend",
+                    "strict text stream ended after a ZWJ or Prepend",
                 ))
             }
             State::Ground(Ground::Other) => {
                 Self::prepare_failure(internals);
                 Err(io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "output text stream must end with newline",
+                    "strict text stream must end with newline",
                 ))
             }
             State::Esc | State::Csi => {
                 Self::prepare_failure(internals);
                 Err(io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "incomplete escape sequence at end of output text stream",
+                    "incomplete escape sequence at end of strict text stream",
                 ))
             }
         }
@@ -499,14 +499,14 @@ impl TextOutput {
                 Self::prepare_failure(internals);
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "output text stream flushed after a ZWJ or Prepend",
+                    "strict text stream flushed after a ZWJ or Prepend",
                 ));
             }
             State::Ground(_) => (),
             State::Esc | State::Csi => {
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "output text stream flushed while an escape sequence was in progress",
+                    "strict text stream flushed while an escape sequence was in progress",
                 ))
             }
         }
@@ -569,7 +569,7 @@ impl Drop for TextOutput {
         if let State::Ground(Ground::Newline) = self.state {
             // oll korrect
         } else {
-            panic!("output text stream not ended with newline");
+            panic!("strict text stream not ended with newline");
         }
     }
 }
