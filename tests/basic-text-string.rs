@@ -476,14 +476,8 @@ fn basic_text_string_sequence_table_misc() {
     assert_eq!(TextString::from_text_lossy("\u{1b}\u{18}").as_str(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}\u{1b}A").as_str(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}A\n").as_str(), "\n");
-    assert_eq!(
-        TextString::from_text_lossy("\u{1b}\t").as_str(),
-        "\u{fffd}\t"
-    );
-    assert_eq!(
-        TextString::from_text_lossy("\u{1b}\n").as_str(),
-        "\u{fffd}\n"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{1b}\t").as_str(), "\t");
+    assert_eq!(TextString::from_text_lossy("\u{1b}\n").as_str(), "\n");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[").as_str(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[A").as_str(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\0").as_str(), "");
@@ -493,11 +487,8 @@ fn basic_text_string_sequence_table_misc() {
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{18}").as_str(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{7}").as_str(), "");
     assert_eq!(TextString::from_text_lossy("\u{1b}[[\u{1b}A").as_str(), "A");
-    assert_eq!(TextString::from_text_lossy("\u{1b}").as_str(), "\u{fffd}");
-    assert_eq!(
-        TextString::from_text_lossy("\u{1b}\n").as_str(),
-        "\u{fffd}\n"
-    );
+    assert_eq!(TextString::from_text_lossy("\u{1b}").as_str(), "");
+    assert_eq!(TextString::from_text_lossy("\u{1b}\n").as_str(), "\n");
 
     // DEL
     assert_eq!(TextString::from_text_lossy("\u{7f}").as_str(), "\u{fffd}");

@@ -65,7 +65,7 @@ A Unicode scalar value is a Basic Text non-ender iff:
 | \[U+1B\]+ U+5B \[U+20–U+3F\]\* \[U+40–U+7E\]?      | CSI | | "Unrecognized escape sequence" |
 | \[U+1B\]+ U+5D \[\^U+7,U+18,U+1B\]\* \[U+7,U+18\]? | OSC | | "Unrecognized escape sequence" |
 | \[U+1B\]+ \[U+40–U+7E\]                            | ESC | | "Unrecognized escape sequence" |
-| \[U+1B\]+           | ESC  | U+FFFD            | "Escape code not valid in text"           |
+| \[U+1B\]+           | ESC  |                   | "Escape code not valid in text"           |
 | \[U+0–U+8,U+B,U+E–U+1F\] | C0 | U+FFFD         | "Control code not valid in text"          |
 | U+7F                | DEL  | U+FFFD            | "Control code not valid in text"          |
 | U+85                | NEL  | U+20              | "Control code not valid in text"          |

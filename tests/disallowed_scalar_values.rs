@@ -1,4 +1,4 @@
-pub const DISALLOWED_SCALAR_VALUES: [char; 191] = [
+pub const DISALLOWED_SCALAR_VALUES: [char; 190] = [
     // All C0, U+7F, and C1 control codes other than U+A (newline),
     // U+9 (horizontal tab), U+D (carriage return), U+C (form feed),
     // U+7 (alert), U+1B (escape) and U+85 (NEL). Many of these are
@@ -26,7 +26,6 @@ pub const DISALLOWED_SCALAR_VALUES: [char; 191] = [
     '\u{18}',
     '\u{19}',
     '\u{1a}',
-    '\u{1b}',
     '\u{1c}',
     '\u{1d}',
     '\u{1e}',

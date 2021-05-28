@@ -68,8 +68,8 @@ Newlines are canonicalized:
  - LS and PS  are replaced by whitespace.
 
 Bare escape codes are replaced:
- - �
- - �
+ - 
+ - 
 
 While escape sequences are removed:
  - 

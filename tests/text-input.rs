@@ -215,8 +215,8 @@ fn test_text_input_escapes() {
     assert_eq!(to_text("\u{1b}\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}\u{1b}A"), "\n");
     assert_eq!(to_text("\u{1b}A\n"), "\n");
-    assert_eq!(to_text("\u{1b}\t"), "\u{fffd}\t\n");
-    assert_eq!(to_text("\u{1b}\n"), "\u{fffd}\n");
+    assert_eq!(to_text("\u{1b}\t"), "\t\n");
+    assert_eq!(to_text("\u{1b}\n"), "\n");
     assert_eq!(to_text("\u{1b}[["), "\n");
     assert_eq!(to_text("\u{1b}[[A"), "\n");
     assert_eq!(to_text("\u{1b}[[\0"), "\n");
@@ -226,10 +226,8 @@ fn test_text_input_escapes() {
     assert_eq!(to_text("\u{1b}[[\u{18}"), "\n");
     assert_eq!(to_text("\u{1b}[[\u{7}"), "\n");
     assert_eq!(to_text("\u{1b}[[\u{1b}A"), "A\n");
-
-    // Replace U+1B (ESC) otherwise with U+FFFD (REPLACEMENT CHARACTER).
-    assert_eq!(to_text("\u{1b}"), "\u{fffd}\n");
-    assert_eq!(to_text("\u{1b}\n"), "\u{fffd}\n");
+    assert_eq!(to_text("\u{1b}"), "\n");
+    assert_eq!(to_text("\u{1b}\n"), "\n");
 }
 
 #[test]

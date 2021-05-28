@@ -374,7 +374,7 @@ fn test_leading_nonstarters() {
 
 #[test]
 fn test_esc() {
-    test(b"\x1b", "\u{fffd}\n");
+    test(b"\x1b", "\n");
     test(b"\x1b@", "\n");
     test(b"\x1b@hello\x1b@world\x1b@", "helloworld\n");
 }

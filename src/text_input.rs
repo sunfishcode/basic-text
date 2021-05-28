@@ -5,7 +5,7 @@ use crate::{TextDuplexer, TextReader, TextSubstr};
 use basic_text_internals::{
     is_basic_text_end, is_basic_text_start, replace,
     unicode::{
-        BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS, REPL,
+        BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS,
     },
     unicode_normalization::{
         char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, Recompositions,
@@ -351,8 +351,6 @@ impl TextInput {
                         self.state = State::Ground(false);
                     }
                     (State::Esc, _) => {
-                        self.queue.push_back(REPL);
-                        self.expect_starter = false;
                         self.state = State::Ground(false);
                         continue;
                     }
@@ -437,15 +435,12 @@ impl TextInput {
                     internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(true);
                 }
-                State::Esc => {
-                    internals.impl_().queue.push_back(REPL);
-                }
                 State::Ff => {
                     internals.impl_().queue.push_back(' ');
                     internals.impl_().expect_starter = false;
                     internals.impl_().state = State::Ground(false);
                 }
-                State::CsiStart | State::Csi | State::Osc | State::Linux => {
+                State::Esc | State::CsiStart | State::Csi | State::Osc | State::Linux => {
                     internals.impl_().state = State::Ground(false);
                 }
             }
