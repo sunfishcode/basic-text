@@ -133,14 +133,14 @@ impl TextOutput {
 
     #[inline]
     pub(crate) fn with_bom_compatibility<Inner: WriteStr + WriteLayered>(
-        internals: &mut Inner,
+        inner: &mut Inner,
     ) -> io::Result<Self> {
         let result = Self::new();
 
         let mut bom_bytes = [0_u8; MAX_UTF8_SIZE];
         let bom_len = BOM.encode_utf8(&mut bom_bytes).len();
         // Safety: `bom_bytes` is valid UTF-8 because we just encoded it.
-        internals.write_all(&bom_bytes[..bom_len])?;
+        inner.write_all(&bom_bytes[..bom_len])?;
 
         // The BOM is not part of the logical content, so leave the stream in
         // Ground(Ground::Newline) mode, meaning we don't require a newline if
