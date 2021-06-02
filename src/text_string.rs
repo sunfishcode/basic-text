@@ -1247,12 +1247,14 @@ impl ToSocketAddrs for TextStr {
 impl TextError {
     /// Returns the index in the given string up to which valid Basic Text was
     /// verified.
+    #[inline]
     pub fn valid_up_to(&self) -> usize {
         self.valid_up_to
     }
 }
 
 impl From<Utf8Error> for TextError {
+    #[inline]
     fn from(err: Utf8Error) -> Self {
         Self {
             valid_up_to: err.valid_up_to(),

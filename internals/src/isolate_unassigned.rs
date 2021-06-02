@@ -11,6 +11,7 @@ pub struct IsolateUnassigned<I: Iterator<Item = char>> {
 }
 
 impl<I: Iterator<Item = char>> IsolateUnassigned<I> {
+    #[inline]
     pub fn new(iter: I) -> Self {
         Self {
             iter: Iterator::fuse(iter),
