@@ -14,7 +14,7 @@ publish = false
 rustc_version = "0.3.3"
 
 [dependencies]
-basic-text = { path = "..", version = "^0.3.4-alpha.0"}
+basic-text = { path = "..", version = "^0.4.0"}
 duplex = "0.4.0"
 layered-io = "0.5.2"
 unicode-normalization = "0.1.17"
