@@ -7,12 +7,16 @@ use std::{
 };
 #[cfg(feature = "terminal-io")]
 use terminal_io::{Terminal, TerminalColorSupport, WriteTerminal};
-#[cfg(not(windows))]
-use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
-use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
-use unsafe_io::OwnsRaw;
+use unsafe_io::os::windows::{
+    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
+};
 use utf8_io::{Utf8Writer, WriteStr};
+#[cfg(not(windows))]
+use {
+    io_lifetimes::{AsFd, BorrowedFd},
+    unsafe_io::os::posish::{AsRawFd, RawFd},
+};
 
 /// A `WriteLayered` implementation which translates to an output
 /// `WriteLayered` producing a valid Basic Text stream from an arbitrary
@@ -232,6 +236,14 @@ impl<Inner: WriteStr + WriteLayered + AsRawFd> AsRawFd for TextWriter<Inner> {
     }
 }
 
+#[cfg(not(windows))]
+impl<Inner: WriteStr + WriteLayered + AsFd> AsFd for TextWriter<Inner> {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        self.inner.as_fd()
+    }
+}
+
 #[cfg(windows)]
 impl<Inner: WriteStr + WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket
     for TextWriter<Inner>
@@ -242,8 +254,13 @@ impl<Inner: WriteStr + WriteLayered + AsRawHandleOrSocket> AsRawHandleOrSocket
     }
 }
 
-// Safety: `TextWriter` implements `OwnsRaw` if `Inner` does.
-unsafe impl<Inner: OwnsRaw> OwnsRaw for TextWriter<Inner> {}
+#[cfg(windows)]
+impl<Inner: WriteStr + WriteLayered + AsHandleOrSocket> AsHandleOrSocket for TextWriter<Inner> {
+    #[inline]
+    fn as_handle_or_socket(&self) -> BorrowedHandleOrSocket<'_> {
+        self.inner.as_handle_or_socket()
+    }
+}
 
 impl<Inner: Debug> Debug for TextWriter<Inner> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {

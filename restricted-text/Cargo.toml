@@ -14,12 +14,12 @@ publish = false
 rustc_version = "0.3.3"
 
 [dependencies]
-basic-text = { path = "..", version = "^0.4.0"}
-duplex = "0.4.0"
-layered-io = "0.5.2"
+basic-text = { path = "..", version = "^0.4.1-alpha.0"}
+duplex = "0.5.0"
+layered-io = "0.6.0"
 unicode-normalization = "0.1.17"
-unsafe-io = "0.6.2"
-utf8-io = { version = "0.4.0", features = ["layered-io"] }
+unsafe-io = "0.7.1"
+utf8-io = { version = "0.5.0", features = ["layered-io"] }
 
 [badges]
 maintenance = { status = "actively-developed" }

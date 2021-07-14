@@ -7,12 +7,16 @@ use std::{
 };
 #[cfg(feature = "terminal-io")]
 use terminal_io::{ReadTerminal, Terminal};
-#[cfg(not(windows))]
-use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
-use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
-use unsafe_io::OwnsRaw;
+use unsafe_io::os::windows::{
+    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
+};
 use utf8_io::{ReadStr, ReadStrLayered, Utf8Reader};
+#[cfg(not(windows))]
+use {
+    io_lifetimes::{AsFd, BorrowedFd},
+    unsafe_io::os::posish::{AsRawFd, RawFd},
+};
 
 /// A [`Read`] implementation which translates from an input `Read`
 /// implementation producing an arbitrary byte sequence into a valid Basic Text
@@ -201,6 +205,14 @@ impl<Inner: ReadStrLayered + AsRawFd> AsRawFd for TextReader<Inner> {
     }
 }
 
+#[cfg(not(windows))]
+impl<Inner: ReadStrLayered + AsFd> AsFd for TextReader<Inner> {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        self.inner.as_fd()
+    }
+}
+
 #[cfg(windows)]
 impl<Inner: ReadStrLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for TextReader<Inner> {
     #[inline]
@@ -209,8 +221,13 @@ impl<Inner: ReadStrLayered + AsRawHandleOrSocket> AsRawHandleOrSocket for TextRe
     }
 }
 
-// Safety: `TextReader` implements `OwnsRaw` if `Inner` does.
-unsafe impl<Inner: ReadStrLayered + OwnsRaw> OwnsRaw for TextReader<Inner> {}
+#[cfg(windows)]
+impl<Inner: ReadStrLayered + AsHandleOrSocket> AsHandleOrSocket for TextReader<Inner> {
+    #[inline]
+    fn as_handle_or_socket(&self) -> BorrowedHandleOrSocket<'_> {
+        self.inner.as_handle_or_socket()
+    }
+}
 
 impl<Inner: ReadStrLayered + Debug> Debug for TextReader<Inner> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {

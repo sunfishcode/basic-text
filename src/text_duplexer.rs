@@ -15,12 +15,16 @@ use std::{
 };
 #[cfg(feature = "terminal-io")]
 use terminal_io::{DuplexTerminal, ReadTerminal, Terminal, TerminalColorSupport, WriteTerminal};
-#[cfg(not(windows))]
-use unsafe_io::os::posish::{AsRawFd, RawFd};
 #[cfg(windows)]
-use unsafe_io::os::windows::{AsRawHandleOrSocket, RawHandleOrSocket};
-use unsafe_io::OwnsRaw;
+use unsafe_io::os::windows::{
+    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
+};
 use utf8_io::{ReadStr, ReadStrLayered, Utf8Duplexer, WriteStr};
+#[cfg(not(windows))]
+use {
+    io_lifetimes::{AsFd, BorrowedFd},
+    unsafe_io::os::posish::{AsRawFd, RawFd},
+};
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`
 /// implementation producing an arbitrary byte sequence into a valid Basic Text
@@ -405,6 +409,14 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawFd> AsRawFd for TextDu
     }
 }
 
+#[cfg(not(windows))]
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsFd> AsFd for TextDuplexer<Inner> {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        self.inner.as_fd()
+    }
+}
+
 #[cfg(windows)]
 impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawHandleOrSocket
     for TextDuplexer<Inner>
@@ -415,10 +427,14 @@ impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsRawHandleOrSocket> AsRawH
     }
 }
 
-// Safety: `TextDuplexer` implements `OwnsRaw` if `Inner` does.
-unsafe impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + OwnsRaw> OwnsRaw
+#[cfg(windows)]
+impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + AsHandleOrSocket> AsHandleOrSocket
     for TextDuplexer<Inner>
 {
+    #[inline]
+    fn as_handle_or_socket(&self) -> BorrowedHandleOrSocket<'_> {
+        self.inner.as_handle_or_socket()
+    }
 }
 
 impl<Inner: HalfDuplexLayered + ReadStr + WriteStr + Debug> Debug for TextDuplexer<Inner> {
