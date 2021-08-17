@@ -23,7 +23,7 @@ use utf8_io::{ReadStr, ReadStrLayered, Utf8Duplexer, WriteStr};
 #[cfg(not(windows))]
 use {
     io_lifetimes::{AsFd, BorrowedFd},
-    unsafe_io::os::posish::{AsRawFd, RawFd},
+    unsafe_io::os::rsix::{AsRawFd, RawFd},
 };
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`

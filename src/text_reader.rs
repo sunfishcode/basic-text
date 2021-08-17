@@ -15,7 +15,7 @@ use utf8_io::{ReadStr, ReadStrLayered, Utf8Reader};
 #[cfg(not(windows))]
 use {
     io_lifetimes::{AsFd, BorrowedFd},
-    unsafe_io::os::posish::{AsRawFd, RawFd},
+    unsafe_io::os::rsix::{AsRawFd, RawFd},
 };
 
 /// A [`Read`] implementation which translates from an input `Read`
