@@ -1,18 +1,15 @@
-use crate::{
-    text_input::TextInput, text_output::TextOutput, ReadText, ReadTextLayered, TextSubstr,
-    WriteText,
-};
+use crate::text_input::TextInput;
+use crate::text_output::TextOutput;
+use crate::{ReadText, ReadTextLayered, TextSubstr, WriteText};
 use duplex::{Duplex, HalfDuplex};
 use layered_io::{
     default_read_to_end, Bufferable, HalfDuplexLayered, LayeredDuplexer, ReadLayered, Status,
     WriteLayered,
 };
-use std::{
-    cmp::max,
-    fmt::{self, Debug, Formatter},
-    io::{self, Read, Write},
-    str,
-};
+use std::cmp::max;
+use std::fmt::{self, Debug, Formatter};
+use std::io::{self, Read, Write};
+use std::str;
 #[cfg(feature = "terminal-io")]
 use terminal_io::{DuplexTerminal, ReadTerminal, Terminal, TerminalColorSupport, WriteTerminal};
 #[cfg(windows)]
@@ -39,8 +36,8 @@ pub struct TextDuplexer<Inner: HalfDuplex + ReadStr + WriteStr> {
 }
 
 impl<Inner: HalfDuplex> TextDuplexer<Utf8Duplexer<LayeredDuplexer<Inner>>> {
-    /// Construct a new instance of `TextDuplexer` wrapping `inner`, which can be
-    /// anything that implements [`HalfDuplex`].
+    /// Construct a new instance of `TextDuplexer` wrapping `inner`, which can
+    /// be anything that implements [`HalfDuplex`].
     #[inline]
     pub fn new(inner: Inner) -> Self {
         Self::from_utf8(Utf8Duplexer::new(LayeredDuplexer::new(inner)))
@@ -58,9 +55,9 @@ impl<Inner: HalfDuplex> TextDuplexer<Utf8Duplexer<LayeredDuplexer<Inner>>> {
     /// "\r\n" for compatibility with consumers that need that.
     ///
     /// Note: This is not often needed; even on Windows these days most
-    /// things are ok with plain '\n' line endings, [including Windows Notepad].
-    /// The main notable things that really need them are IETF RFCs, for example
-    /// [RFC-5198].
+    /// things are ok with plain '\n' line endings, [including Windows
+    /// Notepad]. The main notable things that really need them are IETF
+    /// RFCs, for example [RFC-5198].
     ///
     /// [including Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C
@@ -96,9 +93,9 @@ impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + Wri
         }
     }
 
-    /// Like `from_utf8`, but writes a U+FEFF (BOM) to the beginning of the output
-    /// stream for compatibility with consumers that require that to determine
-    /// the text encoding.
+    /// Like `from_utf8`, but writes a U+FEFF (BOM) to the beginning of the
+    /// output stream for compatibility with consumers that require that to
+    /// determine the text encoding.
     #[inline]
     pub fn from_utf8_with_bom_compatibility(mut inner: Inner) -> io::Result<Self> {
         let output = TextOutput::with_bom_compatibility(&mut inner)?;
@@ -109,13 +106,13 @@ impl<Inner: HalfDuplex + ReadStr + ReadLayered + ReadStrLayered + WriteStr + Wri
         })
     }
 
-    /// Like `from_utf8`, but enables CRLF output mode, which translates "\n" to
-    /// "\r\n" for compatibility with consumers that need that.
+    /// Like `from_utf8`, but enables CRLF output mode, which translates "\n"
+    /// to "\r\n" for compatibility with consumers that need that.
     ///
     /// Note: This is not often needed; even on Windows these days most
-    /// things are ok with plain '\n' line endings, [including Windows Notepad].
-    /// The main notable things that really need them are IETF RFCs, for example
-    /// [RFC-5198].
+    /// things are ok with plain '\n' line endings, [including Windows
+    /// Notepad]. The main notable things that really need them are IETF
+    /// RFCs, for example [RFC-5198].
     ///
     /// [including Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C

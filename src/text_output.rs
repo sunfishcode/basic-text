@@ -2,26 +2,24 @@
 //! `TextDuplexer`.
 
 use crate::{TextDuplexer, TextSubstr, TextWriter};
+use basic_text_internals::unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB};
+use basic_text_internals::unicode_normalization::char::is_public_assigned;
+use basic_text_internals::unicode_normalization::{
+    is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization,
+};
 use basic_text_internals::{
-    is_basic_text_end, is_basic_text_start,
-    unicode::{BOM, ESC, MAX_UTF8_SIZE, SUB},
-    unicode_normalization::{
-        char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, UnicodeNormalization,
-    },
-    BasicTextError, PreNormalization,
+    is_basic_text_end, is_basic_text_start, BasicTextError, PreNormalization,
 };
 #[cfg(can_vector)]
 use layered_io::default_is_write_vectored;
 #[cfg(write_all_vectored)]
 use layered_io::default_write_all_vectored;
 use layered_io::{default_write_vectored, HalfDuplexLayered, WriteLayered};
-use std::{
-    cell::RefCell,
-    io::{self, Write},
-    mem::take,
-    rc::Rc,
-    str,
-};
+use std::cell::RefCell;
+use std::io::{self, Write};
+use std::mem::take;
+use std::rc::Rc;
+use std::str;
 use utf8_io::{ReadStrLayered, WriteStr};
 
 /// Abstract over `TextWriter` and the writer half of `TextDuplexer`.
@@ -118,9 +116,9 @@ impl TextOutput {
     /// "\r\n" for compatibility with consumers that need that.
     ///
     /// Note: This is not often needed; even on Windows these days most
-    /// things are ok with plain '\n' line endings, [including Windows Notepad].
-    /// The main notable things that really need them are IETF RFCs, for example
-    /// [RFC-5198].
+    /// things are ok with plain '\n' line endings, [including Windows
+    /// Notepad]. The main notable things that really need them are IETF
+    /// RFCs, for example [RFC-5198].
     ///
     /// [including Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
     /// [RFC-5198]: https://tools.ietf.org/html/rfc5198#appendix-C

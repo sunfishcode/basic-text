@@ -2,7 +2,8 @@
 //! and `TextSubstr`.
 
 use crate::{TextStr, TextString, TextSubstr, TextSubstring};
-use std::{borrow::Cow, str};
+use std::borrow::Cow;
+use std::str;
 
 impl PartialEq<TextStr> for str {
     #[inline]

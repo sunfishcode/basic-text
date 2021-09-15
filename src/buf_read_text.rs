@@ -1,9 +1,8 @@
 use crate::TextString;
-use basic_text_internals::{is_basic_text, is_basic_text_end, unicode::CGJ};
-use std::{
-    borrow::Cow,
-    io::{self, BufRead},
-};
+use basic_text_internals::unicode::CGJ;
+use basic_text_internals::{is_basic_text, is_basic_text_end};
+use std::borrow::Cow;
+use std::io::{self, BufRead};
 
 /// An extension trait for `BufRead` which adds functions for reading
 /// lines as `TextString`s.

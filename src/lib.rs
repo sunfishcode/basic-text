@@ -2,9 +2,9 @@
 //!
 //! This crate provides several utilities for working with [Basic Text].
 //!
-//!  - [`TextString`] and [`TextStr`] are similar to the standard library's [`String`]
-//!    and [`str`], but use the Basic Text string format, along with a
-//!    [`text!("...")` macro] for Basic Text string literals.
+//!  - [`TextString`] and [`TextStr`] are similar to the standard library's
+//!    [`String`] and [`str`], but use the Basic Text string format, along with
+//!    a [`text!("...")` macro] for Basic Text string literals.
 //!
 //!  - [`TextReader`] and [`TextWriter`] are input and output streams which use
 //!    the Basic Text stream format. On input, content is converted in a way
@@ -16,8 +16,8 @@
 //!    [`text_lines_lossy`] to [`BufRead`] implementations for reading lines
 //!    from an input stream as `BasicText` strings.
 //!
-//!  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an interactive
-//!    stream using Basic Text.
+//!  - [`TextDuplexer`] is a [`Duplex`] for reading and writing on an
+//!    interactive stream using Basic Text.
 //!
 //! # Examples
 //!
@@ -89,9 +89,8 @@ mod text_substring;
 mod text_writer;
 mod write_text;
 
-pub use basic_text_internals::{
-    unicode::NORMALIZATION_BUFFER_SIZE, unicode_normalization::UNICODE_VERSION,
-};
+pub use basic_text_internals::unicode::NORMALIZATION_BUFFER_SIZE;
+pub use basic_text_internals::unicode_normalization::UNICODE_VERSION;
 pub use basic_text_literals::{text, text_substr};
 pub use buf_read_text::{BufReadText, TextLines, TextLinesLossy};
 pub use copy::{copy_text, copy_text_using_status};

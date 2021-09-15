@@ -1,5 +1,6 @@
 use crate::{BasicTextError, Categorize, IsolateUnassigned};
-use std::{cell::RefCell, rc::Rc};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 /// An extension crate providing iterator transforms useful before
 /// normalization.

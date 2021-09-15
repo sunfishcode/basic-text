@@ -1,14 +1,13 @@
 //! On output, several disallowed scalar values are rejected, to catch
 //! applications attempting to use them.
 
-use crate::{
-    replace,
-    unicode::{BOM, ESC, ORC},
-};
+use crate::replace;
+use crate::unicode::{BOM, ESC, ORC};
 use std::collections::VecDeque;
 use thiserror::Error;
 
-/// Test whether the given Unicode scalar value is valid in a Basic Text string.
+/// Test whether the given Unicode scalar value is valid in a Basic Text
+/// string.
 #[inline]
 pub fn check_basic_text_char(c: char) -> Result<(), BasicTextError> {
     match c {

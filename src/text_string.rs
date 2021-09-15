@@ -1,33 +1,29 @@
 //! The `TextString` and `TextStr` types.
 
 use crate::{ReadText, TextReader, TextSubstr, TextWriter};
-use basic_text_internals::{
-    is_basic_text, is_basic_text_start,
-    unicode::{BOM, CGJ, WJ},
-};
+use basic_text_internals::unicode::{BOM, CGJ, WJ};
+use basic_text_internals::{is_basic_text, is_basic_text_start};
 use layered_io::Bufferable;
+use std::borrow::{Borrow, BorrowMut, Cow};
+use std::cmp::Ordering;
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
+use std::error::Error;
+use std::ffi::OsStr;
+use std::fmt::{self, Debug, Display, Formatter};
+use std::hash::Hash;
+use std::io::{self, Read, Write};
+use std::net::{SocketAddr, ToSocketAddrs};
+use std::ops::{Add, AddAssign, Deref, DerefMut, Index, Range, RangeFrom, RangeTo};
+use std::path::Path;
 #[cfg(pattern)]
 use std::str::pattern::{Pattern, ReverseSearcher};
-use std::{
-    borrow::{Borrow, BorrowMut, Cow},
-    cmp::Ordering,
-    error::Error,
-    ffi::OsStr,
-    fmt::{self, Debug, Display, Formatter},
-    hash::Hash,
-    io::{self, Read, Write},
-    net::{SocketAddr, ToSocketAddrs},
-    ops::{Add, AddAssign, Deref, DerefMut, Index, Range, RangeFrom, RangeTo},
-    path::Path,
-    str::{
-        self, Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode,
-        FromStr, Lines, MatchIndices, Matches, RMatchIndices, RMatches, Utf8Error,
-    },
-    string::FromUtf8Error,
-    vec,
+use std::str::{
+    self, Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode,
+    FromStr, Lines, MatchIndices, Matches, RMatchIndices, RMatches, Utf8Error,
 };
+use std::string::FromUtf8Error;
+use std::vec;
 use utf8_io::WriteStr;
 
 /// A Basic Text encoded, growable string.
@@ -38,7 +34,8 @@ use utf8_io::WriteStr;
 ///
 /// # Examples
 ///
-/// You can create a `TextString` from a literal text string with `TextString::from`:
+/// You can create a `TextString` from a literal text string with
+/// `TextString::from`:
 ///
 /// ```rust
 /// use basic_text::{text, TextString};
@@ -107,8 +104,8 @@ pub struct TextString(pub(crate) String);
 /// let hello: &'static TextStr = text!("Hello, world!");
 /// ```
 ///
-/// They are 'static because they’re stored directly in the final binary, and so
-/// will be valid for the 'static duration.
+/// They are 'static because they’re stored directly in the final binary, and
+/// so will be valid for the 'static duration.
 #[derive(PartialEq, Eq, Hash, Debug)]
 #[repr(transparent)]
 pub struct TextStr(pub(crate) str);
@@ -926,8 +923,8 @@ impl TextStr {
         self.0.find(pat)
     }
 
-    /// Returns the byte index for the first character of the rightmost match of
-    /// the pattern in this text string slice.
+    /// Returns the byte index for the first character of the rightmost match
+    /// of the pattern in this text string slice.
     ///
     /// Returns `None` if the pattern doesn't match.
     #[cfg(pattern)]
@@ -940,8 +937,8 @@ impl TextStr {
         self.0.rfind(pat)
     }
 
-    /// Returns the byte index for the first character of the rightmost match of
-    /// the pattern in this text string slice.
+    /// Returns the byte index for the first character of the rightmost match
+    /// of the pattern in this text string slice.
     ///
     /// Returns `None` if the pattern doesn't match.
     #[cfg(not(pattern))]
@@ -1038,7 +1035,8 @@ impl TextStr {
         self.0.rmatch_indices(pat)
     }
 
-    /// Returns a text string slice with leading and trailing whitespace removed.
+    /// Returns a text string slice with leading and trailing whitespace
+    /// removed.
     #[inline]
     pub fn trim(&self) -> &Self {
         unsafe { Self::from_text_unchecked(self.0.trim()) }
@@ -1056,7 +1054,8 @@ impl TextStr {
         unsafe { Self::from_text_unchecked(self.0.trim_end()) }
     }
 
-    // TODO: trim_matches, trim_start_matches, strip_prefix, strip_suffix, trim_end_matches?
+    // TODO: trim_matches, trim_start_matches, strip_prefix, strip_suffix,
+    // trim_end_matches?
 
     /// Parses this text string slice into another type.
     #[inline]
@@ -1096,7 +1095,8 @@ impl TextStr {
         self.into()
     }
 
-    /// Converts a `Box<TextStr>` into a `String` without copying or allocating.
+    /// Converts a `Box<TextStr>` into a `String` without copying or
+    /// allocating.
     #[inline]
     pub fn into_string(self: Box<Self>) -> String {
         let slice = Box::<[u8]>::from(self);
@@ -1543,7 +1543,8 @@ fn validate_string() {
 
 #[test]
 fn split_escape() {
-    //assert_eq!(TextStr::from_text_bytes(b"\x1b[!p").unwrap_err().valid_up_to(), 0);
+    //assert_eq!(TextStr::from_text_bytes(b"\x1b[!p").unwrap_err().valid_up_to(),
+    // 0);
     assert_eq!(
         TextStr::from_text_bytes(b"\x1b[p")
             .unwrap_err()

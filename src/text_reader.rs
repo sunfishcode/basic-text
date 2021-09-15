@@ -1,10 +1,9 @@
-use crate::{text_input::TextInput, ReadText, ReadTextLayered, TextSubstr};
+use crate::text_input::TextInput;
+use crate::{ReadText, ReadTextLayered, TextSubstr};
 use layered_io::{default_read_to_end, Bufferable, LayeredReader, ReadLayered, Status};
-use std::{
-    fmt::{self, Debug, Formatter},
-    io::{self, Read},
-    str,
-};
+use std::fmt::{self, Debug, Formatter};
+use std::io::{self, Read};
+use std::str;
 #[cfg(feature = "terminal-io")]
 use terminal_io::{ReadTerminal, Terminal};
 #[cfg(windows)]

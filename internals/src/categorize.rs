@@ -1,8 +1,10 @@
 //! On output, several disallowed scalar values are rejected, to catch
 //! applications attempting to use them.
 
-use crate::{check_basic_text_char, unicode::SUB, BasicTextError};
-use std::{cell::RefCell, rc::Rc};
+use crate::unicode::SUB;
+use crate::{check_basic_text_char, BasicTextError};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub struct Categorize<Iter: Iterator<Item = char>> {
     iter: Iter,

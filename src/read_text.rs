@@ -31,8 +31,8 @@ pub trait ReadTextLayered: ReadStrLayered {
     /// the resulting data may not be a Basic Text string, as it may be eg. a
     /// portion of a stream that starts with a non-starter.
     ///
-    /// `buf` must be at least `NORMALIZATION_BUFFER_SIZE` bytes long, so that any
-    /// valid normalized sequence can be read.
+    /// `buf` must be at least `NORMALIZATION_BUFFER_SIZE` bytes long, so that
+    /// any valid normalized sequence can be read.
     fn read_text_substr_with_status(&mut self, buf: &mut TextSubstr)
         -> io::Result<(usize, Status)>;
 
@@ -40,8 +40,9 @@ pub trait ReadTextLayered: ReadStrLayered {
     /// As with `read_text`, the resulting string may not be a Basic Text
     /// string.
     ///
-    /// Also, like `ReadText::read_exact_text`, but uses `read_text_with_status`
-    /// to avoid performing an extra `read` at the end.
+    /// Also, like `ReadText::read_exact_text`, but uses
+    /// `read_text_with_status` to avoid performing an extra `read` at the
+    /// end.
     #[inline]
     fn read_exact_text_substr_using_status(&mut self, buf: &mut TextSubstr) -> io::Result<Status> {
         default_read_exact_text_substr_using_status(self, buf)
@@ -71,7 +72,8 @@ pub fn default_read_exact_text_substr<Inner: ReadText + ?Sized>(
     }
 }
 
-/// Default implementation of [`ReadTextLayered::read_exact_text_substr_using_status`].
+/// Default implementation of
+/// [`ReadTextLayered::read_exact_text_substr_using_status`].
 pub fn default_read_exact_text_substr_using_status<Inner: ReadTextLayered + ?Sized>(
     inner: &mut Inner,
     mut buf: &mut TextSubstr,

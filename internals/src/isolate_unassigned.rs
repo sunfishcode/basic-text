@@ -1,4 +1,5 @@
-use crate::{text_utils::is_private_use_area, unicode::CGJ};
+use crate::text_utils::is_private_use_area;
+use crate::unicode::CGJ;
 use std::iter::Fuse;
 use unicode_normalization::char::is_public_assigned;
 

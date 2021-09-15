@@ -1,6 +1,7 @@
 use crate::{ReadText, ReadTextLayered, TextSubstr, WriteText};
 use layered_io::Bufferable;
-use std::{cmp::max, io};
+use std::cmp::max;
+use std::io;
 
 /// Like [`std::io::copy`], but for streams that can operate directly on text
 /// strings, so we can avoid re-validating them as text.
@@ -31,8 +32,8 @@ pub fn copy_text<R: ReadText + Bufferable + ?Sized, W: WriteText + Bufferable + 
 /// Like [`std::io::copy`], but for streams that can operate directly on text
 /// strings, so we can avoid re-validating them as text.
 ///
-/// Also, like `copy_text`, but uses `read_text_substr_with_status` to avoid performing
-/// an extra `read` at the end.
+/// Also, like `copy_text`, but uses `read_text_substr_with_status` to avoid
+/// performing an extra `read` at the end.
 pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Bufferable + ?Sized>(
     reader: &mut R,
     writer: &mut W,
@@ -60,7 +61,8 @@ pub fn copy_text_using_status<R: ReadTextLayered + ?Sized, W: WriteText + Buffer
 #[test]
 fn test_copy_text() {
     use crate::{TextReader, TextStr, TextWriter};
-    use std::{io::Cursor, str};
+    use std::io::Cursor;
+    use std::str;
 
     let text = "hello world ☃\n";
     let mut input = TextReader::new(Cursor::new(text.to_owned()));
@@ -79,7 +81,8 @@ fn test_copy_text() {
 #[test]
 fn test_copy_text_using_status() {
     use crate::{TextReader, TextStr, TextWriter};
-    use std::{io::Cursor, str};
+    use std::io::Cursor;
+    use std::str;
 
     let text = "hello world ☃";
     let mut input = TextReader::new(Cursor::new(text.to_owned()));

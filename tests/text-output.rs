@@ -37,9 +37,9 @@ fn to_text_with_crlf_compatibility(input: &str) -> io::Result<String> {
 #[test]
 fn test_text_output_nfc() {
     // TODO: Test that all the following are done:
-    // - Convert all CJK Compatibility Ideograph scalar values that have corresponding
-    //   [Standardized Variations] into their corresponding standardized variation
-    //   sequences.
+    // - Convert all CJK Compatibility Ideograph scalar values that have
+    //   corresponding [Standardized Variations] into their corresponding
+    //   standardized variation sequences.
     // - Apply the [Stream-Safe Text Process (UAX15-D4)].
     // - Apply `toNFC` according to the [Normalization Process].
     //
@@ -49,7 +49,8 @@ fn test_text_output_nfc() {
 
 #[test]
 fn test_bom_compatibility() {
-    // As an option (BOM compatibility), off by default, prepend U+FEFF to the stream.
+    // As an option (BOM compatibility), off by default, prepend U+FEFF to the
+    // stream.
     assert_eq!(to_text_with_bom_compatibility("").unwrap(), "\u{feff}");
     assert_eq!(to_text_with_bom_compatibility("\n").unwrap(), "\u{feff}\n");
     assert_eq!(

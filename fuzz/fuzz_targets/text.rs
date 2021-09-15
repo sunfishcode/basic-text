@@ -5,10 +5,8 @@ extern crate libfuzzer_sys;
 
 use basic_text::{TextReader, TextStr, TextWriter};
 use layered_io::SliceReader;
-use std::{
-    io::{Read, Write},
-    str,
-};
+use std::io::{Read, Write};
+use std::str;
 use utf8_io::Utf8Reader;
 
 fuzz_target!(|bytes: &[u8]| {

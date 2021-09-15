@@ -1,31 +1,27 @@
 //! The `TextSubstring` and `TextSubstr` types.
 
 use crate::{FromTextError, TextError, TextReader, TextWriter};
-use basic_text_internals::{
-    is_basic_text_substr,
-    unicode::{BOM, WJ},
-};
+use basic_text_internals::is_basic_text_substr;
+use basic_text_internals::unicode::{BOM, WJ};
 use layered_io::Bufferable;
+use std::borrow::{Borrow, BorrowMut, Cow};
+use std::cmp::Ordering;
 #[cfg(try_reserve)]
 use std::collections::TryReserveError;
+use std::ffi::OsStr;
+use std::fmt::{self, Debug, Display, Formatter};
+use std::hash::Hash;
+use std::io::{self, Read, Write};
+use std::net::{SocketAddr, ToSocketAddrs};
+use std::ops::{Deref, DerefMut, Index, Range, RangeFrom, RangeTo};
+use std::path::Path;
 #[cfg(pattern)]
 use std::str::pattern::{Pattern, ReverseSearcher};
-use std::{
-    borrow::{Borrow, BorrowMut, Cow},
-    cmp::Ordering,
-    ffi::OsStr,
-    fmt::{self, Debug, Display, Formatter},
-    hash::Hash,
-    io::{self, Read, Write},
-    net::{SocketAddr, ToSocketAddrs},
-    ops::{Deref, DerefMut, Index, Range, RangeFrom, RangeTo},
-    path::Path,
-    str::{
-        self, Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode,
-        FromStr, Lines, MatchIndices, Matches, RMatchIndices, RMatches,
-    },
-    vec,
+use std::str::{
+    self, Bytes, CharIndices, Chars, EncodeUtf16, EscapeDebug, EscapeDefault, EscapeUnicode,
+    FromStr, Lines, MatchIndices, Matches, RMatchIndices, RMatches,
 };
+use std::vec;
 use utf8_io::WriteStr;
 
 /// A substring of a Basic Text string or stream.
@@ -43,7 +39,8 @@ use utf8_io::WriteStr;
 ///
 /// # Examples
 ///
-/// You can create a `TextSubstring` from a literal text string with `TextSubstring::from`:
+/// You can create a `TextSubstring` from a literal text string with
+/// `TextSubstring::from`:
 ///
 /// ```rust
 /// use basic_text::{text_substr, TextSubstring};
@@ -182,8 +179,8 @@ impl TextSubstring {
 
     // TODO: from_raw_parts, from_utf16*
 
-    /// Converts a vector of bytes to a `TextSubstring` without checking that the
-    /// string contains valid Basic Text.
+    /// Converts a vector of bytes to a `TextSubstring` without checking that
+    /// the string contains valid Basic Text.
     ///
     /// # Safety
     ///
@@ -197,8 +194,8 @@ impl TextSubstring {
         Self::from_text_unchecked(String::from_utf8_unchecked(vec))
     }
 
-    /// Converts a `String` to a `TextSubstring` without checking that the string
-    /// contains valid Basic Text.
+    /// Converts a `String` to a `TextSubstring` without checking that the
+    /// string contains valid Basic Text.
     ///
     /// # Safety
     ///
@@ -233,7 +230,8 @@ impl TextSubstring {
         &self.0
     }
 
-    /// Extracts a Basic Text string slice containing the entire `TextSubstring`.
+    /// Extracts a Basic Text string slice containing the entire
+    /// `TextSubstring`.
     #[inline]
     #[must_use]
     pub fn as_text(&self) -> &TextSubstr {
@@ -261,8 +259,8 @@ impl TextSubstring {
         self.0.reserve(additional);
     }
 
-    /// Ensures that this `TextSubstring`'s capacity is `additional` bytes larger
-    /// than its length.
+    /// Ensures that this `TextSubstring`'s capacity is `additional` bytes
+    /// larger than its length.
     #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
         self.0.reserve_exact(additional);
@@ -341,8 +339,8 @@ impl TextSubstring {
         self.0.len()
     }
 
-    /// Returns `true` if this `TextSubstring` has a length of zero, and `false`
-    /// otherwise.
+    /// Returns `true` if this `TextSubstring` has a length of zero, and
+    /// `false` otherwise.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
@@ -640,10 +638,11 @@ impl TextSubstr {
     /// # Safety
     ///
     /// The caller must ensure that the content of the slice is valid
-    /// Basic Text before the borrow ends and the underlying `TextSubstr` is used.
+    /// Basic Text before the borrow ends and the underlying `TextSubstr` is
+    /// used.
     ///
-    /// Use of a `TextSubstr` whose contents are not valid Basic Text is undefined
-    /// behavior.
+    /// Use of a `TextSubstr` whose contents are not valid Basic Text is
+    /// undefined behavior.
     #[inline]
     pub unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
         self.0.as_bytes_mut()
@@ -819,8 +818,8 @@ impl TextSubstr {
         self.0.find(pat)
     }
 
-    /// Returns the byte index for the first character of the rightmost match of
-    /// the pattern in this text string slice.
+    /// Returns the byte index for the first character of the rightmost match
+    /// of the pattern in this text string slice.
     ///
     /// Returns `None` if the pattern doesn't match.
     #[cfg(pattern)]
@@ -833,8 +832,8 @@ impl TextSubstr {
         self.0.rfind(pat)
     }
 
-    /// Returns the byte index for the first character of the rightmost match of
-    /// the pattern in this text string slice.
+    /// Returns the byte index for the first character of the rightmost match
+    /// of the pattern in this text string slice.
     ///
     /// Returns `None` if the pattern doesn't match.
     #[cfg(not(pattern))]
@@ -912,7 +911,8 @@ impl TextSubstr {
     /// An iterator over the disjoint matches of a pattern within `self`,
     /// yielded in reverse order along with the index of the match.
     ///
-    /// TODO: There should be a `TextRMatchIndices` which yields `&TextSubstr`s.
+    /// TODO: There should be a `TextRMatchIndices` which yields
+    /// `&TextSubstr`s.
     #[cfg(pattern)]
     #[inline]
     pub fn rmatch_indices<'a, P>(&'a self, pat: P) -> RMatchIndices<'a, P>
@@ -931,7 +931,8 @@ impl TextSubstr {
         self.0.rmatch_indices(pat)
     }
 
-    /// Returns a text string slice with leading and trailing whitespace removed.
+    /// Returns a text string slice with leading and trailing whitespace
+    /// removed.
     #[inline]
     pub fn trim(&self) -> &Self {
         unsafe { Self::from_text_unchecked(self.0.trim()) }
@@ -949,7 +950,8 @@ impl TextSubstr {
         unsafe { Self::from_text_unchecked(self.0.trim_end()) }
     }
 
-    // TODO: trim_matches, trim_start_matches, strip_prefix, strip_suffix, trim_end_matches?
+    // TODO: trim_matches, trim_start_matches, strip_prefix, strip_suffix,
+    // trim_end_matches?
 
     /// Parses this text string slice into another type.
     #[inline]
@@ -989,7 +991,8 @@ impl TextSubstr {
         self.into()
     }
 
-    /// Converts a `Box<TextSubstr>` into a `String` without copying or allocating.
+    /// Converts a `Box<TextSubstr>` into a `String` without copying or
+    /// allocating.
     #[inline]
     pub fn into_string(self: Box<Self>) -> String {
         let slice = Box::<[u8]>::from(self);
@@ -1347,7 +1350,8 @@ fn validate_string() {
 
 #[test]
 fn split_escape() {
-    //assert_eq!(TextSubstr::from_text_bytes(b"\x1b[!p").unwrap_err().valid_up_to(), 0);
+    //assert_eq!(TextSubstr::from_text_bytes(b"\x1b[!p").unwrap_err().
+    // valid_up_to(), 0);
     assert_eq!(
         TextSubstr::from_text_bytes(b"\x1b[p")
             .unwrap_err()

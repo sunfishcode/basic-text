@@ -5,11 +5,10 @@
 //! Ideally the major predicates in this file should be auto-generated from
 //! the Unicode data files rather than manually maintained.
 
-use crate::{
-    pre_normalization::PreNormalization,
-    unicode::{is_normalization_form_starter, ESC, SUB, ZWJ},
-};
-use std::{cell::RefCell, rc::Rc};
+use crate::pre_normalization::PreNormalization;
+use crate::unicode::{is_normalization_form_starter, ESC, SUB, ZWJ};
+use std::cell::RefCell;
+use std::rc::Rc;
 use unicode_normalization::{is_nfc_stream_safe, is_nfc_stream_safe_quick, IsNormalized};
 
 /// Test whether `c` is a valid start value for a string in Basic Text.

@@ -2,25 +2,22 @@
 //! `TextDuplexer`.
 
 use crate::{TextDuplexer, TextReader, TextSubstr};
+use basic_text_internals::unicode::{
+    BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS,
+};
+use basic_text_internals::unicode_normalization::char::is_public_assigned;
+use basic_text_internals::unicode_normalization::{
+    is_nfc_stream_safe_quick, IsNormalized, Recompositions, Replacements, StreamSafe,
+    UnicodeNormalization,
+};
 use basic_text_internals::{
-    is_basic_text_end, is_basic_text_start, replace,
-    unicode::{
-        BEL, BOM, CAN, CGJ, DEL, ESC, LS, MAX_UTF8_SIZE, NEL, NORMALIZATION_BUFFER_SIZE, PS,
-    },
-    unicode_normalization::{
-        char::is_public_assigned, is_nfc_stream_safe_quick, IsNormalized, Recompositions,
-        Replacements, StreamSafe, UnicodeNormalization,
-    },
-    IsolateUnassigned, PreNormalization,
+    is_basic_text_end, is_basic_text_start, replace, IsolateUnassigned, PreNormalization,
 };
 use layered_io::{default_read, HalfDuplexLayered, Status, WriteLayered};
-use std::{
-    cmp::max,
-    collections::{vec_deque, VecDeque},
-    io,
-    mem::take,
-    str,
-};
+use std::cmp::max;
+use std::collections::{vec_deque, VecDeque};
+use std::mem::take;
+use std::{io, str};
 use utf8_io::{ReadStrLayered, WriteStr};
 
 /// Abstract over `TextReader` and the reader half of `TextDuplexer`.
@@ -75,8 +72,8 @@ pub(crate) struct TextInput {
 
     /// A queue of scalar values which have been translated but not written to
     /// the output yet.
-    /// TODO: This is awkward; what we really want here is a streaming stream-safe
-    /// and NFC translator.
+    /// TODO: This is awkward; what we really want here is a streaming
+    /// stream-safe and NFC translator.
     queue: VecDeque<char>,
 
     /// An iterator over the chars in `self.queue`.
