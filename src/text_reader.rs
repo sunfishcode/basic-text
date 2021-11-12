@@ -1,20 +1,20 @@
 use crate::text_input::TextInput;
 use crate::{ReadText, ReadTextLayered, TextSubstr};
+#[cfg(windows)]
+use io_extras::os::windows::{
+    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
+};
 use layered_io::{default_read_to_end, Bufferable, LayeredReader, ReadLayered, Status};
 use std::fmt::{self, Debug, Formatter};
 use std::io::{self, Read};
 use std::str;
 #[cfg(feature = "terminal-io")]
 use terminal_io::{ReadTerminal, Terminal};
-#[cfg(windows)]
-use unsafe_io::os::windows::{
-    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
-};
 use utf8_io::{ReadStr, ReadStrLayered, Utf8Reader};
 #[cfg(not(windows))]
 use {
+    io_extras::os::rustix::{AsRawFd, RawFd},
     io_lifetimes::{AsFd, BorrowedFd},
-    unsafe_io::os::rsix::{AsRawFd, RawFd},
 };
 
 /// A [`Read`] implementation which translates from an input `Read`

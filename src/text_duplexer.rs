@@ -2,6 +2,10 @@ use crate::text_input::TextInput;
 use crate::text_output::TextOutput;
 use crate::{ReadText, ReadTextLayered, TextSubstr, WriteText};
 use duplex::{Duplex, HalfDuplex};
+#[cfg(windows)]
+use io_extras::os::windows::{
+    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
+};
 use layered_io::{
     default_read_to_end, Bufferable, HalfDuplexLayered, LayeredDuplexer, ReadLayered, Status,
     WriteLayered,
@@ -12,15 +16,11 @@ use std::io::{self, Read, Write};
 use std::str;
 #[cfg(feature = "terminal-io")]
 use terminal_io::{DuplexTerminal, ReadTerminal, Terminal, TerminalColorSupport, WriteTerminal};
-#[cfg(windows)]
-use unsafe_io::os::windows::{
-    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
-};
 use utf8_io::{ReadStr, ReadStrLayered, Utf8Duplexer, WriteStr};
 #[cfg(not(windows))]
 use {
+    io_extras::os::rustix::{AsRawFd, RawFd},
     io_lifetimes::{AsFd, BorrowedFd},
-    unsafe_io::os::rsix::{AsRawFd, RawFd},
 };
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`

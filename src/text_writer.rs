@@ -1,20 +1,20 @@
 use crate::text_output::TextOutput;
 use crate::{TextSubstr, WriteText};
+#[cfg(windows)]
+use io_extras::os::windows::{
+    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
+};
 use layered_io::{Bufferable, LayeredWriter, WriteLayered};
 use std::fmt::{self, Debug, Formatter};
 use std::io::{self, Write};
 use std::str;
 #[cfg(feature = "terminal-io")]
 use terminal_io::{Terminal, TerminalColorSupport, WriteTerminal};
-#[cfg(windows)]
-use unsafe_io::os::windows::{
-    AsHandleOrSocket, AsRawHandleOrSocket, BorrowedHandleOrSocket, RawHandleOrSocket,
-};
 use utf8_io::{Utf8Writer, WriteStr};
 #[cfg(not(windows))]
 use {
+    io_extras::os::rustix::{AsRawFd, RawFd},
     io_lifetimes::{AsFd, BorrowedFd},
-    unsafe_io::os::rsix::{AsRawFd, RawFd},
 };
 
 /// A `WriteLayered` implementation which translates to an output
