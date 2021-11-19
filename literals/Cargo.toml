@@ -1,6 +1,6 @@
 [package]
 name = "basic-text-literals"
-version = "0.9.1-alpha.0"
+version = "0.9.1"
 description = "Basic Text string literal macro for basic-text"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 edition = "2018"
