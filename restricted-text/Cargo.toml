@@ -10,9 +10,6 @@ repository = "https://github.com/sunfishcode/basic-text"
 edition = "2018"
 publish = false
 
-[build-dependencies]
-rustc_version = "0.4.0"
-
 [dependencies]
 basic-text = { path = "..", version = "^0.9.1-alpha.0"}
 duplex = "0.9.0"
