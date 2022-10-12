@@ -11,6 +11,10 @@ This site discusses three formats.
      which are used in many contexts. It excludes control characters and other
      content unnecessary or impractical for text.
 
+ - [Terminal Support](Terminal.md)
+   - This describes a language supporting ANSI-style terminal codes that can be
+     layered on top of Basic Text.
+
  - [Restricted Text](RestrictedText.md)
    - Restricted Text is a hypothetical format at this time.
    - Like Basic Text, but aims to reduce visual ambiguity by trading off some
