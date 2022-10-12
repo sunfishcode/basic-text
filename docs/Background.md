@@ -25,7 +25,7 @@ compatibility.
 In the future, Basic Text is expected to have a stability policy where
 strings which are valid in one version remain valid in newer versions,
 even as Unicode and NFC evolve. Unassigned scalar values are isolated with
-CGJs to proect them from future normalizations. Older versions should still
+CGJs to protect them from future normalizations. Older versions should still
 be able to read newer strings, though they may insert extra CGJs to isolate
 scalar values they don't recognize.
 

@@ -184,7 +184,7 @@ plain text:
    U+A.
  - Perform the Replacement actions from the [Sequence Table].
  - For any scalar value with `General_Category` of `Unassigned` that
-   isn't already preceeded by U+34F, insert U+34F before it.
+   isn't already preceded by U+34F, insert U+34F before it.
  - For any scalar value with `General_Category` of `Unassigned` that
    isn't already followed by U+34F, insert U+34F after it.
  - Perform the [Stream-Safe Text Process (UAX15-D4)].
@@ -214,7 +214,7 @@ the content is not valid Basic Text:
  - Perform the Error actions from the [Sequence Table].
  - When [*CRLF Compatibility*] is enabled, replace any U+A with U+D U+A.
  - For any scalar value with `General_Category` of `Unassigned` that
-   isn't already preceeded by U+34F, insert U+34F before it.
+   isn't already preceded by U+34F, insert U+34F before it.
  - For any scalar value with `General_Category` of `Unassigned` that
    isn't already followed by U+34F, insert U+34F after it.
  - Perform the [Stream-Safe Text Process (UAX15-D4)].

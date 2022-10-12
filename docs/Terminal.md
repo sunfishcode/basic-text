@@ -1,6 +1,6 @@
 # Terminal Support
 
-This document describes extentions to [Basic Text] adding ANSI-style terminal
+This document describes extensions to [Basic Text] adding ANSI-style terminal
 features. It is experimental.
 
 [Basic Text]: BasicText.md
@@ -239,7 +239,7 @@ The following [control codes](#control-code) are recognized:
 | Code   | Meaning     | Notes                                               |
 | ------ | ----------- | --------------------------------------------------- |
 | U+0 | Ctrl-Space  |                                                     |
-| U+8 | Ctrl-`H`    | Despite U+8 being historically called "backspace" in ACSII, this isn't the backspace key |
+| U+8 | Ctrl-`H`    | Despite U+8 being historically called "backspace" in ASCII, this isn't the backspace key |
 | U+9 | Tab         |                                                     |
 | U+A | Enter       | U+A means "end of line"                          |
 | U+11 | Ctrl-`Q`    | When enabled in the terminal input mode             |
@@ -269,7 +269,7 @@ Except as specified otherwise above, U+1 through U+1A are recognized as
 Ctrl-`A` through Ctrl-`Z`, respectively.
 
 Codes with values U+0 through U+7F, except for U+5B (`[`) and
-U+5D (`]`), may be preceeded by U+1B indicating the Alt modifier.
+U+5D (`]`), may be preceded by U+1B indicating the Alt modifier.
 
 When a program is resumed from being suspended, any streams open in immediate
 input mode are passed a U+C (Ctrl-L). Applications are encouraged to

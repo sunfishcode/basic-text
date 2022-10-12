@@ -37,7 +37,7 @@ choice for the [Restricted Text] format.
    where two strings that look the same contain different scalar values, making
    content easier to work with.
 
-## Whare are the potential disadvantages?
+## Where are the potential disadvantages?
 
 The following are some notes about various situations where NFC has been
 considered to be semantically lossy.
