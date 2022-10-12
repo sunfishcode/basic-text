@@ -92,7 +92,7 @@ Lossy conversion implicitly adds a line terminator at the end if needed, and
 strict conversion requires a line terminator at the end if needed.
 
 [POSIX uses]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_243
-[Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode13.0.0/ch05.pdf#G10213
+[Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode15.0.0/ch05.pdf#G10213
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
 
@@ -192,7 +192,7 @@ letter forms, so they're already excluded from NFC. Rejecting them in
 strict conversion means that any assumptions about them being handled
 differently from the regular letter forms will be promptly corrected.
 
-[recommends]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G25.14143
+[recommends]: https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#G25.14143
 
 ### Characters Whose Use Is Discouraged
 
@@ -202,7 +202,7 @@ Khmer scalar values U+17B4 and U+17B5
 
 For the Cyrillic value U+2DF5, Unicode [prefers] the sequence U+2DED U+2DEE.
 
-[prefers]: https://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf#G10.28571
+[prefers]: https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf#G10.28571
 
 ### "Forbidden Characters"
 
@@ -428,7 +428,7 @@ parties with private agreements.
 The [Basic Text] format here is more focused on being just a plain text format
 with just enough information to permit the text to be rendered legibly.
 
-[Unicode definition of "plain text"]: https://www.unicode.org/versions/Unicode13.0.0/ch02.pdf#G642
+[Unicode definition of "plain text"]: https://www.unicode.org/versions/Unicode15.0.0/ch02.pdf#G642
 
 ### Relationship to "What makes a Unicode code point safe?"
 

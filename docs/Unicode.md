@@ -27,4 +27,4 @@ succeeds but potentially loses information about invalid encodings:
 [From byte sequence to Unicode string]: #from-byte-sequence-to-unicode-string
 [Basic Text]: BasicText.md
 [Unicode Scalar Values]: https://unicode.org/glossary/#unicode_scalar_value
-[U+FFFD Substitution of Maximal Subparts]: https://www.unicode.org/versions/Unicode13.0.0/ch03.pdf#G66453
+[U+FFFD Substitution of Maximal Subparts]: https://www.unicode.org/versions/Unicode15.0.0/ch03.pdf#G66453

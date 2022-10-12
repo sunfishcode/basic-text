@@ -21,4 +21,4 @@ The [background information] contains rationale and source information.
 
 [background information]: Background.md
 [Unicode Scalar Values]: https://unicode.org/glossary/#unicode_scalar_value
-[Unicode encoding form]: https://unicode.org/versions/Unicode13.0.0/ch03.pdf#G7404
+[Unicode encoding form]: https://unicode.org/versions/Unicode15.0.0/ch03.pdf#G7404

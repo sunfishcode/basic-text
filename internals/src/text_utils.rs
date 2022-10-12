@@ -1,6 +1,6 @@
 //! This file contains various utilities which are sensitive to the Unicode
-//! version. Is is currently up to date with Unicode 13.0.0 and
-//! Unicode Text Segmentation revision 37.
+//! version. Is is currently up to date with Unicode 15.0.0 and
+//! Unicode Text Segmentation revision 41.
 //!
 //! Ideally the major predicates in this file should be auto-generated from
 //! the Unicode data files rather than manually maintained.
@@ -15,7 +15,7 @@ use unicode_normalization::{is_nfc_stream_safe, is_nfc_stream_safe_quick, IsNorm
 #[inline]
 pub fn is_basic_text_start(c: char) -> bool {
     is_starter(c) &&
-    // https://unicode.org/reports/tr29/tr29-37.html#Grapheme_Cluster_Break_Property_Values
+    // https://unicode.org/reports/tr29/tr29-41.html#Grapheme_Cluster_Break_Property_Values
     // ZWJ
     c != ZWJ &&
     // Extend
@@ -28,7 +28,7 @@ pub fn is_basic_text_start(c: char) -> bool {
 /// Test whether `c` is a valid end value for a string in Basic Text.
 #[inline]
 pub fn is_basic_text_end(c: char) -> bool {
-    // https://unicode.org/reports/tr29/tr29-37.html#Grapheme_Cluster_Break_Property_Values
+    // https://unicode.org/reports/tr29/tr29-41.html#Grapheme_Cluster_Break_Property_Values
     // ZWJ
     c != ZWJ &&
     // Prepend
@@ -91,7 +91,7 @@ fn is_starter(c: char) -> bool {
 
 /// `Grapheme_Extend = Yes`, except CGJ
 const fn is_grapheme_extend_not_cgj(c: char) -> bool {
-    // Unicode 13.0.0, DerivedCoreProperties.txt
+    // Unicode 15.0.0, DerivedCoreProperties.txt
     matches!(
         c,
         '\u{300}'..='\u{34e}' // exclude U+34F (CGJ)
@@ -120,7 +120,8 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{825}'..='\u{827}'
         | '\u{829}'..='\u{82d}'
         | '\u{859}'..='\u{85b}'
-        | '\u{8d3}'..='\u{8e1}'
+        | '\u{898}'..='\u{89f}'
+        | '\u{8ca}'..='\u{8e1}'
         | '\u{8e3}'..='\u{902}'
         | '\u{93a}'
         | '\u{93c}'
@@ -167,6 +168,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{bd7}'
         | '\u{c00}'
         | '\u{c04}'
+        | '\u{c3c}'
         | '\u{c3e}'..='\u{c40}'
         | '\u{c46}'..='\u{c48}'
         | '\u{c4a}'..='\u{c4d}'
@@ -198,7 +200,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{e47}'..='\u{e4e}'
         | '\u{eb1}'
         | '\u{eb4}'..='\u{ebc}'
-        | '\u{ec8}'..='\u{ecd}'
+        | '\u{ec8}'..='\u{ece}'
         | '\u{f18}'..='\u{f19}'
         | '\u{f35}'
         | '\u{f37}'
@@ -222,7 +224,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{109d}'
         | '\u{135d}'..='\u{135f}'
         | '\u{1712}'..='\u{1714}'
-        | '\u{1732}'..='\u{1734}'
+        | '\u{1732}'..='\u{1733}'
         | '\u{1752}'..='\u{1753}'
         | '\u{1772}'..='\u{1773}'
         | '\u{17b4}'..='\u{17b5}'
@@ -231,6 +233,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{17c9}'..='\u{17d3}'
         | '\u{17dd}'
         | '\u{180b}'..='\u{180d}'
+        | '\u{180f}'
         | '\u{1885}'..='\u{1886}'
         | '\u{18a9}'
         | '\u{1920}'..='\u{1922}'
@@ -248,7 +251,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{1a7f}'
         | '\u{1ab0}'..='\u{1abd}'
         | '\u{1abe}'
-        | '\u{1abf}'..='\u{1ac0}'
+        | '\u{1abf}'..='\u{1ace}'
         | '\u{1b00}'..='\u{1b03}'
         | '\u{1b34}'
         | '\u{1b35}'
@@ -272,8 +275,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{1ced}'
         | '\u{1cf4}'
         | '\u{1cf8}'..='\u{1cf9}'
-        | '\u{1dc0}'..='\u{1df9}'
-        | '\u{1dfb}'..='\u{1dff}'
+        | '\u{1dc0}'..='\u{1dff}'
         | '\u{200c}'
         | '\u{20d0}'..='\u{20dc}'
         | '\u{20dd}'..='\u{20e0}'
@@ -337,12 +339,17 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{10ae5}'..='\u{10ae6}'
         | '\u{10d24}'..='\u{10d27}'
         | '\u{10eab}'..='\u{10eac}'
+        | '\u{10efd}'..='\u{10eff}'
         | '\u{10f46}'..='\u{10f50}'
+        | '\u{10f82}'..='\u{10f85}'
         | '\u{11001}'
         | '\u{11038}'..='\u{11046}'
+        | '\u{11070}'
+        | '\u{11073}'..='\u{11074}'
         | '\u{1107f}'..='\u{11081}'
         | '\u{110b3}'..='\u{110b6}'
         | '\u{110b9}'..='\u{110ba}'
+        | '\u{110c2}'
         | '\u{11100}'..='\u{11102}'
         | '\u{11127}'..='\u{1112b}'
         | '\u{1112d}'..='\u{11134}'
@@ -355,6 +362,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{11234}'
         | '\u{11236}'..='\u{11237}'
         | '\u{1123e}'
+        | '\u{11241}'
         | '\u{112df}'
         | '\u{112e3}'..='\u{112ea}'
         | '\u{11300}'..='\u{11301}'
@@ -422,12 +430,20 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{11d95}'
         | '\u{11d97}'
         | '\u{11ef3}'..='\u{11ef4}'
+        | '\u{11f00}'..='\u{11f01}'
+        | '\u{11f36}'..='\u{11f3a}'
+        | '\u{11f40}'
+        | '\u{11f42}'
+        | '\u{13440}'
+        | '\u{13447}'..='\u{13455}'
         | '\u{16af0}'..='\u{16af4}'
         | '\u{16b30}'..='\u{16b36}'
         | '\u{16f4f}'
         | '\u{16f8f}'..='\u{16f92}'
         | '\u{16fe4}'
         | '\u{1bc9d}'..='\u{1bc9e}'
+        | '\u{1cf00}'..='\u{1cf2d}'
+        | '\u{1cf30}'..='\u{1cf46}'
         | '\u{1d165}'
         | '\u{1d167}'..='\u{1d169}'
         | '\u{1d16e}'..='\u{1d172}'
@@ -446,8 +462,11 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
         | '\u{1e01b}'..='\u{1e021}'
         | '\u{1e023}'..='\u{1e024}'
         | '\u{1e026}'..='\u{1e02a}'
+        | '\u{1e08f}'
         | '\u{1e130}'..='\u{1e136}'
+        | '\u{1e2ae}'
         | '\u{1e2ec}'..='\u{1e2ef}'
+        | '\u{1e4ec}'..='\u{1e4ef}'
         | '\u{1e8d0}'..='\u{1e8d6}'
         | '\u{1e944}'..='\u{1e94a}'
         | '\u{e0020}'..='\u{e007f}'
@@ -457,7 +476,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
 
 /// `Emoji_Modifier = Yes`
 const fn is_emoji_modifier(c: char) -> bool {
-    // Unicode 13.0.0, emoji/emoji-data.txt
+    // Unicode 15.0.0, emoji/emoji-data.txt
     matches!(c, '\u{1f3fb}'..='\u{1f3ff}')
 }
 
@@ -490,7 +509,7 @@ const fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
 
 /// `General_Category = Spacing_Mark`
 const fn is_general_category_spacing_mark(c: char) -> bool {
-    // Unicode 13.0.0, DerivedGeneralCategory.txt
+    // Unicode 15.0.0, DerivedGeneralCategory.txt
     matches!(
         c,
         '\u{903}'
@@ -528,6 +547,7 @@ const fn is_general_category_spacing_mark(c: char) -> bool {
         | '\u{cc7}'..='\u{cc8}'
         | '\u{cca}'..='\u{ccb}'
         | '\u{cd5}'..='\u{cd6}'
+        | '\u{cf3}'
         | '\u{d02}'..='\u{d03}'
         | '\u{d3e}'..='\u{d40}'
         | '\u{d46}'..='\u{d48}'
@@ -550,6 +570,8 @@ const fn is_general_category_spacing_mark(c: char) -> bool {
         | '\u{1087}'..='\u{108c}'
         | '\u{108f}'
         | '\u{109a}'..='\u{109c}'
+        | '\u{1715}'
+        | '\u{1734}'
         | '\u{17b6}'
         | '\u{17be}'..='\u{17c5}'
         | '\u{17c7}'..='\u{17c8}'
@@ -664,6 +686,10 @@ const fn is_general_category_spacing_mark(c: char) -> bool {
         | '\u{11d93}'..='\u{11d94}'
         | '\u{11d96}'
         | '\u{11ef5}'..='\u{11ef6}'
+        | '\u{11f03}'
+        | '\u{11f34}'..='\u{11f35}'
+        | '\u{11f3e}'..='\u{11f3f}'
+        | '\u{11f41}'
         | '\u{16f51}'..='\u{16f87}'
         | '\u{16ff0}'..='\u{16ff1}'
         | '\u{1d165}'..='\u{1d166}'
@@ -673,13 +699,13 @@ const fn is_general_category_spacing_mark(c: char) -> bool {
 
 /// `Indic_Syllabic_Category = Consonant_Preceding_Repha`
 const fn indic_syllabic_category_consonant_preceding_repha(c: char) -> bool {
-    // Unicode 13.0.0, IndicSyllabicCategory.txt
-    matches!(c, '\u{d4e}' | '\u{11941}' | '\u{11d46}')
+    // Unicode 15.0.0, IndicSyllabicCategory.txt
+    matches!(c, '\u{d4e}' | '\u{11941}' | '\u{11d46}' | '\u{11f02}')
 }
 
 /// `Indic_Syllabic_Category = Consonant_Prefixed`
 const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
-    // Unicode 13.0.0, IndicSyllabicCategory.txt
+    // Unicode 15.0.0, IndicSyllabicCategory.txt
     matches!(
         c,
         '\u{111c2}'..='\u{111c3}' | '\u{1193f}' | '\u{11a3a}' | '\u{11a84}'..='\u{11a89}',
@@ -688,7 +714,7 @@ const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
 
 /// `Prepended_Concatenation_Mark = Yes`
 const fn prepended_concatenation_mark(c: char) -> bool {
-    // Unicode 13.0.0, PropList.txt
+    // Unicode 15.0.0, PropList.txt
     matches!(
         c,
         '\u{600}'..='\u{605}' | '\u{6dd}' | '\u{70f}' | '\u{8e2}' | '\u{110bd}' | '\u{110cd}',
