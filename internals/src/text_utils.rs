@@ -1,9 +1,9 @@
 //! This file contains various utilities which are sensitive to the Unicode
-//! version. Is is currently up to date with Unicode 15.0.0 and
+//! version. It is currently up to date with Unicode 15.0.0 and
 //! Unicode Text Segmentation revision 41.
 //!
-//! Ideally the major predicates in this file should be auto-generated from
-//! the Unicode data files rather than manually maintained.
+//! Ideally the major predicates in this file should be auto-generated from the
+//! Unicode data files rather than manually maintained.
 
 use crate::pre_normalization::PreNormalization;
 use crate::unicode::{is_normalization_form_starter, ESC, SUB, ZWJ};

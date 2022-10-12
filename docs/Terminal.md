@@ -1,7 +1,7 @@
 # Terminal Support
 
 This document describes extentions to [Basic Text] adding ANSI-style terminal
-features. Is is experimental.
+features. It is experimental.
 
 [Basic Text]: BasicText.md
 
