@@ -14,9 +14,7 @@ A stream is in Unicode form iff:
  - it consists entirely of a string in Unicode form
 
 A buffered stream is in Unicode form iff:
- - the stream is in Unicode form, and
- - substrings of the string separated by buffer flushes are all in Unicode
-   form.
+ - the stream is in Unicode form
 
 ## Conversion
 

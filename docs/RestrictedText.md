@@ -27,9 +27,7 @@ A stream is in Restricted Text form iff:
  - it consists entirely of a string in Restricted Text form.
 
 A buffered stream is in Restricted Text form iff:
- - the buffered stream is in [Basic Text] form, and
- - a flush of the buffer fails if the data up to that point is not a string in
-   Restricted Text form.
+ - the buffered stream is in [Basic Text] form
 
 Note that even though this excludes U+34F (COMBINING GRAPHEME JOINER), the
 [Stream Safe Text Format] is still required; content must simply avoid using
