@@ -5,23 +5,11 @@ features. It is experimental.
 
 [Basic Text]: BasicText.md
 
-## Additional Input Options
+## Terminal Output
 
-The following options are added to the options for Basic Text:
+Terminal Output uses Basic Text's "strict" conversions.
 
-| Name              | Type    | Applicability               |
-| ----------------- | ------- | --------------------------- |
-| Immediate input   | Boolean | Input streams               |
-| Hidden input      | Boolean | Input streams               |
-
-In Immediate input mode, treat each keypress as if it were followed by a
-newline, though the extra newline is not sent to the application. And as a
-special case, U+C (FF) is not replaced in immediate input mode.
-
-In Hidden input mode, terminal implementations should not echo input
-characters back to the terminal.
-
-## Output Feature Sets
+### Output Feature Sets
 
 Terminal output features are grouped into sets, which can be supported
 independently or in combination:
@@ -41,7 +29,7 @@ The following control codes are recognized:
 | ------ | ----------------------------------------------------------- |
 | U+7    | [Alert](#alert)                                             |
 | U+8    | [Move cursor back one column](#move-cursor-back-one-column) |
-| U+9    | Horizontal Tab                                              |
+| U+9    | [Tab](#tab)                                                 |
 | U+A    | [End of line](#end-of-line)                                 |
 | U+C    | [FF Terminal Compatibility](#ff-terminal-compatibility)     |
 | U+D    | [Carriage Return](#carriage-return)                         |
@@ -49,39 +37,49 @@ The following control codes are recognized:
 
 The following escape sequences are recognized:
 
-| Sequence             | Meaning                      | Notes |
-| -------------------- | ---------------------------- | ----- |
-| `␛[0K`               | Clear to the end of the line | The `0` is optional |
-| `␛[2K`               | Clear the entire line        |       |
+| Sequence             | Meaning                                       |
+| -------------------- | --------------------------------------------- |
+| `␛[K`                | [Clear to end of line](#clear-to-end-of-line) |
+| `␛[0K`               | [Clear to end of line](#clear-to-end-of-line) |
+| `␛[2K`               | [Clear entire line](#clear-entire-line)       |
 
 ##### Alert
 
-U+7 (BEL) on output to a terminal may produce an acoustic indication, a
-visual indication, or do nothing.
+Produce an acoustic indication or a visual indication if possible, without
+modifying the state of the terminal.
 
 ##### Move cursor back one column
 
-U+8 (BS) on output to a terminal moves the cursor back one column, but not
-past the first column.
+Move the cursor back one column, but not past the first column.
+
+##### Tab
+
+Move the cursor back one column, but not past the first column.
 
 ##### End of line
 
-U+A on output to a terminal moves the cursor to the beginning of the next
-line, scrolling the output if needed.
+Move the cursor to the beginning of the next line, scrolling the output if
+needed.
 
 ##### FF Terminal Compatibility
 
-U+C on output to a terminal moves the cursor to the next line without
-changing the column.
+Move the cursor to the next line without changing the column.
 
 ##### Carriage Return
 
-U+D (CR) on output to a terminal moves the cursor to the first column of the
-current line.
+Move the cursor to the first column of the current line.
 
 ##### No Effect
 
-U+7F (DEL) on output to a terminal has no effect.
+Leave the state of the terminal unmodified.
+
+##### Clear to end of line
+
+Clear to the end of the line, leaving the cursor where it is.
+
+##### Clear entire line
+
+Clear the entire line, and move the cursor to the first column.
 
 #### Full-screen output
 
@@ -141,10 +139,10 @@ and string parameters, and min/max valid values for numeric parameters.
 
 #### Color
 
-This feature set adds color and display attributes such as bold, underline,
-and italics.
+This feature set adds color and display attributes such as bold, underline, and
+italics.
 
-This feature defines the following escape sequences on output:
+This feature defines the following escape sequences:
 
 | Sequence              | Meaning                  | Notes |
 | --------------------- | ------------------------ | ----- |
@@ -209,47 +207,42 @@ terminals may substitute the closest available color.
 
 This feature set adds the ability to set a custom window title.
 
-This feature defines the following escape sequences on output:
+This feature defines the following escape sequences:
 
 | Sequence              | Meaning                  | Notes |
 | --------------------- | ------------------------ | ----- |
 | `␛]0;«string»␇`       | Sets the terminal's title to `«string»` | Implementations may implicitly add a prefix and/or truncate the string |
 | `␛]2;«string»␇`       | Sets the terminal's title to `«string»` | Ditto |
 
-### Binary
-
-Arbitrary bytes are permitted, without translation.
-
 ## Terminal input
 
+Terminal Input uses Basic Text's normal (not "strict") conversions.
+
 Most keys have obvious mappings to Unicode scalar value sequences. This section
-describes mapping for special keys read from a terminal. Note that depending on
-the stream [class](#the-classes), some of these sequences may be replaced by
-replacement sequences.
+describes mapping for special keys read from a terminal.
 
 Three modifiers are recognized: Ctrl, Alt, and Shift. In environments with Meta
 keys, Meta is mapped to Alt.
-
-Input key sequences are at most 8 bytes long.
 
 ### Terminal input control codes
 
 The following [control codes](#control-code) are recognized:
 
-| Code   | Meaning     | Notes                                               |
-| ------ | ----------- | --------------------------------------------------- |
-| U+0 | Ctrl-Space  |                                                     |
-| U+8 | Ctrl-`H`    | Despite U+8 being historically called "backspace" in ASCII, this isn't the backspace key |
-| U+9 | Tab         |                                                     |
-| U+A | Enter       | U+A means "end of line"                          |
-| U+11 | Ctrl-`Q`    | When enabled in the terminal input mode             |
-| U+13 | Ctrl-`S`    | When enabled in the terminal input mode             |
-| U+1B | Escape      | When read in in immediate input mode                |
-| U+1C | Ctrl-`\`    | When enabled in the terminal input mode             |
-| U+1D | Ctrl-`]`    |                                                     |
-| U+1E | Ctrl-`^`    |                                                     |
-| U+1F | Ctrl-`_`    |                                                     |
-| U+7F | Backspace   | This is the backspace key                           |
+| Code | Meaning    | Notes                                               |
+| ---- | ---------- | --------------------------------------------------- |
+| U+0  | Ctrl-Space |                                                     |
+| U+8  | Ctrl-`H`   | Despite U+8 being historically called "backspace" in ASCII, it isn't the backspace key |
+| U+9  | Tab        |                                                     |
+| U+A  | Enter      | U+A means "end of line"                             |
+| U+C  | Ctrl-`L`   | This is only transmitted in immediate mode, and requests applications refresh the screen |
+| U+11 | Ctrl-`Q`   | When enabled in the terminal input mode             |
+| U+13 | Ctrl-`S`   | When enabled in the terminal input mode             |
+| U+1B | Escape     | When read in in immediate input mode                |
+| U+1C | Ctrl-`\`   | When enabled in the terminal input mode             |
+| U+1D | Ctrl-`]`   |                                                     |
+| U+1E | Ctrl-`^`   |                                                     |
+| U+1F | Ctrl-`_`   |                                                     |
+| U+7F | Backspace  | This is the backspace key                           |
 
 The following control codes are interpreted by the implementation and not
 passed on to applications:
@@ -334,3 +327,24 @@ with the shift modifier.
 As special cases, Delete, Insert, Home, End, Page Up and Down, and F1 and F12
 with the Ctrl-Alt or Ctrl-Alt-Shift modifiers are reserved and not passed on
 to the application.
+
+### Input Modes
+
+The following options are added to the options for Basic Text:
+
+| Name              | Type    | Applicability               |
+| ----------------- | ------- | --------------------------- |
+| Immediate mode    | Boolean | Input                       |
+| Hidden mode       | Boolean | Input                       |
+
+#### Immediate mode
+
+In Immediate input mode, each keypress is treated as if it were followed
+by U+A and immediately sent to the application without the extra U+A.
+And as a special case, U+C (FF) is not replaced in
+[immediate mode](#immediate-mode).
+
+#### Hidden mode
+
+In Hidden input mode, terminal implementations should not echo input
+characters back to the terminal.
