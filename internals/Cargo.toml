@@ -1,6 +1,6 @@
 [package]
 name = "basic-text-internals"
-version = "0.12.0"
+version = "0.13.0"
 description = "Basic Text string literal implementation details"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 edition = "2018"
