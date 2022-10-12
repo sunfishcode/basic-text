@@ -1,7 +1,8 @@
 # Basic Text
 
 The *Basic Text* format is a subset of the [Unicode] format and meant to
-fulfill common notions of "plain text".
+fulfill common notions of "plain text". It is not yet standardized anywhere,
+and may evolve, but it is usable for many purposes.
 
 Basic Text permits homoglyphs and other visual ambiguities; see
 [Restricted Text] for an alternative which might provide some mitigations.
@@ -18,8 +19,8 @@ A string is in Basic Text form iff:
  - it is a [Unicode] string in [Stream-Safe] [NFC] form, and
  - it doesn't start with a [Basic Text non-starter], and
  - it doesn't end with a [Basic Text non-ender], and
- - all scalar values either have a `General_Category` other than `Unassigned`
-   or are preceded and followed by U+34F.
+ - all scalar values with a `General_Category` of `Unassigned` are preceded and
+   followed by U+34F.
  - it doesn't contain any of the sequences listed in the [Sequence Table].
 
 A stream is in Basic Text form iff:

@@ -168,8 +168,8 @@ the table suggests that, but does not perform the substitution automatically.
 
 ### Unassigned Mathematical Alphanumeric Symbols
 
-In the Mathematical Alphanumeric Symbols block, the codepoint U+1D455 would be
-the place for `ℎ`, however unicode already had an `ℎ` at U+210E, so U+1D455
+In the Mathematical Alphanumeric Symbols block, the scalar value U+1D455 would
+be the place for `ℎ`, however unicode already had an `ℎ` at U+210E, so U+1D455
 was left unassigned.
 
 Several other characters are treated similarly: U+9E4, U+9E5, U+A64, U+A65,
@@ -179,7 +179,7 @@ U+1D4A7, U+1D4A8, U+1D4AD, U+1D4BA, U+1D4BC, U+1D4C4, U+1D506, U+1D50B,
 U+1D50C, U+1D515, U+1D51D, U+1D53A, U+1D53F, U+1D545, U+1D547, U+1D548,
 U+1D549, and U+1D551.
 
-Unicode considers these codepoints unassigned, so they could potentially be
+Unicode considers these scalar values unassigned, so they could potentially be
 assigned new meanings in the future. Consequently, in Basic Text they convert
 to U+FFFD rather than their designated replacements.
 
@@ -368,7 +368,7 @@ inspirations of, the formats defined here.
 
 PRECIS doesn't permit tabs; we include them for the reasons mentioned above.
 
-And, PRECIS doesn't restrict obsolete or discouraged codepoints, so in
+And, PRECIS doesn't restrict obsolete or discouraged scalar values, so in
 general it's more permissive than Basic Text.
 
 [PRECIS]: https://tools.ietf.org/html/rfc8264
@@ -434,8 +434,8 @@ with just enough information to permit the text to be rendered legibly.
 
 The blog post ["What makes a Unicode code point safe?"] has a list of safety
 criteria with much in common with the plain text format here. Both exclude
-unassigned codepoints, noncharacters, private-use characters, surrogate
-codepoints, and most control codes. And both require text be stable under
+unassigned scalar values, noncharacters, private-use characters, surrogate
+scalar values, and most control codes. And both require text be stable under
 normalization.
 
 The [Basic Text] format here permits format characters, whitespace characters,

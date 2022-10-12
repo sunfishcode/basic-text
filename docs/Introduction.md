@@ -2,10 +2,11 @@
 
 Basic Text is a subset of Unicode intending to simplify plain text use cases,
 so that consumers don't need to worry about control codes, deprecated
-codepoints, newline conventions, or other complexities.
+scalar values, newline conventions, or other complexities.
 
-This book contains the specification and supporting documentation. There is
-also [a Github repo] containing a prototype implementation.
+This book contains the current specification draft and supporting
+documentation. There is also [a Github repo] containing a prototype
+implementation.
 
 [a Github repo]: https://github.com/sunfishcode/basic-text/
 
@@ -36,19 +37,19 @@ things that are not necessary for modern practical plain text use cases.
 
 And if we're defining a Unicode subset for plain text, we also have an
 opportunity to rationalize line endings so that users don't have to think about
-the old CRLF vs LF problem. And we can restrict codepoints that Unicode itself
-deprecates or discourages, but which Unicode itself can't drop because of its
-need for round-trip compatibility with other character sets, so that consumers
-that only need to work with Unicode have fewer things to think about.
+the old CRLF vs LF problem. And we can restrict scalar values that Unicode
+itself deprecates or discourages, but which Unicode itself can't drop because
+of its need for round-trip compatibility with other character sets, so that
+consumers that only need to work with Unicode have fewer things to think about.
 
 There are existing standard subsets of Unicode doing similar things, such as
 [PRECIS FreeformClass], [*printable files* in POSIX], and others, however
-they either restrict codepoints that are frequently used in "plain text"
-content, or don't restrict deprecated codepoints.
+they either restrict scalar values that are frequently used in "plain text"
+content, or don't restrict deprecated scalar values.
 
 Basic Text is a subset of Unicode aiming to make it as simple as possible
-(but no simpler) to work with plain text. It is not yet standardized, and may
-evolve, but it is usable for many purposes.
+(but no simpler) to work with plain text. It is not yet standardized anywhere,
+and may evolve, but it is usable for many purposes.
 
 ## Development
 
@@ -60,8 +61,8 @@ in [the Github repo].
 ## Restricted Text
 
 Basic Text can still be visually ambiguous. There are numerous ways that
-two different codepoint sequences can have identical or similar appearances,
-such as codepoints representing Cyrillic and Latin letters.
+two different scalar value sequences can have identical or similar appearances,
+such as scalar values representing Cyrillic and Latin letters.
 
 There are several techniques for mitigating visual ambiguities, but some of
 them are too restrictive for general-purpose plain text, and thus too
