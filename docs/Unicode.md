@@ -13,9 +13,6 @@ A string is in Unicode form iff:
 A stream is in Unicode form iff:
  - it consists entirely of a string in Unicode form
 
-A buffered stream is in Unicode form iff:
- - the stream is in Unicode form
-
 ## Conversion
 
 ### From byte sequence to Unicode string

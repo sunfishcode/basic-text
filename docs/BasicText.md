@@ -26,9 +26,6 @@ A stream is in Basic Text form iff:
  - it consists entirely of a string in Basic Text form, and
  - it is empty or ends with U+A.
 
-A buffered stream is in Basic Text form iff:
- - it is in Basic Text form
-
 ### Supplementary definitions
 
 #### Basic Text non-starter
