@@ -394,11 +394,8 @@ impl TextInput {
         }
 
         let mut nread = 0;
-        loop {
-            match internals.impl_().queue_next() {
-                Some(c) => nread += c.encode_utf8(&mut buf[nread..]).len(),
-                None => break,
-            }
+        while let Some(c) = internals.impl_().queue_next() {
+            nread += c.encode_utf8(&mut buf[nread..]).len();
             if buf.len() - nread < MAX_UTF8_SIZE {
                 // Write out single-byte codepoints to preserve UTF-8 validity.
                 clear_to_char_boundary(&mut buf[nread..]);

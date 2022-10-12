@@ -82,7 +82,7 @@ use utf8_io::WriteStr;
 ///
 /// assert_eq!(text!("💖"), &sparkle_heart);
 /// ```
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Default)]
 #[repr(transparent)]
 pub struct TextString(pub(crate) String);
 
@@ -499,26 +499,19 @@ impl Clone for TextString {
     }
 }
 
-impl Default for TextString {
-    #[inline]
-    fn default() -> Self {
-        Self(String::default())
-    }
-}
-
 impl Deref for TextString {
     type Target = TextStr;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
-        unsafe { TextStr::from_text_unchecked(&*self.0) }
+        unsafe { TextStr::from_text_unchecked(&self.0) }
     }
 }
 
 impl DerefMut for TextString {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { TextStr::from_text_unchecked_mut(&mut *self.0) }
+        unsafe { TextStr::from_text_unchecked_mut(&mut self.0) }
     }
 }
 

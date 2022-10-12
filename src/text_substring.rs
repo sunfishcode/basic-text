@@ -77,7 +77,7 @@ use utf8_io::WriteStr;
 ///
 /// assert_eq!(text_substr!("💖"), &sparkle_heart);
 /// ```
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Default)]
 #[repr(transparent)]
 pub struct TextSubstring(pub(crate) String);
 
@@ -446,26 +446,19 @@ impl Clone for TextSubstring {
     }
 }
 
-impl Default for TextSubstring {
-    #[inline]
-    fn default() -> Self {
-        Self(String::default())
-    }
-}
-
 impl Deref for TextSubstring {
     type Target = TextSubstr;
 
     #[inline]
     fn deref(&self) -> &Self::Target {
-        unsafe { TextSubstr::from_text_unchecked(&*self.0) }
+        unsafe { TextSubstr::from_text_unchecked(&self.0) }
     }
 }
 
 impl DerefMut for TextSubstring {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { TextSubstr::from_text_unchecked_mut(&mut *self.0) }
+        unsafe { TextSubstr::from_text_unchecked_mut(&mut self.0) }
     }
 }
 
