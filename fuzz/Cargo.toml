@@ -12,7 +12,7 @@ libfuzzer-sys = "0.4.0"
 basic-text = { path = ".." }
 layered-io = "0.20.0"
 unicode-normalization = "0.1.17"
-utf8-io = { version = "0.15.0", features = ["layered-io"] }
+utf8-io = { version = "0.16.0", features = ["layered-io"] }
 
 [[bin]]
 name = "text"
