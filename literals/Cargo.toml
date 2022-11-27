@@ -1,6 +1,6 @@
 [package]
 name = "basic-text-literals"
-version = "0.15.0"
+version = "0.16.0"
 description = "Basic Text string literal macro for basic-text"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 edition = "2018"
@@ -13,4 +13,4 @@ proc-macro = true
 [dependencies]
 quote = "1.0.2"
 syn = "1.0.72"
-basic-text-internals = { path = "../internals", version = "^0.15.0" }
+basic-text-internals = { path = "../internals", version = "^0.16.0" }
