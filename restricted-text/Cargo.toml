@@ -1,6 +1,6 @@
 [package]
 name = "restricted-text"
-version = "0.16.0"
+version = "0.17.0"
 description = "Restricted Text strings and I/O streams"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
@@ -11,7 +11,7 @@ edition = "2018"
 publish = false
 
 [dependencies]
-basic-text = { path = "..", version = "^0.16.0" }
+basic-text = { path = "..", version = "^0.17.0" }
 duplex = "0.16.0"
 layered-io = "0.21.0"
 unicode-normalization = "0.1.17"
