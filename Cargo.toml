@@ -14,11 +14,11 @@ exclude = ["/."]
 arbitrary = { version = "1.0.0", optional = true }
 basic-text-internals = { path = "internals", version = "^0.16.0" }
 basic-text-literals = { path = "literals", version = "^0.16.0" }
-duplex = "0.15.0"
-layered-io = "0.20.0"
-terminal-io = { version = "0.17.0", optional = true }
+duplex = "0.16.0"
+layered-io = "0.21.0"
+terminal-io = { version = "0.18.0", optional = true }
 io-extras = "0.17.0"
-utf8-io = { version = "0.16.0", features = ["layered-io"] }
+utf8-io = { version = "0.17.0", features = ["layered-io"] }
 io-lifetimes = { version = "1.0.0", default-features = false }
 
 [dev-dependencies]
