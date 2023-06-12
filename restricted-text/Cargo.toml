@@ -13,7 +13,7 @@ publish = false
 [dependencies]
 basic-text = { path = "..", version = "^0.17.0" }
 duplex = "0.16.0"
-layered-io = "0.21.0"
+layered-io = "0.22.0"
 unicode-normalization = "0.1.17"
-io-extras = "0.17.0"
-utf8-io = { version = "0.17.0", features = ["layered-io"] }
+io-extras = "0.18.0"
+utf8-io = { version = "0.18.0", features = ["layered-io"] }

@@ -20,7 +20,7 @@ use utf8_io::{ReadStr, ReadStrLayered, Utf8Duplexer, WriteStr};
 #[cfg(not(windows))]
 use {
     io_extras::os::rustix::{AsRawFd, RawFd},
-    io_lifetimes::{AsFd, BorrowedFd},
+    std::os::fd::{AsFd, BorrowedFd},
 };
 
 /// A [`HalfDuplex`] implementation which translates from an input `HalfDuplex`

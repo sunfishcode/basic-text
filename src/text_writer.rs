@@ -14,7 +14,7 @@ use utf8_io::{Utf8Writer, WriteStr};
 #[cfg(not(windows))]
 use {
     io_extras::os::rustix::{AsRawFd, RawFd},
-    io_lifetimes::{AsFd, BorrowedFd},
+    std::os::fd::{AsFd, BorrowedFd},
 };
 
 /// A `WriteLayered` implementation which translates to an output
