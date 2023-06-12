@@ -7,6 +7,4 @@
 #![deny(missing_docs)]
 #![cfg_attr(can_vector, feature(can_vector))]
 #![cfg_attr(write_all_vectored, feature(write_all_vectored))]
-#![cfg_attr(try_reserve, feature(try_reserve))]
 #![cfg_attr(pattern, feature(pattern))]
-#![cfg_attr(shrink_to, feature(shrink_to))]

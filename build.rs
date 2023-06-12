@@ -4,9 +4,7 @@ use std::io::Write;
 fn main() {
     use_feature_or_nothing("can_vector"); // https://github.com/rust-lang/rust/issues/69941
     use_feature_or_nothing("write_all_vectored"); // https://github.com/rust-lang/rust/issues/70436
-    use_feature_or_nothing("try_reserve"); // https://github.com/rust-lang/rust/issues/56431
     use_feature_or_nothing("pattern"); // https://github.com/rust-lang/rust/issues/27721
-    use_feature_or_nothing("shrink_to"); // https://github.com/rust-lang/rust/issues/56431
     use_feature_or_nothing("extend_one"); // https://github.com/rust-lang/rust/issues/72631
 
     // Don't rerun this on changes other than build.rs, as we only depend on
