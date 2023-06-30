@@ -97,7 +97,7 @@ fn test_text_output_rules() {
     );
 
     // Fail at specific scalar values.
-    for c in &[
+    for c in [
         '\u{7}', '\u{c}', '\u{1b}', '\u{feff}', '\u{149}', '\u{673}', '\u{f77}', '\u{f79}',
         '\u{17a3}', '\u{17a4}', '\u{2329}', '\u{232a}', '\u{2126}', '\u{212a}', '\u{212b}',
         '\u{2028}', '\u{2029}',
