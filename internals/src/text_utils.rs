@@ -1,5 +1,5 @@
 //! This file contains various utilities which are sensitive to the Unicode
-//! version. It is currently up to date with Unicode 15.0.0 and
+//! version. It is currently up to date with Unicode 15.1.0 and
 //! Unicode Text Segmentation revision 41.
 //!
 //! Ideally the major predicates in this file should be auto-generated from the
@@ -91,7 +91,7 @@ fn is_starter(c: char) -> bool {
 
 /// `Grapheme_Extend = Yes`, except CGJ
 const fn is_grapheme_extend_not_cgj(c: char) -> bool {
-    // Unicode 15.0.0, DerivedCoreProperties.txt
+    // Unicode 15.1.0, DerivedCoreProperties.txt
     matches!(
         c,
         '\u{300}'..='\u{34e}' // exclude U+34F (CGJ)
@@ -476,7 +476,7 @@ const fn is_grapheme_extend_not_cgj(c: char) -> bool {
 
 /// `Emoji_Modifier = Yes`
 const fn is_emoji_modifier(c: char) -> bool {
-    // Unicode 15.0.0, emoji/emoji-data.txt
+    // Unicode 15.1.0, emoji/emoji-data.txt
     matches!(c, '\u{1f3fb}'..='\u{1f3ff}')
 }
 
@@ -509,7 +509,7 @@ const fn is_grapheme_cluster_break_spacing_mark_plus(c: char) -> bool {
 
 /// `General_Category = Spacing_Mark`
 const fn is_general_category_spacing_mark(c: char) -> bool {
-    // Unicode 15.0.0, DerivedGeneralCategory.txt
+    // Unicode 15.1.0, DerivedGeneralCategory.txt
     matches!(
         c,
         '\u{903}'
@@ -699,13 +699,13 @@ const fn is_general_category_spacing_mark(c: char) -> bool {
 
 /// `Indic_Syllabic_Category = Consonant_Preceding_Repha`
 const fn indic_syllabic_category_consonant_preceding_repha(c: char) -> bool {
-    // Unicode 15.0.0, IndicSyllabicCategory.txt
+    // Unicode 15.1.0, IndicSyllabicCategory.txt
     matches!(c, '\u{d4e}' | '\u{11941}' | '\u{11d46}' | '\u{11f02}')
 }
 
 /// `Indic_Syllabic_Category = Consonant_Prefixed`
 const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
-    // Unicode 15.0.0, IndicSyllabicCategory.txt
+    // Unicode 15.1.0, IndicSyllabicCategory.txt
     matches!(
         c,
         '\u{111c2}'..='\u{111c3}' | '\u{1193f}' | '\u{11a3a}' | '\u{11a84}'..='\u{11a89}',
@@ -714,7 +714,7 @@ const fn indic_syllabic_category_consonant_prefixed(c: char) -> bool {
 
 /// `Prepended_Concatenation_Mark = Yes`
 const fn prepended_concatenation_mark(c: char) -> bool {
-    // Unicode 15.0.0, PropList.txt
+    // Unicode 15.1.0, PropList.txt
     matches!(
         c,
         '\u{600}'..='\u{605}' | '\u{6dd}' | '\u{70f}' | '\u{8e2}' | '\u{110bd}' | '\u{110cd}',
