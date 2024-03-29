@@ -92,7 +92,7 @@ Lossy conversion implicitly adds a line terminator at the end if needed, and
 strict conversion requires a line terminator at the end if needed.
 
 [POSIX uses]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_243
-[Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode15.0.0/ch05.pdf#G10213
+[Unicode Newline Guidelines' Recommendations]: https://www.unicode.org/versions/Unicode15.1.0/ch05.pdf#G10213
 [IETF RFCs]: https://www.rfc-editor.org/old/EOLstory.txt
 [even Windows Notepad]: https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/
 
@@ -428,7 +428,7 @@ parties with private agreements.
 The [Basic Text] format here is more focused on being just a plain text format
 with just enough information to permit the text to be rendered legibly.
 
-[Unicode definition of "plain text"]: https://www.unicode.org/versions/Unicode15.0.0/ch02.pdf#G642
+[Unicode definition of "plain text"]: https://www.unicode.org/versions/Unicode15.1.0/ch02.pdf#G642
 
 ### Relationship to "What makes a Unicode code point safe?"
 
